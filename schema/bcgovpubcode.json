@@ -176,7 +176,8 @@
           }
         },
         "api_specifications": {
-          "description": "API specification URL.",
+          "title":"API Specifications",
+          "description": "API specification URLs.",
           "type": "array",
           "items": {
             "type": "string",
@@ -245,6 +246,7 @@
           }
         },
         "backend_frameworks": {
+          "title": "Backend Frameworks.",
           "description": "This key contains the frameworks used for backends( express or gin or fiber or spring boot or quarkus etc..).",
           "type": "array",
           "items": {
@@ -253,6 +255,7 @@
           }
         },
         "frontend_languages": {
+          "title": "Frontend Languages.",
           "description": "This key contains the frontend languages.",
           "type": "array",
           "items": {
@@ -261,6 +264,7 @@
           }
         },
         "frontend_frameworks": {
+          "title": "Frontend Frameworks.",
           "description": "This key contains the frontend frameworks(react or angular or vue et..)",
           "type": "array",
           "items": {
@@ -269,6 +273,7 @@
           }
         },
         "spatial_storage_platform": {
+          "title": "Spatial Storage Platform.",
           "description": "This key contains the spatial storage platforms used in the stack.",
           "type": "array",
           "items": {
@@ -281,6 +286,7 @@
           }
         },
         "spatial_mapping_technologies": {
+          "title": "Spatial Mapping Technologies",
           "description": "This key contains the mapping technologies used in the stack(Leaflet, Geoserver  et..)",
           "type": "array",
           "items": {
@@ -294,6 +300,7 @@
       "additionalProperties": false,
       "properties": {
         "identity_authorization": {
+          "title": "Identity And Authorization",
           "description": "This key contains the Identity Integrations and authorization components used in the stack.",
           "type": "array",
           "items": {
@@ -310,6 +317,7 @@
           }
         },
         "notification_standard": {
+          "title": "Notification Standard.",
           "description": "This key contains the notification systems use.",
           "type": "array",
           "items": {
@@ -322,6 +330,7 @@
           }
         },
         "notification_custom": {
+          "title": "Notification Custom.",
           "description": "This key contains the notification other which is to be filled if the notification does not have the option to fill in.",
           "type": "string",
           "maxLength": 150
@@ -333,14 +342,17 @@
       "additionalProperties": false,
       "properties": {
         "data_custodian": {
+          "title": "Data Custodian.",
           "description": "This key contains the Contact Name who is data custodian for the application/suite of applications.link https://bcgov.github.io/data-publication/pages/dsg_bcdc_roles_responsibilities.html#am-i-a-data-custodian",
           "type": "string"
         },
         "data_steward": {
+          "title": "Data Steward.",
           "description": "This key contains the Contact Name who is the data steward.",
           "type": "string"
         },
         "data_manager": {
+          "title": "Data Manager.",
           "description": "This key contains the Contact Name who is the data manager.",
           "type": "string"
         }
@@ -350,31 +362,31 @@
   "description": "bcgovpubcode.yml is a metadata standard for repositories containing software developed or acquired by the Public Administration, aimed at making them easily discoverable and thus reusable by other entities. ",
   "properties": {
     "product_information": {
-      "title": "Product Information",
+      "title": "Product Information.",
       "description": "This Section describes the basic information around product.",
       "type": "object",
       "$ref": "#/definitions/product_info"
     },
     "product_technology_information": {
-      "title": "Product Technology Information",
+      "title": "Product Technology Information.",
       "description": "This Section describes the basic information around tech stack used in the product.",
       "type": "object",
       "$ref": "#/definitions/product_technology_info"
     },
     "product_external_dependencies": {
-      "title": "Product External Dependencies",
+      "title": "Product External Dependencies.",
       "description": "This Section describes the information around external dependencies which the product relies upon.",
       "type": "object",
       "$ref": "#/definitions/external_dependencies"
     },
     "data_management_roles": {
-      "title": "Data Management Roles",
+      "title": "Data Management Roles.",
       "description": "This Section describes the information around Data Assets.",
       "type": "object",
       "$ref": "#/definitions/data_management_roles"
     },
     "bcgov_pubcode_version": {
-      "title": "BCGov Pubcode Version",
+      "title": "BCGov Pubcode Version.",
       "description": "This key defines which version of the yaml is being filled.",
       "type": "integer",
       "items": {
