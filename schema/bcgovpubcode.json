@@ -377,7 +377,9 @@
       "title": "BCGov Pubcode Version",
       "description": "This key defines which version of the yaml is being filled.",
       "type": "integer",
-      "anyOf": [1]
+      "items": {
+        "enum": [1]
+      }
     }
   },
   "required": [
