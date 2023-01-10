@@ -6,7 +6,7 @@ labels:
 parameters:
   - name: NAME
     description: Module name
-    value: nr-quickstart-typescript
+    value: public-code
   - name: COMPONENT
     description: Component name
     value: frontend
@@ -37,7 +37,7 @@ parameters:
     value: ghcr.io
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/nr-quickstart-typescript:prod-frontend
+    value: bcgov/public-code/frontend:prod
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -87,9 +87,6 @@ objects:
             - image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
               imagePullPolicy: Always
               name: ${NAME}
-              env:
-                - name: BACKEND_URL
-                  value: https://${NAME}-${ZONE}-backend.${DOMAIN}
               ports:
                 - containerPort: 3000
                   protocol: TCP
