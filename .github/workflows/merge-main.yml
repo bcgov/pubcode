@@ -98,18 +98,18 @@ jobs:
 #            -p NAME=${{ github.event.repository.name }} ${{ matrix.parameters }}
 #          penetration_test: false
 
-  image-promotions:
-    name: Promote images to PROD
-    needs:
-      - deploys-prod
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        component: [backend, frontend]
-    steps:
-      - uses: shrink/actions-docker-registry-tag@v3
-        with:
-          registry: ghcr.io
-          repository: ${{ github.repository }}/${{ matrix.component }}
-          target: test
-          tags: prod
+#  image-promotions:
+#    name: Promote images to PROD
+#    needs:
+#      - deploys-prod
+#    runs-on: ubuntu-22.04
+#    strategy:
+#      matrix:
+#        component: [backend, frontend]
+#    steps:
+#      - uses: shrink/actions-docker-registry-tag@v3
+#        with:
+#          registry: ghcr.io
+#          repository: ${{ github.repository }}/${{ matrix.component }}
+#          target: test
+#          tags: prod
