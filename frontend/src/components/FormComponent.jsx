@@ -84,6 +84,8 @@ export default class FormComponent extends React.Component {
         )}*/}
         {this.state.formEnabled && (
           <Form
+            liveValidate
+            noHtml5Validate
             schema={this.state?.data}
             uiSchema={uiSchema}
             formData={this.state.formData}
