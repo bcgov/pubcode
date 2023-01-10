@@ -5,12 +5,8 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "product_owner",
-        "ministry",
-        "program_area",
-        "application_acronym",
-        "application_name",
-        "application_short_description"
+        "name",
+        "version"
       ],
       "properties": {
         "name": {
