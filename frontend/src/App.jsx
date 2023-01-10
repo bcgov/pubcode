@@ -30,6 +30,12 @@ const useStyles = makeStyles((theme) => ({
     margin: "0.2em",
     padding: "0.2em",
   },
+  headerTitle: {
+    flexGrow: 0.8,
+    fontSize: "1.5em",
+    align: "center",
+    alignItems: "center",
+  },
   form: {
     width: "100%",
   },
@@ -43,6 +49,9 @@ function App() {
       <AppBar position="fixed">
         <Toolbar className={classes.appBar}>
           <img src={BCGovLogo} />
+          <Typography className={classes.headerTitle}>
+            BCGov Public Code
+          </Typography>
         </Toolbar>
       </AppBar>
       <FormComponent className={classes.form} />
