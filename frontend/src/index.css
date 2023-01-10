@@ -74,11 +74,17 @@ button:focus-visible {
 }
 
 .rjsf {
-    padding: 2rem;
-    margin: 2rem;
+    padding: 1.5em;
+    margin: 1.5em;
 }
 
 .MuiButton-containedPrimary {
     color: #ffffff !important;
     background-color: #355992 !important;
+}
+.customButton{
+    color: #ffffff !important;
+    background-color: #355992 !important;
+    margin: 0.2em !important;
+    padding: 0.2em !important;
 }

@@ -8,7 +8,8 @@ import { Button } from "@material-ui/core/";
 import React from "react";
 import FormComponent from "./components/FormComponent.jsx";
 import BCGovLogo from "./assets/gov-bc-logo-horiz.png";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const useStyles = makeStyles((theme) => ({
   menu: {
     marginRight: theme.spacing(2),
@@ -124,6 +125,17 @@ function App() {
           </Typography>
         </Toolbar>
       </AppBar>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }
