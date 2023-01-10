@@ -1,6 +1,30 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+
   "definitions": {
+    "name_version": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product_owner",
+        "ministry",
+        "program_area",
+        "application_acronym",
+        "application_name",
+        "application_short_description"
+      ],
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "This key contains the Name.",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "description": "This key contains the Version.",
+          "type": "string"
+        }
+      }
+    },
     "product_info": {
       "type": "object",
       "additionalProperties": false,
@@ -14,10 +38,12 @@
       ],
       "properties": {
         "product_owner": {
+          "title": "Product Owner",
           "description": "This key contains the full name of one of the product owner. It must be a real person.",
           "type": "string"
         },
         "ministry": {
+          "title": "Ministry",
           "description": "This key contains the ministry name. link: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries",
           "type": "array",
           "items": {
@@ -48,29 +74,65 @@
           }
         },
         "program_area": {
+          "title": "Program Area",
           "description": "This key contains the program area name. ex: It could be a ministry division branch or section. ",
           "type": "string"
         },
         "application_acronym": {
+          "title": "Application Acronym",
           "description": "This key contains the application acronym. ex: Infrastructure reporting service the acronym (IRS)",
           "type": "string"
         },
         "application_name": {
+          "title": "Application Name",
           "description": "This key contains the full application name.",
           "type": "string"
         },
         "business_capabilities_standard": {
+          "title":"Business Capabilities Standard",
           "description": "This key contains the business capabilities that are supported by this application. ex: Invoice Management, Customer Relationship Management, Supply Chain Management.",
           "type": "array",
           "items": {
             "enum": [
-              "invoice-management",
-              "customer-relationship-management",
-              "supply-chain-management"
+              "Invoice Management",
+              "Customer Relationship Management",
+              "Supply Chain Management",
+              "Policy and Legislation",
+              "Laboratory Services",
+              "License Management",
+              "Agriculture Land Management",
+              "Program Management",
+              "Stakeholder Engagement",
+              "Indigenous Relations",
+              "Compliance and Enforcement",
+              "Financial Management",
+              "Communications",
+              "Procurement",
+              "Authorization Management",
+              "Mineral Titles and Tenures",
+              "Environmental Protection",
+              "Economic Development",
+              "Land Use Planning",
+              "Environmental Monitoring",
+              "Environmental Assessments",
+              "Parks Management",
+              "Resource Management",
+              "Timber Pricing and Sales",
+              "Tenure Management",
+              "Permit Management",
+              "Heritage Protection",
+              "Recreation",
+              "Program and Project Management",
+              "Hazards Management",
+              "Human Resources Management",
+              "Workplace Strategies",
+              "Client Advisory Services",
+              "Performance Management"
             ]
           }
         },
         "business_capabilities_custom": {
+          "title":"Business Capabilities Custom",
           "description": "This key contains the business capabilities that are supported by this application, which are not available in pick list of `business_capabilities_standard`. Array of string with free text",
           "type": "array",
           "items": {
@@ -78,17 +140,20 @@
           }
         },
         "application_short_description": {
+          "title":"Application Short Description",
           "description": "This key contains a short description of the software. It should be a single line containing a single sentence. Maximum 150 characters are allowed.",
           "type": "string",
           "maxLength": 150
         },
         "application_long_description": {
+          "title":"Application Long Description",
           "description": "This key contains a longer description of the software, between 500 and 10000 chars. It is meant to provide an overview of the capabilities of the software for a potential user. The audience for this text should be that of users of the software, not developers. You can think of this text as the description of the software that would be in its website (if the software had one).\n\nThis description can contain some basic markdown: *italic*, **bold**, bullet points and [links](#).",
           "type": "string",
           "minLength": 200,
           "maxLength": 10000
         },
         "product_status": {
+          "title":"Product Status",
           "description": "Status of the product. more around this can be found here https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md",
           "type": "array",
           "items": {
@@ -102,7 +167,8 @@
           }
         },
         "product_urls": {
-          "description": "Urls of the product.",
+          "title":"Product URLs",
+          "description": "Different Urls of the product.",
           "type": "array",
           "items": {
             "type": "string",
@@ -110,7 +176,7 @@
           }
         },
         "api_specifications": {
-          "description": "API specification.",
+          "description": "API specification URL.",
           "type": "array",
           "items": {
             "type": "string",
@@ -127,6 +193,7 @@
       ],
       "properties": {
         "hosting_platforms": {
+          "title": "Hosting Platforms",
           "description": "This key contains the hosting platforms used in this product.",
           "type": "array",
           "items": {
@@ -140,6 +207,7 @@
           }
         },
         "relational_datastore": {
+          "title": "Relational Datastore",
           "description": "This key contains the relational databases used. The main engine behind the relation databases, for ex: cockroach DB uses postgresql, patroni is a distributed flavor of postgresql ",
           "type": "array",
           "items": {
@@ -153,6 +221,7 @@
           }
         },
         "non_relational_datastore": {
+          "title": "Non Relational Datastore",
           "description": "This key contains the non-relational databases used.",
           "type": "array",
           "items": {
@@ -167,31 +236,36 @@
           }
         },
         "backend_languages_version": {
+          "title": "Backend Languages with their version.",
           "description": "This key contains the languages used for backends( java or erlang or golang or elixir or rust etc..) with their version",
           "type": "array",
           "items": {
-            "type": "object"
+            "type": "object",
+            "$ref": "#/definitions/name_version"
           }
         },
         "backend_frameworks": {
           "description": "This key contains the frameworks used for backends( express or gin or fiber or spring boot or quarkus etc..).",
           "type": "array",
           "items": {
-            "type": "object"
+            "type": "object",
+            "$ref": "#/definitions/name_version"
           }
         },
         "frontend_languages": {
           "description": "This key contains the frontend languages.",
           "type": "array",
           "items": {
-            "type": "object"
+            "type": "object",
+            "$ref": "#/definitions/name_version"
           }
         },
         "frontend_frameworks": {
           "description": "This key contains the frontend frameworks(react or angular or vue et..)",
           "type": "array",
           "items": {
-            "type": "object"
+            "type": "object",
+            "$ref": "#/definitions/name_version"
           }
         },
         "spatial_storage_platform": {
@@ -276,35 +350,39 @@
   "description": "bcgovpubcode.yml is a metadata standard for repositories containing software developed or acquired by the Public Administration, aimed at making them easily discoverable and thus reusable by other entities. ",
   "properties": {
     "product_information": {
-      "description": "This key describes the basic information around product.",
+      "title": "Product Information",
+      "description": "This Section describes the basic information around product.",
       "type": "object",
       "$ref": "#/definitions/product_info"
     },
     "product_technology_information": {
-      "description": "This key describes the basic information around product tech stack.",
+      "title": "Product Technology Information",
+      "description": "This Section describes the basic information around tech stack used in the product.",
       "type": "object",
       "$ref": "#/definitions/product_technology_info"
     },
     "product_external_dependencies": {
-      "description": "This key describes the information around external dependencies which the product relies upon.",
+      "title": "Product External Dependencies",
+      "description": "This Section describes the information around external dependencies which the product relies upon.",
       "type": "object",
       "$ref": "#/definitions/external_dependencies"
     },
     "data_management_roles": {
-      "description": "This key describes the information around Data Assets.",
+      "title": "Data Management Roles",
+      "description": "This Section describes the information around Data Assets.",
       "type": "object",
       "$ref": "#/definitions/data_management_roles"
     },
     "bcgov_pubcode_version": {
-      "description": "This key defines which...",
-      "type": "integer"
+      "title": "BCGov Pubcode Version",
+      "description": "This key defines which version of the yaml is being filled.",
+      "type": "integer",
+      "anyOf": [1]
     }
   },
   "required": [
     "product_information",
     "product_technology_information",
-    "product_external_dependencies",
-    "data_management_roles",
     "bcgov_pubcode_version"
   ],
   "title": "JSON schema for bcgovpubcode.yml",
