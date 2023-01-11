@@ -1,5 +1,5 @@
 {
-
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "name_version": {
       "type": "object",
@@ -384,10 +384,8 @@
     "bcgov_pubcode_version": {
       "title": "BCGov Pubcode Version.",
       "description": "This key defines which version of the yaml is being filled.",
-      "type": "integer",
-      "items": {
-        "enum": [1]
-      }
+      "type": "number",
+      "enum": [1]
     }
   },
   "required": [
