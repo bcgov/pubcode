@@ -25,21 +25,15 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "product_owner",
         "ministry",
         "program_area",
-        "application_acronym",
-        "application_name",
-        "application_short_description"
+        "product_acronym",
+        "product_name",
+        "product_description"
       ],
       "properties": {
-        "product_owner": {
-          "title": "Product Owner",
-          "description": "This key contains the full name of one of the product owner. It must be a real person.",
-          "type": "string"
-        },
         "ministry": {
-          "title": "Ministry",
+          "title": "Ministry *",
           "description": "This key contains the ministry name. link: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries",
           "type": "array",
           "items": {
@@ -74,83 +68,75 @@
           "description": "This key contains the program area name. ex: It could be a ministry division branch or section. ",
           "type": "string"
         },
-        "application_acronym": {
-          "title": "Application Acronym",
-          "description": "This key contains the application acronym. ex: Infrastructure reporting service the acronym (IRS)",
+        "product_acronym": {
+          "title": "Product Acronym",
+          "description": "This key contains the product acronym. ex: Infrastructure reporting service the acronym (IRS)",
           "type": "string"
         },
-        "application_name": {
-          "title": "Application Name",
-          "description": "This key contains the full application name.",
+        "product_name": {
+          "title": "Product Name",
+          "description": "This key contains the full product name.",
+          "type": "string"
+        },
+        "product_description": {
+          "title": "Product Description",
+          "description": "This key contains description of the product.",
           "type": "string"
         },
         "business_capabilities_standard": {
-          "title":"Business Capabilities Standard",
-          "description": "This key contains the business capabilities that are supported by this application. ex: Invoice Management, Customer Relationship Management, Supply Chain Management.",
+          "title": "Business Capabilities Standard",
+          "description": "This key contains the business capabilities that are supported by this product.",
           "type": "array",
           "items": {
             "enum": [
-              "Invoice Management",
-              "Customer Relationship Management",
-              "Supply Chain Management",
-              "Policy and Legislation",
-              "Laboratory Services",
-              "License Management",
               "Agriculture Land Management",
-              "Program Management",
-              "Stakeholder Engagement",
-              "Indigenous Relations",
-              "Compliance and Enforcement",
-              "Financial Management",
-              "Communications",
-              "Procurement",
               "Authorization Management",
-              "Mineral Titles and Tenures",
-              "Environmental Protection",
-              "Economic Development",
-              "Land Use Planning",
-              "Environmental Monitoring",
-              "Environmental Assessments",
-              "Parks Management",
-              "Resource Management",
-              "Timber Pricing and Sales",
-              "Tenure Management",
-              "Permit Management",
-              "Heritage Protection",
-              "Recreation",
-              "Program and Project Management",
-              "Hazards Management",
-              "Human Resources Management",
-              "Workplace Strategies",
               "Client Advisory Services",
-              "Performance Management"
+              "Communications",
+              "Compliance and Enforcement",
+              "Customer Relationship Management",
+              "Economic Development",
+              "Environmental Assessments",
+              "Environmental Monitoring",
+              "Environmental Protection",
+              "Financial Management",
+              "Hazards Management",
+              "Heritage Protection",
+              "Human Resources Management",
+              "Indigenous Relations",
+              "Invoice Management",
+              "Laboratory Services",
+              "Land Use Planning",
+              "License Management",
+              "Mineral Titles and Tenures",
+              "Parks Management",
+              "Performance Management",
+              "Permit Management",
+              "Policy and Legislation",
+              "Procurement",
+              "Program Management",
+              "Program and Project Management",
+              "Recreation",
+              "Resource Management",
+              "Stakeholder Engagement",
+              "Supply Chain Management",
+              "Tenure Management",
+              "Timber Pricing and Sales",
+              "Workplace Strategies"
             ]
           }
         },
         "business_capabilities_custom": {
-          "title":"Business Capabilities Custom",
-          "description": "This key contains the business capabilities that are supported by this application, which are not available in pick list of `business_capabilities_standard`. Array of string with free text",
+          "title": "Business Capabilities Custom",
+          "description": "This key contains the business capabilities that are supported by this product, which are not available in pick list of \"Business Capabilities Standard\". Array of string with free text",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "application_short_description": {
-          "title":"Application Short Description",
-          "description": "This key contains a short description of the software. It should be a single line containing a single sentence. Maximum 150 characters are allowed.",
-          "type": "string",
-          "maxLength": 150
-        },
-        "application_long_description": {
-          "title":"Application Long Description",
-          "description": "This key contains a longer description of the software, between 500 and 10000 chars. It is meant to provide an overview of the capabilities of the software for a potential user. The audience for this text should be that of users of the software, not developers. You can think of this text as the description of the software that would be in its website (if the software had one).\n\nThis description can contain some basic markdown: *italic*, **bold**, bullet points and [links](#).",
-          "type": "string",
-          "minLength": 200,
-          "maxLength": 10000
-        },
         "product_status": {
-          "title":"Product Status",
-          "description": "Status of the product. more around this can be found here https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md",
+          "title": "Product Status",
+          "description": "Status of the product. more around this can be found here. link: https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md",
           "type": "array",
           "items": {
             "enum": [
@@ -163,7 +149,7 @@
           }
         },
         "product_urls": {
-          "title":"Product URLs",
+          "title": "Product URLs",
           "description": "Different Urls of the product.",
           "type": "array",
           "items": {
@@ -172,7 +158,7 @@
           }
         },
         "api_specifications": {
-          "title":"API Specifications",
+          "title": "API Specifications",
           "description": "API specification URLs.",
           "type": "array",
           "items": {
@@ -190,7 +176,7 @@
       ],
       "properties": {
         "hosting_platforms": {
-          "title": "Hosting Platforms",
+          "title": "Hosting Platforms *",
           "description": "This key contains the hosting platforms used in this product.",
           "type": "array",
           "items": {
@@ -203,9 +189,9 @@
             ]
           }
         },
-        "relational_datastore": {
-          "title": "Relational Datastore",
-          "description": "This key contains the relational databases used. The main engine behind the relation databases, for ex: cockroach DB uses postgresql, patroni is a distributed flavor of postgresql ",
+        "data_storage_platforms": {
+          "title": "Data Storage Platforms",
+          "description": "This key contains the data storage platforms used, relational, in-memory, spatial, document, object et...",
           "type": "array",
           "items": {
             "enum": [
@@ -213,22 +199,18 @@
               "postgresql",
               "mysql",
               "sqlserver",
-              "microsoft-access"
-            ]
-          }
-        },
-        "non_relational_datastore": {
-          "title": "Non Relational Datastore",
-          "description": "This key contains the non-relational databases used.",
-          "type": "array",
-          "items": {
-            "enum": [
+              "microsoft-access",
               "mongodb",
               "dynamodb",
               "redis",
               "memcached",
               "tikv",
-              "cassandra"
+              "cassandra",
+              "object-storage",
+              "postgis",
+              "oracle-spatial",
+              "esri-sde",
+              "esri-geodatabase"
             ]
           }
         },
@@ -266,19 +248,6 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/name_version"
-          }
-        },
-        "spatial_storage_platform": {
-          "title": "Spatial Storage Platform.",
-          "description": "This key contains the spatial storage platforms used in the stack.",
-          "type": "array",
-          "items": {
-            "enum": [
-              "postgis",
-              "oracle-spatial",
-              "esri-sde",
-              "esri-geodatabase"
-            ]
           }
         },
         "spatial_mapping_technologies": {
@@ -330,42 +299,57 @@
           "description": "This key contains the notification other which is to be filled if the notification does not have the option to fill in.",
           "type": "string",
           "maxLength": 150
+        },
+        "other_dependencies": {
+          "title": "Other Dependencies",
+          "description": "This key contains the external dependencies which are not outlined in above.",
+          "type": "string"
         }
       }
     },
     "data_management_roles": {
       "type": "object",
       "additionalProperties": false,
+      "required": [
+        "product_owner",
+        "data_custodian"
+      ],
       "properties": {
+        "product_owner": {
+          "title": "Product Owner",
+          "description": "This key contains the full name of one of the product owner. It must be a real person.",
+          "type": "string"
+        },
         "data_custodian": {
-          "title": "Data Custodian.",
+          "title": "Data Custodian",
           "description": "This key contains the Contact Name who is data custodian for the application/suite of applications.link https://bcgov.github.io/data-publication/pages/dsg_bcdc_roles_responsibilities.html#am-i-a-data-custodian",
           "type": "string"
         },
         "data_steward": {
-          "title": "Data Steward.",
+          "title": "Data Steward",
           "description": "This key contains the Contact Name who is the data steward.",
-          "type": "string"
-        },
-        "data_manager": {
-          "title": "Data Manager.",
-          "description": "This key contains the Contact Name who is the data manager.",
           "type": "string"
         }
       }
     }
   },
-  "description": "bcgovpubcode.yml is a metadata standard for repositories containing software developed or acquired by the Public Administration, aimed at making them easily discoverable and thus reusable by other entities. ",
+  "description": "bcgovpubcode.yml is a metadata standard for repositories containing software developed or acquired by the Public Administration, aimed at making them easily discoverable and thus reusable by other entities. Fields or Sections marked with \"*\" are mandatory",
   "properties": {
     "product_information": {
-      "title": "Product Information.",
-      "description": "This Section describes the basic information around product.",
+      "title": "Product Information *",
+      "description": "This Section describes the basic information around product and is required to be filled.",
       "type": "object",
       "$ref": "#/definitions/product_info"
     },
+    "data_management_roles": {
+      "title": "Data Management Roles *",
+      "description": "This Section describes the information around Data Assets and is required to be filled.",
+      "type": "object",
+      "$ref": "#/definitions/data_management_roles"
+    },
     "product_technology_information": {
-      "title": "Product Technology Information.",
-      "description": "This Section describes the basic information around tech stack used in the product.",
+      "title": "Product Technology Information *",
+      "description": "This Section describes the basic information around tech stack used in the product and is required to be filled.",
       "type": "object",
       "$ref": "#/definitions/product_technology_info"
     },
@@ -375,21 +359,19 @@
       "type": "object",
       "$ref": "#/definitions/external_dependencies"
     },
-    "data_management_roles": {
-      "title": "Data Management Roles.",
-      "description": "This Section describes the information around Data Assets.",
-      "type": "object",
-      "$ref": "#/definitions/data_management_roles"
-    },
     "bcgov_pubcode_version": {
       "title": "BCGov Pubcode Version.",
       "description": "This key defines which version of the yaml is being filled.",
       "type": "number",
-      "enum": [1]
+      "default": 1,
+      "enum": [
+        1
+      ]
     }
   },
   "required": [
     "product_information",
+    "data_management_roles",
     "product_technology_information",
     "bcgov_pubcode_version"
   ],
