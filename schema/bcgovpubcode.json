@@ -214,6 +214,14 @@
             ]
           }
         },
+        "ci_cd_tools": {
+          "title": "Continuous Integration and Delivery Tools.",
+          "description": "This key contains the CI/CD tools used platforms used, GitHub Actions, ArgoCD, Helm, Kustomize et..",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "backend_languages_version": {
           "title": "Backend Languages with their version.",
           "description": "This key contains the languages used for backends( java or erlang or golang or elixir or rust etc..) with their version",
