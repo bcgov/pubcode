@@ -185,7 +185,8 @@
               "openshift-container-platform",
               "microsoft-azure",
               "google-cloud-platform",
-              "virtual-servers"
+              "virtual-servers",
+              "on-premise"
             ]
           }
         },

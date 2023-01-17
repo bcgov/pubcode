@@ -6,16 +6,25 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { Button } from "@material-ui/core/";
 import React from "react";
-import FormComponent from "./components/FormComponent.jsx";
 import BCGovLogo from "./assets/gov-bc-logo-horiz.png";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/index.jsx";
+
 const useStyles = makeStyles((theme) => ({
   menu: {
     marginRight: theme.spacing(2),
   },
   title: {
     flexGrow: 1,
+  },
+  appBarHeader: {
+    top: "auto",
+    bottom: 0,
+    color: "#ffffff",
+    backgroundColor: "#355992",
+    borderBottom: "2px solid #fcba19"
   },
   appBar: {
     top: "auto",
@@ -32,14 +41,11 @@ const useStyles = makeStyles((theme) => ({
     padding: "0.2em",
   },
   headerTitle: {
-    flexGrow: 0.8,
+    flexGrow: 0.9,
     fontSize: "1.5em",
     align: "center",
     alignItems: "center",
-  },
-  form: {
-    width: "100%",
-  },
+  }
 }));
 
 function App() {
@@ -48,14 +54,16 @@ function App() {
   return (
     <div>
       <AppBar position="fixed">
-        <Toolbar className={classes.appBar}>
+        <Toolbar className={classes.appBarHeader}>
           <img src={BCGovLogo} />
           <Typography className={classes.headerTitle}>
             BCGov Public Code
           </Typography>
         </Toolbar>
       </AppBar>
-      <FormComponent className={classes.form} />
+      <BrowserRouter>
+        <AppRoutes/>
+      </BrowserRouter>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Typography className={classes.title}>
