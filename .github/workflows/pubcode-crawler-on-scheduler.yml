@@ -41,5 +41,5 @@ jobs:
 
       - name: process script
         run: |
-          node main.js
+          node src/main.js
 
