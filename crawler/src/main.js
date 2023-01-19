@@ -22,7 +22,9 @@ async function getAllPubCodeYamls() {
   console.info(yamlArray); //print it for the time being, when api is ready this data will be pushed to an endpoint.
 }
 
-function processResponseData(responseData, cursor, moreRecords) {
+function processResponseData(responseData) {
+  let currentLoopCursor =null;
+  let currentLoopMoreRecords;
   if (responseData.data?.organization?.repositories?.edges?.length > 0) {
     responseData.data.organization.repositories.edges.forEach(element => {
       repoWithDetailsArray.push(
@@ -30,15 +32,15 @@ function processResponseData(responseData, cursor, moreRecords) {
           name: element.node.name,
           defaultBranch: element.node.defaultBranchRef.name
         });
-      cursor = element.cursor;// keep overriding, the last cursor will be used
+      currentLoopCursor = element.cursor;// keep overriding, the last cursor will be used
     });
     if (responseData.data.organization.repositories.edges?.length < 100) {
-      moreRecords = false;
+      currentLoopMoreRecords = false;
     }
   } else {
-    moreRecords = false;
+    currentLoopMoreRecords = false;
   }
-  return { cursor, moreRecords };
+  return { currentLoopCursor, currentLoopMoreRecords };
 }
 
 const performCrawling = async () => {
@@ -81,9 +83,10 @@ const performCrawling = async () => {
             }
           });
           const responseData = response.data;
-          const __ret = processResponseData(responseData, cursor, moreRecords);
-          cursor = __ret.cursor;
-          moreRecords = __ret.moreRecords;
+          const __ret = processResponseData(responseData);
+          console.info(__ret);
+          cursor = __ret.currentLoopCursor;
+          moreRecords = __ret.currentLoopMoreRecords;
           if (200 !== response.status && 429 !== response.status) {
             // don't retry other than 429
             bail(new Error(response.status));
