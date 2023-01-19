@@ -72,8 +72,6 @@ const performCrawling = async () => {
                     }
                   }`;
     try {
-      await retry(
-        async (bail) => {
           const response = await axios({
             method: "post",
             url: "https://api.github.com/graphql",
@@ -85,10 +83,6 @@ const performCrawling = async () => {
               query
             }
           });
-          if (200 !== response.status && 429 !== response.status) {
-            // don't retry other than 429
-            bail(new Error(response.status));
-          }
           const responseData = response.data;
           if (responseData.data?.organization?.repositories?.edges?.length > 0) {
             for (const edge of responseData.data.organization.repositories.edges) {
@@ -105,13 +99,7 @@ const performCrawling = async () => {
           } else {
             moreRecords = false;
           }
-        },
-        {
-          retries: 5,
-          factor: 10
-        }
-      );
-
+          console.info('iteration completed, cursor at ', cursor);
     } catch (e) {
       console.error(e);
     }
