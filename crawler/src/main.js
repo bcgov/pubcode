@@ -82,6 +82,7 @@ const performCrawling = async () => {
           });
           const responseData = response.data;
           const __ret = processResponseData(responseData, cursor, moreRecords);
+          console.info(__ret);
           cursor = __ret.cursor;
           moreRecords = __ret.moreRecords;
           if (200 !== response.status && 429 !== response.status) {
