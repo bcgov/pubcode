@@ -51,9 +51,10 @@ const performCrawling = async () => {
   let moreRecords = true;
   let cursor='';
   do {
+    console.info('iteration started, cursor at ', cursor);
     let after = "";
     if (cursor) {
-      after = `,after:${cursor}`;
+      after = `,after:"${cursor}"`;
     }
     const query = `query {
                     organization(login: "bcgov") {
@@ -86,11 +87,15 @@ const performCrawling = async () => {
           const responseData = response.data;
           if (responseData.data?.organization?.repositories?.edges?.length > 0) {
             for (const edge of responseData.data.organization.repositories.edges) {
-              repoWithDetailsArray.push(
-                {
-                  name: edge.node.name,
-                  defaultBranch: edge.node.defaultBranchRef.name
-                });
+              if(edge.node?.defaultBranchRef?.name){
+                repoWithDetailsArray.push(
+                  {
+                    name: edge.node.name,
+                    defaultBranch: edge.node.defaultBranchRef.name
+                  });
+              }else{
+                console.warn(`skipping ${edge.node.name} as it does not have default branch.`);
+              }
               cursor = edge.cursor;// keep overriding, the last cursor will be used
             }
             if (responseData.data.organization.repositories.edges?.length < 100) {
