@@ -23,7 +23,8 @@ async function getAllPubCodeYamls() {
 }
 
 function processResponseData(responseData) {
-  let cursor, moreRecords;
+  let currentLoopCursor=null;
+  let currentLoopMoreRecords=true;
   if (responseData.data?.organization?.repositories?.edges?.length > 0) {
     responseData.data.organization.repositories.edges.forEach(element => {
       repoWithDetailsArray.push(
@@ -31,15 +32,15 @@ function processResponseData(responseData) {
           name: element.node.name,
           defaultBranch: element.node.defaultBranchRef.name
         });
-      cursor = element.cursor;// keep overriding, the last cursor will be used
+      currentLoopCursor = element.cursor;// keep overriding, the last cursor will be used
     });
     if (responseData.data.organization.repositories.edges?.length < 100) {
-      moreRecords = false;
+      currentLoopMoreRecords = false;
     }
   } else {
-    moreRecords = false;
+    currentLoopMoreRecords = false;
   }
-  return { cursor, moreRecords };
+  return { currentLoopCursor, currentLoopMoreRecords };
 }
 
 const performCrawling = async () => {
@@ -84,8 +85,8 @@ const performCrawling = async () => {
           const responseData = response.data;
           const __ret = processResponseData(responseData);
           console.info(__ret);
-          cursor = __ret.cursor;
-          moreRecords = __ret.moreRecords;
+          cursor = __ret.currentLoopCursor;
+          moreRecords = __ret.currentLoopMoreRecords;
           if (200 !== response.status && 429 !== response.status) {
             // don't retry other than 429
             bail(new Error(response.status));
