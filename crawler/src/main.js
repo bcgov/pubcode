@@ -22,26 +22,6 @@ async function getAllPubCodeYamls() {
   console.info(yamlArray); //print it for the time being, when api is ready this data will be pushed to an endpoint.
 }
 
-function processResponseData(responseData) {
-  let currentLoopCursor=null;
-  let currentLoopMoreRecords=true;
-  if (responseData.data?.organization?.repositories?.edges?.length > 0) {
-    responseData.data.organization.repositories.edges.forEach(element => {
-      repoWithDetailsArray.push(
-        {
-          name: element.node.name,
-          defaultBranch: element.node.defaultBranchRef.name
-        });
-      currentLoopCursor = element.cursor;// keep overriding, the last cursor will be used
-    });
-    if (responseData.data.organization.repositories.edges?.length < 100) {
-      currentLoopMoreRecords = false;
-    }
-  } else {
-    currentLoopMoreRecords = false;
-  }
-  return { currentLoopCursor, currentLoopMoreRecords };
-}
 
 const performCrawling = async () => {
   let moreRecords = true;
@@ -68,7 +48,6 @@ const performCrawling = async () => {
                     }
                   }`;
     try {
-
       await retry(
         async (bail) => {
           const response = await axios({
@@ -82,16 +61,27 @@ const performCrawling = async () => {
               query
             }
           });
-          const responseData = response.data;
-          const __ret = processResponseData(responseData);
-          console.info(__ret);
-          cursor = __ret.currentLoopCursor;
-          moreRecords = __ret.currentLoopMoreRecords;
           if (200 !== response.status && 429 !== response.status) {
             // don't retry other than 429
             bail(new Error(response.status));
           }
-
+          const responseData = response.data;
+          if (responseData.data?.organization?.repositories?.edges?.length > 0) {
+            for (const edge of responseData.data.organization.repositories.edges) {
+              repoWithDetailsArray.push(
+                {
+                  name: edge.node.name,
+                  defaultBranch: edge.node.defaultBranchRef.name
+                });
+              cursor = edge.cursor;// keep overriding, the last cursor will be used
+            }
+            if (responseData.data.organization.repositories.edges?.length < 100) {
+              moreRecords = false;
+            }
+          } else {
+            moreRecords = false;
+          }
+          moreRecords = false;
         },
         {
           retries: 5,
