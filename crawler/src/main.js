@@ -22,7 +22,8 @@ async function getAllPubCodeYamls() {
   console.info(yamlArray); //print it for the time being, when api is ready this data will be pushed to an endpoint.
 }
 
-function processResponseData(responseData, cursor, moreRecords) {
+function processResponseData(responseData) {
+  let cursor, moreRecords;
   if (responseData.data?.organization?.repositories?.edges?.length > 0) {
     responseData.data.organization.repositories.edges.forEach(element => {
       repoWithDetailsArray.push(
@@ -81,7 +82,7 @@ const performCrawling = async () => {
             }
           });
           const responseData = response.data;
-          const __ret = processResponseData(responseData, cursor, moreRecords);
+          const __ret = processResponseData(responseData);
           console.info(__ret);
           cursor = __ret.cursor;
           moreRecords = __ret.moreRecords;
