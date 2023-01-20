@@ -10,33 +10,9 @@ const yamlArray = [];
 async function getAllPubCodeYamls() {
   for (const repoWithDetails of repoWithDetailsArray) {
     try {
-      const query = `query {
-                        repository(name:"${repoWithDetails.name}", owner: "bcgov") {
-                          object(expression: "${repoWithDetails.defaultBranch}:bcgovpubcode.yml") {
-                            ... on Blob {
-                              text
-                            }
-                          }
-                        }
-                      }`;
-
-      const yamlResponse = await  axios({
-        method: "post",
-        url: "https://api.github.com/graphql",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        data: {
-          query
-        }
-      });
-      console.info(yamlResponse.data);
-      const yaml = yamlResponse.data?.data?.repository?.object?.text;
-      if(yaml){
-        yamlArray.push(yaml);
-      }
-
+      const yamlResponse = await axios.get(`https://raw.githubusercontent.com/bcgov/${repoWithDetails.name}/${repoWithDetails.defaultBranch}/bcgovpubcode.yml`);
+      const yaml = yamlResponse.data;
+      yamlArray.push(yaml);
     } catch (e) {
       //continue
       console.error(e.response?.status);
