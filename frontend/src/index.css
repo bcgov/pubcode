@@ -73,9 +73,16 @@ button:focus-visible {
     }
 }
 
-.rjsf {
+.appContent {
     padding: 1.5em;
     margin: 1.5em;
+    width: 100%;
+}
+.yamlContent {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    display: grid;
+    text-align: left;
 }
 
 .MuiButton-containedPrimary {
