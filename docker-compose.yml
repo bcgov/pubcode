@@ -18,7 +18,7 @@ services:
     ports:
       - "8001:8081"
     environment:
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
       ME_CONFIG_MONGODB_AUTH_DATABASE: db
       ME_CONFIG_MONGODB_AUTH_USERNAME: default
       ME_CONFIG_MONGODB_AUTH_PASSWORD: default
