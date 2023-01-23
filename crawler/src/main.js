@@ -1,6 +1,5 @@
 import axios from "axios";
 import * as dotenv from "dotenv";
-import retry from "async-retry";
 
 dotenv.config();
 const token = process.env.GIT_TOKEN;
@@ -27,14 +26,13 @@ const performCrawling = async () => {
   let moreRecords = true;
   let cursor='';
   do {
-    console.info('iteration started, cursor at ', cursor);
     let after = "";
     if (cursor) {
       after = `,after:"${cursor}"`;
     }
     const query = `query {
                     organization(login: "bcgov") {
-                      repositories(first:100${after}){
+                      repositories(first:100,isArchived: false${after}){
                         edges{
                           node{
                             url,
