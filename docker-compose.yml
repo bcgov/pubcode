@@ -1,70 +1,27 @@
 ---
-version: "3.8"
+version: "3.9"
 
 services:
   database:
-    container_name: database
+    container_name: mongodb
     environment:
-      POSTGRES_USER: default
-      POSTGRES_PASSWORD: default
-      POSTGRES_DB: default
+      MONGO_INITDB_ROOT_USERNAME: default
+      MONGO_INITDB_ROOT_PASSWORD: default
     hostname: database
-    image: postgres:13
-    restart: always
-    volumes:
-      - /pgdata
-
-  backend:
-    container_name: backend
-    entrypoint:
-      - "sh"
-      - "-c"
-      - "npm i && npm run start"
-    environment:
-      NODE_ENV: development
-      POSTGRESQL_HOST: database
-      POSTGRESQL_USER: default
-      POSTGRESQL_PASSWORD: default
-      POSTGRESQL_DATABASE: default
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    hostname: backend
-    image: node:14
-    links:
-      - database
+    image: mongo
     ports:
-      - "3001:3000"
-    volumes:
-      - ./backend:/app:z
-      - /app/node_modules
-    working_dir: "/app"
-
-  frontend:
-    container_name: frontend
-    entrypoint:
-      - "sh"
-      - "-c"
-      - "npm i && npm run start"
-    environment:
-      NODE_ENV: development
-      BACKEND_URL: backend
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    hostname: frontend
-    image: node:14
-    links:
-      - backend
+      - "27017:27017"
+    restart: unless-stopped
+  mongo-express: # The admin UI container for mongoDB
+    image: mongo-express
+    restart: unless-stopped
     ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app:z
-      - /app/node_modules
-    working_dir: "/app"
+      - "8001:8081"
+    environment:
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_AUTH_DATABASE: db
+      ME_CONFIG_MONGODB_AUTH_USERNAME: default
+      ME_CONFIG_MONGODB_AUTH_PASSWORD: default
+      ME_CONFIG_MONGODB_ADMINUSERNAME: default
+      ME_CONFIG_MONGODB_ADMINPASSWORD: default
+      ME_CONFIG_MONGODB_URL: mongodb://default:default@database:27017/
