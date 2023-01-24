@@ -32,16 +32,6 @@ jobs:
             Once merged, code will be promoted and handed off to following workflow run.
             [Main Merge Workflow](https://github.com/${{ github.repository }}/actions/workflows/merge-main.yml)
 
-  secret-search:
-    name: Secret Search
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: secret-search
-        uses: Hacks4Snacks/secret-search@v1.1
-        with:
-          exclude-file: docker-compose.yml
-
   builds:
     name: Builds
     runs-on: ubuntu-22.04
@@ -55,7 +45,7 @@ jobs:
             triggers: ('frontend/')
     steps:
       - uses: actions/checkout@v3
-      - uses: bcgov-nr/action-builder-ghcr@v0.0.2
+      - uses: bcgov-nr/action-builder-ghcr@v1.0.0
         with:
           package: ${{ matrix.package }}
           tag: ${{ github.event.number }}
@@ -77,7 +67,7 @@ jobs:
             overwrite: true
             parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
     steps:
-      - uses: bcgov-nr/action-deployer-openshift@v0.1.0
+      - uses: bcgov-nr/action-deployer-openshift@v1.0.1
         with:
           file: ${{ matrix.file }}
           oc_namespace: ${{ secrets.OC_NAMESPACE }}
