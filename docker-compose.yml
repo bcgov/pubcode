@@ -3,15 +3,16 @@ version: "3.9"
 
 services:
   database:
-    container_name: mongodb
+    build:
+      context: database
     environment:
       MONGO_INITDB_ROOT_USERNAME: default
       MONGO_INITDB_ROOT_PASSWORD: default
-    hostname: database
     image: mongo
     ports:
       - "27017:27017"
     restart: unless-stopped
+
   mongo-express: # The admin UI container for mongoDB
     image: mongo-express
     restart: unless-stopped
