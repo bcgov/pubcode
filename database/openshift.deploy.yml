@@ -105,8 +105,7 @@ objects:
                     - "/bin/sh"
                     - "-i"
                     - "-c"
-                    - mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD
-                      --eval="quit()"
+                    - mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD --eval="quit()"
                 failureThreshold: 5
                 initialDelaySeconds: 30
                 periodSeconds: 15
@@ -140,8 +139,6 @@ objects:
                       name: ${NAME}-${ZONE}-${COMPONENT}
                       key: database-name
               resources:
-                limits:
-                  memory: "${MEMORY_LIMIT}"
               volumeMounts:
                 - name: ${NAME}-${ZONE}-${COMPONENT}
                   mountPath: ${PVC_MOUNT_PATH}
