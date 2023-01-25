@@ -67,7 +67,6 @@ jobs:
           - name: database
             file: database/openshift.deploy.yml
             overwrite: false
-            parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
