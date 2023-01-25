@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "name_version": {
+    "language_name_version": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -11,8 +11,93 @@
       "properties": {
         "name": {
           "title": "Name",
-          "description": "This key contains the Name.",
+          "description": "This key contains the name of the language used",
+          "type": "string",
+          "enum": [
+            "C",
+            "C#",
+            "C++",
+            "Clojure",
+            "CoffeeScript",
+            "Cobol",
+            "Dart",
+            "Elixir",
+            "Erlang",
+            "F#",
+            "Fortran",
+            "Go",
+            "Groovy",
+            "Haskell",
+            "Java",
+            "JavaScript",
+            "Julia",
+            "Kotlin",
+            "Lua",
+            "Objective-C",
+            "Perl",
+            "PHP",
+            "PowerShell",
+            "Python",
+            "R",
+            "Ruby",
+            "Rust",
+            "Scala",
+            "Shell",
+            "Swift",
+            "Zig",
+            "TypeScript",
+            "Other"
+          ]
+        },
+        "version": {
+          "title": "Version",
+          "description": "This key contains the Version.",
           "type": "string"
+        }
+      }
+    },
+    "frameworks_name_version": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "This key contains the Name of the framework used",
+          "type": "string",
+          "enum": [
+            "Actix",
+            "Angular",
+            "ASP.NET",
+            "Bootstrap",
+            "Bun",
+            "Cordova",
+            "Deno",
+            "Django",
+            "Express",
+            "FastAPI",
+            "Fiber",
+            "Flask",
+            "Happi",
+            "Helidon",
+            "jQuery",
+            "Koa",
+            "Laravel",
+            "Micronaut",
+            "NestJS",
+            "Next.js",
+            "Node.js",
+            "Quarkus",
+            "React",
+            "Ruby on Rails",
+            "Spring Boot",
+            "Svelte",
+            "Vue",
+            "Other"
+          ]
         },
         "version": {
           "title": "Version",
@@ -23,7 +108,6 @@
     },
     "product_info": {
       "type": "object",
-      "additionalProperties": true,
       "required": [
         "ministry",
         "program_area",
@@ -84,9 +168,40 @@
           "description": "This key contains description of the product.",
           "type": "string"
         },
+        "product_status": {
+          "title": "Product Status",
+          "description": "Status of the product. more around this can be found here. link: https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md",
+          "type": "string",
+          "enum": [
+            "active",
+            "stable",
+            "maturing",
+            "dormant",
+            "retired"
+          ]
+        },
+        "product_urls": {
+          "uniqueItems": true,
+          "title": "Product URLs",
+          "description": "Different Urls of the product.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "api_specifications": {
+          "title": "API Specifications",
+          "description": "API specification URLs",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
         "business_capabilities_standard": {
           "uniqueItems": true,
-          "title": "Business Capabilities Standard",
+          "title": "Business Capabilities - Standard",
           "description": "This key contains the business capabilities that are supported by this product.",
           "type": "array",
           "default": [],
@@ -129,44 +244,34 @@
               "Other"
             ]
           }
-        },
-        "business_capabilities_custom": {
-          "title": "Business Capabilities Custom",
-          "description": "This key contains the business capabilities that are supported by this product, which are not available in pick list of \"Business Capabilities Standard\". comma separated string with free text",
-          "type": "string"
-        },
-        "product_status": {
-          "title": "Product Status",
-          "description": "Status of the product. more around this can be found here. link: https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md",
-          "type": "string",
-          "enum": [
-            "active",
-            "stable",
-            "maturing",
-            "dormant",
-            "retired"
-          ]
-        },
-        "product_urls": {
-          "uniqueItems": true,
-          "title": "Product URLs",
-          "description": "Different Urls of the product.",
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "uri"
-          }
-        },
-        "api_specifications": {
-          "title": "API Specifications",
-          "description": "API specification URLs",
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "uri"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "business_capabilities_standard": {
+                "contains": {
+                  "enum": [
+                    "Other"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "business_capabilities_custom": {
+                "title": "Business Capabilities - Custom",
+                "description": "This key contains the business capabilities that are supported by this product, which are not available in pick list of \"Business Capabilities Standard\". comma separated string with free text",
+                "type": "string"
+              }
+            }
+          },
+          "else": {
           }
         }
-      }
+      ]
     },
     "product_technology_info": {
       "type": "object",
@@ -182,12 +287,13 @@
           "type": "array",
           "items": {
             "enum": [
-              "amazon-web-service",
-              "openshift-container-platform",
-              "microsoft-azure",
-              "google-cloud-platform",
-              "virtual-servers",
-              "on-premise"
+              "Amazon-Web-Services",
+              "Google-Cloud-Platform",
+              "Microsoft-Azure",
+              "On-Premise-Physical",
+              "On-Premise-Virtual",
+              "Private-Cloud-Openshift",
+              "Other"
             ]
           }
         },
@@ -198,22 +304,22 @@
           "type": "array",
           "items": {
             "enum": [
-              "oracle",
-              "postgresql",
-              "mysql",
-              "sqlserver",
-              "microsoft-access",
-              "mongodb",
-              "dynamodb",
-              "redis",
-              "memcached",
-              "tikv",
-              "cassandra",
-              "object-storage",
-              "postgis",
-              "oracle-spatial",
-              "esri-sde",
-              "esri-geodatabase"
+              "Cassandra",
+              "Dynamodb",
+              "Esri-Geodatabase",
+              "Esri-Sde",
+              "Microsoft-Access",
+              "Memcached",
+              "Mongodb",
+              "Mysql",
+              "Object-Storage",
+              "Oracle",
+              "Oracle-Spatial",
+              "Postgis",
+              "Postgresql",
+              "Redis",
+              "Sqlserver",
+              "Tikv"
             ]
           }
         },
@@ -223,51 +329,79 @@
           "description": "This key contains the CI/CD tools used for the product. ex: GitHub Actions, ArgoCD, Helm, Kustomize",
           "type": "array",
           "items": {
-            "type": "string"
+            "enum": [
+              "ArgoCD",
+              "GitLab-CI",
+              "GitHub-Actions",
+              "Helm",
+              "Jenkins",
+              "Kustomize",
+              "OpenShift-Templates",
+              "Tekton",
+              "Terraform",
+              "Terragrunt",
+              "Other"
+            ]
           }
         },
         "backend_languages_version": {
+          "uniqueItems": true,
           "title": "Backend Languages with their version",
           "description": "This key contains the languages used for backends( java or erlang or golang or elixir or rust) with their version",
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/name_version"
+            "$ref": "#/definitions/language_name_version"
           }
         },
         "backend_frameworks": {
+          "uniqueItems": true,
           "title": "Backend Frameworks",
           "description": "This key contains the frameworks used for backends( express or gin or fiber or spring boot or quarkus)",
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/name_version"
+            "$ref": "#/definitions/frameworks_name_version"
           }
         },
         "frontend_languages": {
+          "uniqueItems": true,
           "title": "Frontend Languages",
           "description": "This key contains the frontend languages",
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/name_version"
+            "$ref": "#/definitions/language_name_version"
           }
         },
         "frontend_frameworks": {
+          "uniqueItems": true,
           "title": "Frontend Frameworks",
           "description": "This key contains the frontend frameworks(react or angular or vue or svelte)",
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/name_version"
+            "$ref": "#/definitions/frameworks_name_version"
           }
         },
         "spatial_mapping_technologies": {
+          "uniqueItems": true,
           "title": "Spatial Mapping Technologies",
           "description": "This key contains the mapping technologies used in the stack(Leaflet, Geoserver, Mapbox, Openlayers, ArcGIS, Google Maps, Bing Maps, OpenStreetMap, MapLibre)",
           "type": "array",
           "items": {
-            "type": "string"
+            "enum": [
+              "Leaflet",
+              "Geoserver",
+              "Mapbox",
+              "Openlayers",
+              "ArcGIS",
+              "Google Maps",
+              "Bing Maps",
+              "OpenStreetMap",
+              "MapLibre",
+              "Other"
+            ]
           }
         }
       }
@@ -279,7 +413,7 @@
         "identity_authorization": {
           "uniqueItems": true,
           "title": "Identity And Authorization",
-          "description": "This key contains the Identity Integrations and authorization components used in the stack.",
+          "description": "This key contains the Identity Integrations and authorization components used in the stack",
           "type": "array",
           "items": {
             "enum": [
@@ -294,6 +428,30 @@
             ]
           }
         },
+        "common_components": {
+          "uniqueItems": true,
+          "title": "Common Components",
+          "description": "This key contains the common components used in the stack, link: https://digital.gov.bc.ca/common-components",
+          "type": "array",
+          "items": {
+            "enum": [
+              "Address-Complete",
+              "BC-Address-Geocoder",
+              "BC-Express-Pay",
+              "BC-Route-Planner",
+              "CMS-Forms",
+              "Common-Document-Generation-Service",
+              "Common-Hosted-Form-Service",
+              "Common-Object-Management-Service",
+              "Design-System",
+              "Digital-Mailroom-and-Document-Scanning",
+              "Microsoft-Active-Directory-Services",
+              "PayBC",
+              "Secure-File-Transfer-Service",
+              "Simple-Map-Kit"
+            ]
+          }
+        },
         "notification_standard": {
           "uniqueItems": true,
           "title": "Notification Standard",
@@ -301,10 +459,10 @@
           "type": "array",
           "items": {
             "enum": [
-              "gc-notify",
-              "ches",
-              "custom-smtp",
-              "other"
+              "GCNotify",
+              "Common-Hosted-Email-Service",
+              "Custom-SMTP",
+              "Other"
             ]
           }
         },
