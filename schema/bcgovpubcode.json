@@ -23,7 +23,7 @@
     },
     "product_info": {
       "type": "object",
-      "additionalProperties": false,
+      "additionalProperties": true,
       "required": [
         "ministry",
         "program_area",
@@ -33,7 +33,8 @@
       ],
       "properties": {
         "ministry": {
-          "title": "Ministry *",
+          "uniqueItems": true,
+          "title": "Ministry",
           "description": "This key contains the ministry name. link: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries",
           "type": "array",
           "items": {
@@ -84,9 +85,11 @@
           "type": "string"
         },
         "business_capabilities_standard": {
+          "uniqueItems": true,
           "title": "Business Capabilities Standard",
           "description": "This key contains the business capabilities that are supported by this product.",
           "type": "array",
+          "default": [],
           "items": {
             "enum": [
               "Agriculture Land Management",
@@ -122,33 +125,30 @@
               "Supply Chain Management",
               "Tenure Management",
               "Timber Pricing and Sales",
-              "Workplace Strategies"
+              "Workplace Strategies",
+              "Other"
             ]
           }
         },
         "business_capabilities_custom": {
           "title": "Business Capabilities Custom",
-          "description": "This key contains the business capabilities that are supported by this product, which are not available in pick list of \"Business Capabilities Standard\". Array of string with free text",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "description": "This key contains the business capabilities that are supported by this product, which are not available in pick list of \"Business Capabilities Standard\". comma separated string with free text",
+          "type": "string"
         },
         "product_status": {
           "title": "Product Status",
           "description": "Status of the product. more around this can be found here. link: https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md",
-          "type": "array",
-          "items": {
-            "enum": [
-              "active",
-              "stable",
-              "maturing",
-              "dormant",
-              "retired"
-            ]
-          }
+          "type": "string",
+          "enum": [
+            "active",
+            "stable",
+            "maturing",
+            "dormant",
+            "retired"
+          ]
         },
         "product_urls": {
+          "uniqueItems": true,
           "title": "Product URLs",
           "description": "Different Urls of the product.",
           "type": "array",
@@ -159,7 +159,7 @@
         },
         "api_specifications": {
           "title": "API Specifications",
-          "description": "API specification URLs.",
+          "description": "API specification URLs",
           "type": "array",
           "items": {
             "type": "string",
@@ -176,8 +176,9 @@
       ],
       "properties": {
         "hosting_platforms": {
-          "title": "Hosting Platforms *",
-          "description": "This key contains the hosting platforms used in this product.",
+          "uniqueItems": true,
+          "title": "Hosting Platforms",
+          "description": "This key contains the hosting platforms used in this product",
           "type": "array",
           "items": {
             "enum": [
@@ -191,8 +192,9 @@
           }
         },
         "data_storage_platforms": {
+          "uniqueItems": true,
           "title": "Data Storage Platforms",
-          "description": "This key contains the data storage platforms used, relational, in-memory, spatial, document, object et...",
+          "description": "This key contains the data storage platforms used, relational, in-memory, spatial, document, object storage",
           "type": "array",
           "items": {
             "enum": [
@@ -216,16 +218,17 @@
           }
         },
         "ci_cd_tools": {
-          "title": "Continuous Integration and Delivery Tools.",
-          "description": "This key contains the CI/CD tools used for the product. ex: GitHub Actions, ArgoCD, Helm, Kustomize et..",
+          "uniqueItems": true,
+          "title": "Continuous Integration and Delivery Tools",
+          "description": "This key contains the CI/CD tools used for the product. ex: GitHub Actions, ArgoCD, Helm, Kustomize",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "backend_languages_version": {
-          "title": "Backend Languages with their version.",
-          "description": "This key contains the languages used for backends( java or erlang or golang or elixir or rust etc..) with their version",
+          "title": "Backend Languages with their version",
+          "description": "This key contains the languages used for backends( java or erlang or golang or elixir or rust) with their version",
           "type": "array",
           "items": {
             "type": "object",
@@ -233,8 +236,8 @@
           }
         },
         "backend_frameworks": {
-          "title": "Backend Frameworks.",
-          "description": "This key contains the frameworks used for backends( express or gin or fiber or spring boot or quarkus etc..).",
+          "title": "Backend Frameworks",
+          "description": "This key contains the frameworks used for backends( express or gin or fiber or spring boot or quarkus)",
           "type": "array",
           "items": {
             "type": "object",
@@ -242,8 +245,8 @@
           }
         },
         "frontend_languages": {
-          "title": "Frontend Languages.",
-          "description": "This key contains the frontend languages.",
+          "title": "Frontend Languages",
+          "description": "This key contains the frontend languages",
           "type": "array",
           "items": {
             "type": "object",
@@ -251,8 +254,8 @@
           }
         },
         "frontend_frameworks": {
-          "title": "Frontend Frameworks.",
-          "description": "This key contains the frontend frameworks(react or angular or vue et..)",
+          "title": "Frontend Frameworks",
+          "description": "This key contains the frontend frameworks(react or angular or vue or svelte)",
           "type": "array",
           "items": {
             "type": "object",
@@ -261,7 +264,7 @@
         },
         "spatial_mapping_technologies": {
           "title": "Spatial Mapping Technologies",
-          "description": "This key contains the mapping technologies used in the stack(Leaflet, Geoserver  et..)",
+          "description": "This key contains the mapping technologies used in the stack(Leaflet, Geoserver, Mapbox, Openlayers, ArcGIS, Google Maps, Bing Maps, OpenStreetMap, MapLibre)",
           "type": "array",
           "items": {
             "type": "string"
@@ -274,6 +277,7 @@
       "additionalProperties": false,
       "properties": {
         "identity_authorization": {
+          "uniqueItems": true,
           "title": "Identity And Authorization",
           "description": "This key contains the Identity Integrations and authorization components used in the stack.",
           "type": "array",
@@ -291,8 +295,9 @@
           }
         },
         "notification_standard": {
-          "title": "Notification Standard.",
-          "description": "This key contains the notification systems use.",
+          "uniqueItems": true,
+          "title": "Notification Standard",
+          "description": "This key contains the notification systems used in the stack",
           "type": "array",
           "items": {
             "enum": [
@@ -304,14 +309,14 @@
           }
         },
         "notification_custom": {
-          "title": "Notification Custom.",
-          "description": "This key contains the notification other which is to be filled if the notification does not have the option to fill in.",
+          "title": "Notification Custom",
+          "description": "This key contains the notification other which is to be filled if the notification does not have the option to fill in the above key",
           "type": "string",
           "maxLength": 150
         },
         "other_dependencies": {
           "title": "Other Dependencies",
-          "description": "This key contains the external dependencies which are not outlined in above.",
+          "description": "This key contains the external dependencies which are not outlined in above keys",
           "type": "string"
         }
       }
@@ -326,7 +331,7 @@
       "properties": {
         "product_owner": {
           "title": "Product Owner",
-          "description": "This key contains the full name of one of the product owner. It must be a real person.",
+          "description": "This key contains the full name of one of the product owner, It must be a real person",
           "type": "string"
         },
         "data_custodian": {
@@ -336,7 +341,7 @@
         },
         "data_steward": {
           "title": "Data Steward",
-          "description": "This key contains the Contact Name who is the data steward.",
+          "description": "This key contains the Contact Name who is the data steward",
           "type": "string"
         }
       }
@@ -346,31 +351,31 @@
   "properties": {
     "product_information": {
       "title": "Product Information *",
-      "description": "This Section describes the basic information around product and is required to be filled.",
+      "description": "This Section describes the basic information around product and is required to be filled",
       "type": "object",
       "$ref": "#/definitions/product_info"
     },
     "data_management_roles": {
       "title": "Data Management Roles *",
-      "description": "This Section describes the information around Data Assets and is required to be filled.",
+      "description": "This Section describes the information around Data Assets and is required to be filled",
       "type": "object",
       "$ref": "#/definitions/data_management_roles"
     },
     "product_technology_information": {
       "title": "Product Technology Information *",
-      "description": "This Section describes the basic information around tech stack used in the product and is required to be filled.",
+      "description": "This Section describes the basic information around tech stack used in the product and is required to be filled",
       "type": "object",
       "$ref": "#/definitions/product_technology_info"
     },
     "product_external_dependencies": {
-      "title": "Product External Dependencies.",
-      "description": "This Section describes the information around external dependencies which the product relies upon.",
+      "title": "Product External Dependencies",
+      "description": "This Section describes the information around external dependencies which the product relies upon",
       "type": "object",
       "$ref": "#/definitions/external_dependencies"
     },
     "bcgov_pubcode_version": {
-      "title": "BCGov Pubcode Version.",
-      "description": "This key defines which version of the yaml is being filled.",
+      "title": "BCGov Pubcode Version",
+      "description": "This key defines which version of the yaml is being filled",
       "type": "number",
       "default": 1,
       "enum": [
