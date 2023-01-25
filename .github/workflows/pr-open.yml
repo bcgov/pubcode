@@ -39,8 +39,10 @@ jobs:
       packages: write
     strategy:
       matrix:
-        package: [frontend]
+        package: [database, frontend]
         include:
+          - package: database
+            triggers: ('database/')
           - package: frontend
             triggers: ('frontend/')
     steps:

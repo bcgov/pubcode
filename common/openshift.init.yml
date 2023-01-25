@@ -4,7 +4,7 @@ parameters:
   - name: NAME
     description: Product name
     value: nr-quickstart-typescript
-  - name: PG_DATABASE
+  - name: DATABASE
     description: Postgres database name
     value: database
   - name: ZONE
@@ -12,7 +12,11 @@ parameters:
     required: true
   - name: PROMOTE
     description: Dummy param, for convenience in deployments
-  - name: DB_PASSWORD
+  - name: GENERATED_USER_PASSWORD
+    description: Password for the PostgreSQL connection user.
+    from: "[a-zA-Z0-9]{16}"
+    generate: expression
+  - name: GENERATED_ADMIN_PASSWORD
     description: Password for the PostgreSQL connection user.
     from: "[a-zA-Z0-9]{16}"
     generate: expression
@@ -20,12 +24,13 @@ objects:
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: ${NAME}-${ZONE}-${PG_DATABASE}
+      name: ${NAME}-${ZONE}-${DATABASE}
       labels:
         app: ${NAME}-${ZONE}
     stringData:
       database-name: ${NAME}
-      database-password: ${DB_PASSWORD}
+      database-password: ${GENERATED_USER_PASSWORD}
+      database-admin-password: ${GENERATED_ADMIN_PASSWORD}
       database-user: ${NAME}
   - apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
