@@ -15,7 +15,7 @@ parameters:
     value: latest
   - name: PVC_MOUNT_PATH
     description: Where to mount the PVC, subpath (e.g. data/)
-    value: /var/lib/mongodb/data
+    value: /data
   - name: DB_PVC_SIZE
     description: Volume space available for data, e.g. 512Mi, 2Gi.
     displayName: Database Volume Capacity
