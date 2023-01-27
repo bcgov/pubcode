@@ -93,6 +93,10 @@ objects:
             - name: ${NAME}-${ZONE}-${COMPONENT}
               persistentVolumeClaim:
                 claimName: ${NAME}-${ZONE}-${COMPONENT}
+          initContainers:
+            - name: ${NAME}-init
+              image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
+              command: ["sh", "-c", "mkdir -p /data/db"]
           containers:
             - name: ${NAME}
               image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
