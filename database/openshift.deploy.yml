@@ -95,8 +95,11 @@ objects:
                 claimName: ${NAME}-${ZONE}-${COMPONENT}
           initContainers:
             - name: ${NAME}-init
-              image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
+              image: ghcr.io/bcgov/public-code/${COMPONENT}:${ZONE}
               command: ["sh", "-c", "mkdir -p /data/db"]
+              volumeMounts:
+                - name: ${NAME}-${ZONE}-${COMPONENT}
+                  mountPath: ${PVC_MOUNT_PATH}
           containers:
             - name: ${NAME}
               image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
@@ -104,12 +107,8 @@ objects:
                 - containerPort: 27017
                   protocol: TCP
               readinessProbe:
-                exec:
-                  command:
-                    - "/bin/sh"
-                    - "-i"
-                    - "-c"
-                    - mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD --eval="quit()"
+                tcpSocket:
+                  port: 27017
                 failureThreshold: 5
                 initialDelaySeconds: 30
                 periodSeconds: 15
