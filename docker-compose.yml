@@ -3,26 +3,26 @@ version: "3.9"
 
 services:
   database:
-    container_name: mongodb
+    build:
+      context: database
     environment:
       MONGO_INITDB_ROOT_USERNAME: default
       MONGO_INITDB_ROOT_PASSWORD: default
-    hostname: database
     image: mongo
     ports:
       - "27017:27017"
     restart: unless-stopped
+
   mongo-express: # The admin UI container for mongoDB
     image: mongo-express
     restart: unless-stopped
     ports:
       - "8001:8081"
     environment:
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
       ME_CONFIG_MONGODB_AUTH_DATABASE: db
       ME_CONFIG_MONGODB_AUTH_USERNAME: default
       ME_CONFIG_MONGODB_AUTH_PASSWORD: default
       ME_CONFIG_MONGODB_ADMINUSERNAME: default
       ME_CONFIG_MONGODB_ADMINPASSWORD: default
       ME_CONFIG_MONGODB_URL: mongodb://default:default@database:27017/
-
