@@ -1,39 +1,34 @@
 {
-        auto_https off
-        admin off
+    auto_https off
+    admin off
+    debug
 }
-
-:3000
-root * /app/dist
-
-file_server
-
-
-header {
+:3000 {
+    log {
+        output stdout
+        format console {
+          time_format iso8601
+          level_format color
+        }
+        level debug
+    }
+    encode gzip
+	handle /env-config.js {
+            header Content-Type text/javascript
+            respond `window.config = {"VITE_BACKEND_URL": "{$BACKEND_URL}"};`
+    }
+	handle {
+		root * /app/dist
+		file_server
+	}
+	header {
         X-Frame-Options "SAMEORIGIN"
         X-XSS-Protection "1;mode=block"
         Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate"
         X-Content-Type-Options "nosniff"
         Strict-Transport-Security "max-age=31536000"
-        Content-Security-Policy  https://raw.githubusercontent.com/bcgov/public-code/main/schema/bcgovpubcode.json "default-src 'self'  *.devops.gov.bc.ca data:; script-src 'self' 'unsafe-eval' https://www2.gov.bc.ca ;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://fonts.googleapis.com http://www.w3.org https://spm.gov.bc.ca"
+        Content-Security-Policy  https://raw.githubusercontent.com/bcgov/* "default-src 'self'  *.devops.gov.bc.ca data:; script-src 'self' 'unsafe-eval' https://www2.gov.bc.ca ;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://fonts.googleapis.com http://www.w3.org"
         Referrer-Policy "same-origin"
         Feature-Policy "fullscreen 'self'; camera 'none'; microphone 'none'"
+    }
 }
-
-@unspecified_path {
-        not path_regexp ^\/0.0.0.0
-}
-handle @unspecified_path {
-        try_files {path} {path}/ /?_url={uri}
-}
-
-encode {
-        gzip 7
-}
-
-log {
-        output stdout
-        format console
-        level DEBUG
-}
-

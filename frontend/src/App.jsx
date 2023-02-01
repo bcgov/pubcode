@@ -1,23 +1,21 @@
 import "./App.css";
-
-import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import { Button } from "@material-ui/core/";
 import React from "react";
 import BCGovLogo from "./assets/gov-bc-logo-horiz.png";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes/index.jsx";
+import { AppBar, Button, Container, CssBaseline, Grid, IconButton, Toolbar, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import LeftDrawer from "./components/LeftDrawer.jsx";
+import { HomeRounded } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   menu: {
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(2)
   },
   title: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   appBarHeader: {
     top: "auto",
@@ -27,42 +25,56 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: "2px solid #fcba19"
   },
   appBar: {
+    flexShrink: 0,
     top: "auto",
     bottom: 0,
     color: "#ffffff",
-    backgroundColor: "#355992",
+    backgroundColor: "#355992"
   },
   toolbar: {
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   footerButton: {
     margin: "0.2em",
-    padding: "0.2em",
+    padding: "0.2em"
   },
   headerTitle: {
     flexGrow: 0.9,
     fontSize: "1.5em",
     align: "center",
-    alignItems: "center",
+    alignItems: "center"
   }
 }));
 
 function App() {
   const classes = useStyles();
-
   return (
-    <div>
-      <AppBar position="fixed">
+    <Container style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <CssBaseline />
+      <AppBar position="fixed" style={{ flexShrink: 0 }}>
         <Toolbar className={classes.appBarHeader}>
           <img src={BCGovLogo} />
           <Typography className={classes.headerTitle}>
             BCGov Public Code
           </Typography>
+          <a href={"/"} target={"_self"}>
+            <IconButton style={{ backgroundColor: "#FFFFFF" }}>
+              <HomeRounded color="primary"></HomeRounded>
+            </IconButton>
+          </a>
         </Toolbar>
       </AppBar>
+
       <BrowserRouter>
-        <AppRoutes/>
+        <Grid position={"static"} container spacing={0}>
+          <Grid position={"static"} item xs={2} sm={2} md={2} lg={false} xl={false}>
+            <LeftDrawer />
+          </Grid>
+          <Grid position={"static"} item xs={10} sm={10} md={10} lg={12} xl={12}>
+            <AppRoutes />
+          </Grid>
+        </Grid>
       </BrowserRouter>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
@@ -144,7 +156,7 @@ function App() {
         draggable
         pauseOnHover
       />
-    </div>
+    </Container>
   );
 }
 
