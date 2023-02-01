@@ -2,12 +2,25 @@ import * as React from "react";
 import { Button, Divider, Drawer, Icon, List, ListItem, ListItemText, Tooltip } from "@material-ui/core";
 import { useNavigate } from "react-router";
 import { Add, Edit, Search } from "@material-ui/icons";
+import { makeStyles } from "@material-ui/core/styles";
 
-
+const useStyles = makeStyles(theme => ({
+  disabled: {
+    color: theme.palette.text.disabled,
+    backgroundColor: theme.palette.action.disabledBackground,
+    width: "10em !important"
+  },
+  leftDrawer: {
+    color: "#ffffff !important",
+    backgroundColor: "#355992 !important",
+    borderRadius: "0.3em !important",
+    width: "10em !important"
+  }
+}));
 export default function LeftDrawer() {
+  const classes = useStyles();
   const navigate = useNavigate();
   const buttonClicked = (event) => {
-    console.info("buttonClicked", event);
     navigate(event.route, { state: { data: undefined } });// reset the state
   };
   return (
@@ -39,7 +52,7 @@ export default function LeftDrawer() {
                 disabled: true
               }].map((element) => (
               <ListItem key={element.key}>
-                <Button className={"leftDrawerButtons"} disabled={element.disabled}
+                <Button className={element.disabled ? `${classes.disabled}` : `${classes.leftDrawer}`} disabled={element.disabled}
                         onClick={() => buttonClicked(element)}>
                   <ListItemText primary={element.key} />
                   <Tooltip title={element.description}>
