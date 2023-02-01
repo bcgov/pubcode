@@ -5,7 +5,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes/index.jsx";
-import { AppBar, Button, Container, Grid, IconButton, makeStyles, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Container, Grid, IconButton, Toolbar, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import LeftDrawer from "./components/LeftDrawer.jsx";
 import { HomeRounded } from "@mui/icons-material";
 
