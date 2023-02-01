@@ -46,11 +46,17 @@
 .editForm{
     margin: 1em;
 }
-button.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.Mui-disabled{
+.Mui-disabled{
     background-color: #dadada !important;
 }
 .leftDrawerButtons{
     color: #ffffff !important;
     background-color: #355992 !important;
     border-radius: 0.3em !important;
+    width: 10em !important;
+}
+
+.MuiDrawer-paperAnchorDockedLeft{
+    z-index: 0 !important;
+    top: 4em !important;
 }

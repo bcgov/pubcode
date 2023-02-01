@@ -1,28 +1,21 @@
 import * as React from "react";
-import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
+import { Button, Divider, Drawer, Icon, List, ListItem, ListItemText, Tooltip } from "@material-ui/core";
 import { useNavigate } from "react-router";
-import { IconButton, Tooltip } from "@mui/material";
-import { Search, Edit, Add } from "@mui/icons-material";
+import { Add, Edit, Search } from "@material-ui/icons";
 
 
 export default function LeftDrawer() {
   const navigate = useNavigate();
   const buttonClicked = (event) => {
-    console.info('buttonClicked', event);
+    console.info("buttonClicked", event);
     navigate(event.route, { state: { data: undefined } });// reset the state
   };
   return (
     <div>
-      <Drawer
-        variant="permanent"
-        open={true}
+      <Drawer style={{ zIndex: "0 !important", top: "4em !important" }}
+              variant="permanent"
+              open={true}
       >
-        <Divider />
         <List>
           {
             [
@@ -45,22 +38,22 @@ export default function LeftDrawer() {
                 description: "Search for a repository",
                 disabled: true
               }].map((element) => (
-              <ListItem  key={element.key}>
-                <ListItemButton  dense className={"leftDrawerButtons"} disabled={element.disabled} onClick={() => buttonClicked(element)}>
+              <ListItem key={element.key}>
+                <Button className={"leftDrawerButtons"} disabled={element.disabled}
+                        onClick={() => buttonClicked(element)}>
                   <ListItemText primary={element.key} />
                   <Tooltip title={element.description}>
-                    <IconButton className={"leftDrawerButtons"}>
+                    <Icon style={{ lineHeight: 1 }}>
                       {element.icon === "Search" && <Search />}
                       {element.icon === "Edit" && <Edit />}
                       {element.icon === "Add" && <Add />}
-                    </IconButton>
+                    </Icon>
                   </Tooltip>
-                </ListItemButton>
+                </Button>
               </ListItem>
             ))
           }
         </List>
-        <Divider />
       </Drawer>
 
     </div>

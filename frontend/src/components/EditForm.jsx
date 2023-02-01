@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import * as YAML from "js-yaml";
 import * as _ from "lodash";
-import { Backdrop, CircularProgress } from "@mui/material";
+import { Backdrop, CircularProgress } from "@material-ui/core";
 import { useNavigate } from "react-router";
 
 // below props needs to be treated properly for the form to work properly as the nesting does not work if they are undefined.
@@ -42,14 +42,13 @@ export default function EditForm() {
         const updatedData = matchFormattingForFormDisplay(existingYamlAsJson);
         navigate("/form", { state: { data: updatedData } });
       } catch (e) {
+        console.error(e);
         toast.error("Please provide a valid link to bcgovpubcode.yml :(");
         setFormDisabled(false);
       }
     } else {
       toast.error("Please provide a valid link to bcgovpubcode.yml :(");
-      setTimeout(() => {
-        setFormDisabled(false);
-      }, 5000);
+      setFormDisabled(false);
     }
   };
   const schema = {

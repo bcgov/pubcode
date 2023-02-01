@@ -5,10 +5,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes/index.jsx";
-import { AppBar, Button, Container, Grid, IconButton, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Container, CssBaseline, Grid, IconButton, Toolbar, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import LeftDrawer from "./components/LeftDrawer.jsx";
-import { HomeRounded } from "@mui/icons-material";
+import { HomeRounded } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   menu: {
@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: "2px solid #fcba19"
   },
   appBar: {
+    flexShrink: 0,
     top: "auto",
     bottom: 0,
     color: "#ffffff",
@@ -49,30 +50,32 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
   return (
-    <Container>
-      <AppBar position="fixed">
+    <Container style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <CssBaseline />
+      <AppBar position="fixed" style={{ flexShrink: 0 }}>
         <Toolbar className={classes.appBarHeader}>
           <img src={BCGovLogo} />
           <Typography className={classes.headerTitle}>
             BCGov Public Code
           </Typography>
-          <a href={"/"} target={"_self"} >
-          <IconButton  style={{ backgroundColor: "#FFFFFF"}}>
-            <HomeRounded color="primary" ></HomeRounded>
-          </IconButton>
+          <a href={"/"} target={"_self"}>
+            <IconButton style={{ backgroundColor: "#FFFFFF" }}>
+              <HomeRounded color="primary"></HomeRounded>
+            </IconButton>
           </a>
         </Toolbar>
       </AppBar>
-      <Grid position={"sticky"} container spacing={0}>
-        <BrowserRouter>
-          <Grid position={"sticky"} item xs={2} sm={2} md={2} lg={0} xl={0}>
-          <LeftDrawer />
+
+      <BrowserRouter>
+        <Grid position={"static"} container spacing={0}>
+          <Grid position={"static"} item xs={2} sm={2} md={2} lg={false} xl={false}>
+            <LeftDrawer />
           </Grid>
-          <Grid position={"sticky"} item xs={10} sm={10} md={10} lg={12} xl={12}>
-          <AppRoutes />
+          <Grid position={"static"} item xs={10} sm={10} md={10} lg={12} xl={12}>
+            <AppRoutes />
           </Grid>
-        </BrowserRouter>
-      </Grid>
+        </Grid>
+      </BrowserRouter>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Typography className={classes.title}>

@@ -4,7 +4,25 @@ import validator from "@rjsf/validator-ajv8";
 import * as YAML from "js-yaml";
 //import * as localSchema from "../../../schema/bcgovpubcode.json";
 import { useLocation, useNavigate } from "react-router";
-import { Backdrop, CircularProgress } from "@mui/material";
+import { Backdrop, CircularProgress } from "@material-ui/core";
+import * as _ from "lodash";
+// below props needs to be treated properly for the form to work properly as the nesting does not work if they are undefined.
+const props = ["product_information.business_capabilities_standard", "product_technology_information.ci_cd_tools", "product_technology_information.data_storage_platforms", "product_technology_information.frontend_frameworks", "product_technology_information.hosting_platforms", "product_technology_information.spatial_mapping_technologies", "product_external_dependencies.common_components", "product_external_dependencies.identity_authorization"];
+function removeBlankArrayFields(jsonData) {
+  console.info(jsonData);
+  if (jsonData) {
+    for (const replaceProp of props) {
+      const existingValue = _.get(jsonData, replaceProp);
+      console.info(existingValue);
+      if (existingValue !== undefined && existingValue !== null && Array.isArray(existingValue) && existingValue.length === 0) {
+        _.unset(jsonData, replaceProp);
+      }
+    }
+  }
+  console.info('done');
+  console.info(jsonData);
+  return jsonData;
+}
 
 const FormComponent = () => {
   let initialFormData = null;
@@ -62,7 +80,9 @@ const FormComponent = () => {
   const uiSchema = {};
 
   const onSubmit = ({ formData }) => {
-    const yaml = YAML.dump(formData, { indent: 2, sortKeys: true });
+    const updatedData = removeBlankArrayFields(formData);
+    const yaml = YAML.dump(updatedData, { indent: 2, sortKeys: true });
+
     navigate("/yaml", { state: { data: yaml } });
   };
 
