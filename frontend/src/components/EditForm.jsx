@@ -36,11 +36,17 @@ export default function EditForm() {
         } else {
           url = formData.bcgovpubcode_url.replace("https://github.com", "https://raw.githubusercontent.com").replace("/blob/", "/");
         }
-        const yaml = await fetch(url);
-        const data = await yaml.text();
-        const existingYamlAsJson = YAML.load(data);
-        const updatedData = matchFormattingForFormDisplay(existingYamlAsJson);
-        navigate("/form", { state: { data: updatedData } });
+        const response = await fetch(url);
+        if(response.ok){
+          const data = await response.text();
+          const existingYamlAsJson = YAML.load(data);
+          const updatedData = matchFormattingForFormDisplay(existingYamlAsJson);
+          navigate("/form", { state: { data: updatedData } });
+        }else {
+          console.error('looks like there was a problem, status code: ' + response.status);
+          toast.error("bcgovpubcode.yml could not be found at the link :(");
+          setFormDisabled(false);
+        }
       } catch (e) {
         console.error(e);
         toast.error("Please provide a valid link to bcgovpubcode.yml :(");
