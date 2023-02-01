@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Form from "@rjsf/material-ui";
 import validator from "@rjsf/validator-ajv8";
 import * as YAML from "js-yaml";
-import * as localSchema from "../../../schema/bcgovpubcode.json";
+//import * as localSchema from "../../../schema/bcgovpubcode.json";
 import { useLocation, useNavigate } from "react-router";
 import { Backdrop, CircularProgress } from "@mui/material";
 
@@ -37,7 +37,7 @@ const FormComponent = () => {
     }
   });
 
-  const [schema, setSchema] = useState(localSchema);
+  const [schema, setSchema] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
