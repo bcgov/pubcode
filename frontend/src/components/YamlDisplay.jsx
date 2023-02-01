@@ -1,5 +1,5 @@
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router";

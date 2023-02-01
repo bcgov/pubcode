@@ -1,19 +1,18 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
+import { Button, makeStyles } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
-      margin: theme.spacing(1),
+      margin: theme.spacing(1)
     },
     button: {
       margin: "0.2em",
       padding: "0.2em",
       color: "#ffffff",
-      backgroundColor: "#355992",
-    },
-  },
+      backgroundColor: "#355992"
+    }
+  }
 }));
 
 export default function SelectionPage({ onButtonClick }) {

@@ -106,7 +106,7 @@
         }
       }
     },
-    "product_info": {
+    "product_information": {
       "type": "object",
       "required": [
         "ministry",
@@ -395,75 +395,10 @@
     },
     "product_technology_info": {
       "type": "object",
-      "additionalProperties": false,
       "required": [
         "hosting_platforms"
       ],
       "properties": {
-        "hosting_platforms": {
-          "uniqueItems": true,
-          "title": "Hosting Platforms",
-          "description": "This key contains the hosting platforms used in this product",
-          "type": "array",
-          "items": {
-            "enum": [
-              "Amazon-Web-Services",
-              "Google-Cloud-Platform",
-              "Microsoft-Azure",
-              "On-Premise-Physical",
-              "On-Premise-Virtual",
-              "Private-Cloud-Openshift",
-              "Other"
-            ]
-          }
-        },
-        "data_storage_platforms": {
-          "uniqueItems": true,
-          "title": "Data Storage Platforms",
-          "description": "This key contains the data storage platforms used, relational, in-memory, spatial, document, object storage",
-          "type": "array",
-          "items": {
-            "enum": [
-              "Cassandra",
-              "Dynamodb",
-              "Esri-Geodatabase",
-              "Esri-Sde",
-              "Microsoft-Access",
-              "Memcached",
-              "Mongodb",
-              "Mysql",
-              "Object-Storage",
-              "Oracle",
-              "Oracle-Spatial",
-              "Postgis",
-              "Postgresql",
-              "Redis",
-              "Sqlserver",
-              "Tikv"
-            ]
-          }
-        },
-        "ci_cd_tools": {
-          "uniqueItems": true,
-          "title": "Continuous Integration and Delivery Tools",
-          "description": "This key contains the CI/CD tools used for the product. ex: GitHub Actions, ArgoCD, Helm, Kustomize",
-          "type": "array",
-          "items": {
-            "enum": [
-              "ArgoCD",
-              "GitLab-CI",
-              "GitHub-Actions",
-              "Helm",
-              "Jenkins",
-              "Kustomize",
-              "OpenShift-Templates",
-              "Tekton",
-              "Terraform",
-              "Terragrunt",
-              "Other"
-            ]
-          }
-        },
         "backend_languages_version": {
           "uniqueItems": true,
           "title": "Backend Languages with their version",
@@ -504,31 +439,288 @@
             "$ref": "#/definitions/frameworks_name_version"
           }
         },
-        "spatial_mapping_technologies": {
+        "hosting_platforms": {
           "uniqueItems": true,
-          "title": "Spatial Mapping Technologies",
-          "description": "This key contains the mapping technologies used in the stack(Leaflet, Geoserver, Mapbox, Openlayers, ArcGIS, Google Maps, Bing Maps, OpenStreetMap, MapLibre)",
+          "title": "Hosting Platforms",
+          "minItems": 1,
+          "default": [],
+          "description": "This key contains the hosting platforms used in this product",
           "type": "array",
           "items": {
             "enum": [
-              "Leaflet",
-              "Geoserver",
-              "Mapbox",
-              "Openlayers",
-              "ArcGIS",
-              "Google Maps",
-              "Bing Maps",
-              "OpenStreetMap",
-              "MapLibre",
+              "Amazon-Web-Services",
+              "Google-Cloud-Platform",
+              "Microsoft-Azure",
+              "On-Premise-Physical",
+              "On-Premise-Virtual",
+              "Private-Cloud-Openshift",
               "Other"
             ]
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "hosting_platforms": {
+                "contains": {
+                  "enum": [
+                    "Other"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "hosting_platforms_custom": {
+                "title": "Hosting Platforms - Custom",
+                "description": "This key contains the hosting platform the product is hosted on which is not available as a pick list in the Hosting Platforms. Comma separated string with free text",
+                "type": "string"
+              },
+              "data_storage_platforms": {
+                "uniqueItems": true,
+                "title": "Data Storage Platforms",
+                "description": "This key contains the data storage platforms used, relational, in-memory, spatial, document, object storage",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "enum": [
+                    "Cassandra",
+                    "Dynamodb",
+                    "Esri-Geodatabase",
+                    "Esri-Sde",
+                    "Microsoft-Access",
+                    "Memcached",
+                    "Mongodb",
+                    "Mysql",
+                    "Object-Storage",
+                    "Oracle",
+                    "Oracle-Spatial",
+                    "Postgis",
+                    "Postgresql",
+                    "Redis",
+                    "Sqlserver",
+                    "Tikv",
+                    "Other"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "hosting_platforms_custom"
+            ]
+          },
+          "else": {
+            "properties": {
+              "data_storage_platforms": {
+                "uniqueItems": true,
+                "title": "Data Storage Platforms",
+                "description": "This key contains the data storage platforms used, relational, in-memory, spatial, document, object storage",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "Cassandra",
+                    "Dynamodb",
+                    "Esri-Geodatabase",
+                    "Esri-Sde",
+                    "Microsoft-Access",
+                    "Memcached",
+                    "Mongodb",
+                    "Mysql",
+                    "Object-Storage",
+                    "Oracle",
+                    "Oracle-Spatial",
+                    "Postgis",
+                    "Postgresql",
+                    "Redis",
+                    "Sqlserver",
+                    "Tikv",
+                    "Other"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "data_storage_platforms": {
+                "contains": {
+                  "enum": [
+                    "Other"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data_storage_platforms_custom": {
+                "title": "Data Storage Platforms - Custom",
+                "description": "This key contains the data storage platforms used, relational, in-memory, spatial, document, object storage,  which is not available as a pick list in the Data Storage Platforms. Comma separated string with free text",
+                "type": "string"
+              },
+              "ci_cd_tools": {
+                "uniqueItems": true,
+                "title": "Continuous Integration and Delivery Tools",
+                "description": "This key contains the CI/CD tools used for the product. ex: GitHub Actions, ArgoCD, Helm, Kustomize",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "enum": [
+                    "ArgoCD",
+                    "GitLab-CI",
+                    "GitHub-Actions",
+                    "Helm",
+                    "Jenkins",
+                    "Kustomize",
+                    "OpenShift-Templates",
+                    "Tekton",
+                    "Terraform",
+                    "Terragrunt",
+                    "Other"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "data_storage_platforms_custom"
+            ]
+          },
+          "else": {
+            "properties": {
+              "ci_cd_tools": {
+                "uniqueItems": true,
+                "title": "Continuous Integration and Delivery Tools",
+                "description": "This key contains the CI/CD tools used for the product. ex: GitHub Actions, ArgoCD, Helm, Kustomize",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "enum": [
+                    "ArgoCD",
+                    "GitLab-CI",
+                    "GitHub-Actions",
+                    "Helm",
+                    "Jenkins",
+                    "Kustomize",
+                    "OpenShift-Templates",
+                    "Tekton",
+                    "Terraform",
+                    "Terragrunt",
+                    "Other"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "ci_cd_tools": {
+                "contains": {
+                  "enum": [
+                    "Other"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "ci_cd_tools_custom": {
+                "title": "Continuous Integration and Delivery Tools - Custom",
+                "description": "This key contains the CI/CD tools used for the product. ex: GitHub Actions, ArgoCD, Helm, Kustomize,  which is not available as a pick list in the Continuous Integration and Delivery Tools. Comma separated string with free text",
+                "type": "string"
+              },
+              "spatial_mapping_technologies": {
+                "uniqueItems": true,
+                "title": "Spatial Mapping Technologies",
+                "description": "This key contains the mapping technologies used in the stack(Leaflet, Geoserver, Mapbox, Openlayers, ArcGIS, Google Maps, Bing Maps, OpenStreetMap, MapLibre)",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "enum": [
+                    "Leaflet",
+                    "Geoserver",
+                    "Mapbox",
+                    "Openlayers",
+                    "ArcGIS",
+                    "Google Maps",
+                    "Bing Maps",
+                    "OpenStreetMap",
+                    "MapLibre",
+                    "Other"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "ci_cd_tools_custom"
+            ]
+          },
+          "else": {
+            "properties": {
+              "spatial_mapping_technologies": {
+                "uniqueItems": true,
+                "title": "Spatial Mapping Technologies",
+                "description": "This key contains the mapping technologies used in the stack(Leaflet, Geoserver, Mapbox, Openlayers, ArcGIS, Google Maps, Bing Maps, OpenStreetMap, MapLibre)",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "enum": [
+                    "Leaflet",
+                    "Geoserver",
+                    "Mapbox",
+                    "Openlayers",
+                    "ArcGIS",
+                    "Google Maps",
+                    "Bing Maps",
+                    "OpenStreetMap",
+                    "MapLibre",
+                    "Other"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "spatial_mapping_technologies": {
+                "contains": {
+                  "enum": [
+                    "Other"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "spatial_mapping_technologies_custom": {
+                "title": "Spatial Mapping Technologies - Custom",
+                "description": "This key contains the mapping technologies used in the stack(Leaflet, Geoserver, Mapbox, Openlayers, ArcGIS, Google Maps, Bing Maps, OpenStreetMap, MapLibre),  which is not available as a pick list in the Spatial Mapping Technologies. Comma separated string with free text",
+                "type": "string"
+              }
+            },
+            "required": [
+              "spatial_mapping_technologies_custom"
+            ]
+          },
+          "else": {
+          }
+        }
+      ]
     },
     "external_dependencies": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "identity_authorization": {
           "uniqueItems": true,
@@ -601,7 +793,6 @@
     },
     "data_management_roles": {
       "type": "object",
-      "additionalProperties": false,
       "required": [
         "product_owner",
         "data_custodian"
@@ -610,12 +801,14 @@
         "product_owner": {
           "title": "Product Owner",
           "description": "This key contains the full name of one of the product owner, It must be a real person",
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "data_custodian": {
           "title": "Data Custodian",
           "description": "This key contains the Contact Name who is data custodian for the application/suite of applications.link https://bcgov.github.io/data-publication/pages/dsg_bcdc_roles_responsibilities.html#am-i-a-data-custodian",
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "data_steward": {
           "title": "Data Steward",
@@ -631,7 +824,7 @@
       "title": "Product Information *",
       "description": "This Section describes the basic information around product and is required to be filled",
       "type": "object",
-      "$ref": "#/definitions/product_info"
+      "$ref": "#/definitions/product_information"
     },
     "data_management_roles": {
       "title": "Data Management Roles *",

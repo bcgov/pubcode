@@ -1,23 +1,20 @@
 import "./App.css";
-
-import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import { Button } from "@material-ui/core/";
 import React from "react";
 import BCGovLogo from "./assets/gov-bc-logo-horiz.png";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes/index.jsx";
+import { AppBar, Button, Container, Grid, IconButton, makeStyles, Toolbar, Typography } from "@mui/material";
+import LeftDrawer from "./components/LeftDrawer.jsx";
+import { HomeRounded } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
   menu: {
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(2)
   },
   title: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   appBarHeader: {
     top: "auto",
@@ -30,40 +27,51 @@ const useStyles = makeStyles((theme) => ({
     top: "auto",
     bottom: 0,
     color: "#ffffff",
-    backgroundColor: "#355992",
+    backgroundColor: "#355992"
   },
   toolbar: {
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between"
   },
   footerButton: {
     margin: "0.2em",
-    padding: "0.2em",
+    padding: "0.2em"
   },
   headerTitle: {
     flexGrow: 0.9,
     fontSize: "1.5em",
     align: "center",
-    alignItems: "center",
+    alignItems: "center"
   }
 }));
 
 function App() {
   const classes = useStyles();
-
   return (
-    <div>
+    <Container>
       <AppBar position="fixed">
         <Toolbar className={classes.appBarHeader}>
           <img src={BCGovLogo} />
           <Typography className={classes.headerTitle}>
             BCGov Public Code
           </Typography>
+          <a href={"/"} target={"_self"} >
+          <IconButton  style={{ backgroundColor: "#FFFFFF"}}>
+            <HomeRounded color="primary" ></HomeRounded>
+          </IconButton>
+          </a>
         </Toolbar>
       </AppBar>
-      <BrowserRouter>
-        <AppRoutes/>
-      </BrowserRouter>
+      <Grid position={"sticky"} container spacing={0}>
+        <BrowserRouter>
+          <Grid position={"sticky"} item xs={2} sm={2} md={2} lg={0} xl={0}>
+          <LeftDrawer />
+          </Grid>
+          <Grid position={"sticky"} item xs={10} sm={10} md={10} lg={12} xl={12}>
+          <AppRoutes />
+          </Grid>
+        </BrowserRouter>
+      </Grid>
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Typography className={classes.title}>
@@ -144,7 +152,7 @@ function App() {
         draggable
         pauseOnHover
       />
-    </div>
+    </Container>
   );
 }
 

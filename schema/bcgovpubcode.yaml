@@ -1,0 +1,21 @@
+  product_information:
+    ministry:
+      - Environment and Climate Change Strategy
+    program_area: LRS
+    product_acronym: ESRA
+    product_name: Electronic Site Registry Application
+    product_description: This application is used to manage the electronic site registry for the Province of British Columbia.
+  data_management_roles:
+    product_owner: Someone
+    data_custodian: Someone
+  product_technology_information:
+    hosting_platforms:
+      - Private-Cloud-Openshift
+    ci_cd_tools:
+      - GitHub-Actions
+    data_storage_platforms:
+      - Postgis
+      - Postgresql
+      - Object-Storage
+      - Mongodb
+  bcgov_pubcode_version: 1

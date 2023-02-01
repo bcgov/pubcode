@@ -40,3 +40,17 @@
 .read-the-docs {
   color: #888;
 }
+.css-12i7wg6-MuiPaper-root-MuiDrawer-paper{
+    top: 4em !important;
+}
+.editForm{
+    margin: 1em;
+}
+button.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.Mui-disabled{
+    background-color: #dadada !important;
+}
+.leftDrawerButtons{
+    color: #ffffff !important;
+    background-color: #355992 !important;
+    border-radius: 0.3em !important;
+}
