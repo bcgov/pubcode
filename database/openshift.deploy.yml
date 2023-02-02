@@ -121,7 +121,7 @@ objects:
                   port: 27017
                 timeoutSeconds: 1
               env:
-                - name: MONGODB_USER
+                - name: MONGO_INITDB_ROOT_USERNAME
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-${COMPONENT}
@@ -131,7 +131,7 @@ objects:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-${COMPONENT}
                       key: database-password
-                - name: MONGODB_ADMIN_PASSWORD
+                - name: MONGO_INITDB_ROOT_USERNAME
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-${COMPONENT}
