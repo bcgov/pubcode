@@ -97,7 +97,7 @@ objects:
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
-                      key: database-password
+                      key: database-admin-password
                 - name: DB_USER
                   valueFrom:
                     secretKeyRef:
