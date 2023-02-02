@@ -26,3 +26,21 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: default
       ME_CONFIG_MONGODB_ADMINPASSWORD: default
       ME_CONFIG_MONGODB_URL: mongodb://default:default@database:27017/
+    depends_on:
+      database:
+        condition: service_started
+
+  backend:
+    image: pub-code-backend:latest
+    build:
+      context: backend
+    environment:
+      DB_HOST: database
+      DB_USER: default
+      DB_PWD: default
+    ports:
+      - "3005:3000"
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_started
