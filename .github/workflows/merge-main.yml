@@ -56,6 +56,7 @@ jobs:
           - name: backend
             file: backend/openshift.deploy.yml
             overwrite: true
+            parameters: -p API_KEY=${{ secrets.API_KEY }}
           - name: init
             file: common/openshift.init.yml
             overwrite: false
