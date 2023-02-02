@@ -6,11 +6,7 @@ const DB_PWD = process.env.DB_PWD || "default";
 const database = async () => {
   mongoose.set("strictQuery", false);
   try {
-    await mongoose.connect(`mongodb://${DB_USER}:${DB_PWD}@${DB_HOST}:27017/pub-code?authSource=admin`,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      });
+    await mongoose.connect(`mongodb://${DB_USER}:${DB_PWD}@${DB_HOST}:27017/pub-code?authSource=admin`);
     mongoose.connection.on("disconnected", () => {
       logger.error("disconnected from mongodb");
     });
