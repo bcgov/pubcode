@@ -42,7 +42,7 @@ parameters:
     description: Image (namespace/name:tag) to promote/import
     value: bcgov/public-code/backend:prod
   - name: API_KEY
-    description: API key to secure some endpoints of the API
+    description: API key to secure the POST endpoint of the API
     required: true
 objects:
   - apiVersion: v1
