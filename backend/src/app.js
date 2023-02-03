@@ -1,5 +1,5 @@
 const express = require("express");
-const { database, pubcodeSchema } = require("./db/database");
+const morgan = require("morgan");
 const nocache = require("nocache");
 const helmet = require("helmet");
 const cors = require("cors");
@@ -8,6 +8,11 @@ const app = express();
 const apiRouter = express.Router();
 const pubcodeRouter = require("./routes/pubcode-router");
 const log = require("./logger");
+const logStream = {
+  write: (message) => {
+    log.info(message);
+  }
+};
 app.set("trust proxy", 1);
 app.use(cors());
 app.use(helmet());
@@ -19,6 +24,7 @@ app.use(bodyParser.urlencoded({
   extended: true,
   limit: "50mb"
 }));
+app.use(morgan("dev", { stream: logStream }));
 app.get("/", (req, res, next) => {
   res.sendStatus(200);// generally for route verification.
 });
