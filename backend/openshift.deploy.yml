@@ -93,7 +93,7 @@ objects:
               env:
                 - name: DB_HOST
                   value: ${NAME}-${ZONE}-database
-                - name: DB_PASSWORD
+                - name: DB_PWD
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
