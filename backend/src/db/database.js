@@ -7,7 +7,9 @@ const DB_PORT = process.env.DB_PORT || 27017;
 const database = async () => {
   mongoose.set("strictQuery", false);
   try {
-    await mongoose.connect(`mongodb://${DB_USER}:${DB_PWD}@${DB_HOST}:${DB_PORT}/pub-code`,{
+    const connectionUri =`mongodb://${DB_USER}:${DB_PWD}@${DB_HOST}:${DB_PORT}/pub-code`;
+    logger.info(`connecting to mongodb on url: ${connectionUri}`);
+    await mongoose.connect(connectionUri,{
       authSource: "admin",
       useNewUrlParser: true,
       useUnifiedTopology: true,
