@@ -2,6 +2,7 @@ name: Pull Request
 
 on:
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -39,12 +40,14 @@ jobs:
       packages: write
     strategy:
       matrix:
-        package: [database, frontend]
+        package: [database, frontend, backend]
         include:
           - package: database
             triggers: ('database/')
           - package: frontend
             triggers: ('frontend/')
+          - package: backend
+            triggers: ('backend/')
     steps:
       - uses: actions/checkout@v3
       - uses: bcgov-nr/action-builder-ghcr@v1.0.0
@@ -62,13 +65,17 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        name: [database, frontend, init]
+        name: [database, frontend, init, backend]
         include:
           - name: database
             file: database/openshift.deploy.yml
             overwrite: false
           - name: frontend
             file: frontend/openshift.deploy.yml
+            overwrite: true
+            parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
+          - name: backend
+            file: backend/openshift.deploy.yml
             overwrite: true
             parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
           - name: init
