@@ -19,6 +19,9 @@ app.use(bodyParser.urlencoded({
   extended: true,
   limit: "50mb"
 }));
+app.get("/", (req, res, next) => {
+  res.sendStatus(200);// generally for route verification.
+});
 app.use(/(\/api)?/, apiRouter);
 apiRouter.use("/pub-code", pubcodeRouter);
 
