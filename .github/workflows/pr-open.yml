@@ -60,7 +60,6 @@ jobs:
 
   deploys:
     name: Deploys
-    environment: dev
     needs:
       - builds
     runs-on: ubuntu-22.04
@@ -78,7 +77,7 @@ jobs:
           - name: backend
             file: backend/openshift.deploy.yml
             overwrite: true
-            parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p API_KEY=${{ secrets.API_KEY }}
+            parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
           - name: init
             file: common/openshift.init.yml
             overwrite: false

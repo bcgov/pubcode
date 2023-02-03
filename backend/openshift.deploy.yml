@@ -41,9 +41,6 @@ parameters:
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
     value: bcgov/public-code/backend:prod
-  - name: API_KEY
-    description: API key to secure the POST endpoint of the API
-    required: true
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -107,7 +104,10 @@ objects:
                       name: ${NAME}-${ZONE}-database
                       key: database-user
                 - name: API_KEY
-                  value: ${API_KEY}
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-backend
+                      key: api_key
               ports:
                 - containerPort: 3000
                   protocol: TCP

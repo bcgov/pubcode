@@ -20,6 +20,10 @@ parameters:
     description: Password for the PostgreSQL connection user.
     from: "[a-zA-Z0-9]{16}"
     generate: expression
+  - name: API_KEY
+    description: KEY for the API
+    from: "[a-zA-Z0-9]{32}"
+    generate: expression
 objects:
   - apiVersion: v1
     kind: Secret
@@ -32,6 +36,15 @@ objects:
       database-password: ${GENERATED_USER_PASSWORD}
       database-admin-password: ${GENERATED_ADMIN_PASSWORD}
       database-user: ${NAME}
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: ${NAME}-${ZONE}-backend
+      labels:
+        app: ${NAME}-${ZONE}
+    stringData:
+      api_key: ${API_KEY}
+
   - apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
