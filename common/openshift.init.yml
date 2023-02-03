@@ -12,13 +12,10 @@ parameters:
     required: true
   - name: PROMOTE
     description: Dummy param, for convenience in deployments
-  - name: GENERATED_USER_PASSWORD
-    description: Password for the PostgreSQL connection user.
-    from: "[a-zA-Z0-9]{16}"
     generate: expression
   - name: GENERATED_ADMIN_PASSWORD
-    description: Password for the PostgreSQL connection user.
-    from: "[a-zA-Z0-9]{16}"
+    description: Password for the mongodb connection user.
+    from: "[a-z]{32}"
     generate: expression
   - name: API_KEY
     description: KEY for the API
@@ -32,10 +29,8 @@ objects:
       labels:
         app: ${NAME}-${ZONE}
     stringData:
-      database-name: ${NAME}
-      database-password: ${GENERATED_USER_PASSWORD}
       database-admin-password: ${GENERATED_ADMIN_PASSWORD}
-      database-user: ${NAME}
+      database-admin-user: default
   - apiVersion: v1
     kind: Secret
     metadata:

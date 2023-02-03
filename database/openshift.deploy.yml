@@ -125,7 +125,7 @@ objects:
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-${COMPONENT}
-                      key: database-user
+                      key: database-admin-user
                 - name: MONGO_INITDB_ROOT_PASSWORD
                   valueFrom:
                     secretKeyRef:
