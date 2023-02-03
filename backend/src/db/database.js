@@ -27,6 +27,9 @@ const database = async () => {
     });
   } catch (error) {
     logger.error(error);
+    if(error.stack?.includes("MongooseServerSelectionError")){
+      process.exit(2);// exit with error code 2 for mongodb connection error
+    }
   }
 };
 module.exports = { database };
