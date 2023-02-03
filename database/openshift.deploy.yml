@@ -131,6 +131,11 @@ objects:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-${COMPONENT}
                       key: database-admin-password
+                - name: MONGODB_DATABASE
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-${COMPONENT}
+                      key: database-name
               volumeMounts:
                 - name: ${NAME}-${ZONE}-${COMPONENT}
                   mountPath: ${PVC_MOUNT_PATH}

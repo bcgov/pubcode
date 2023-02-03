@@ -4,10 +4,11 @@ const DB_HOST = process.env.DB_HOST || "localhost";
 const DB_USER = process.env.DB_USER || "default";
 const DB_PWD = process.env.DB_PWD || "default";
 const DB_PORT = process.env.DB_PORT || 27017;
+const DB_NAME = process.env.DB_NAME || "public-code";
 const database = async () => {
   mongoose.set("strictQuery", false);
   try {
-    const connectionUri =`mongodb://${DB_USER}:${DB_PWD}@${DB_HOST}:${DB_PORT}/pub-code`;
+    const connectionUri =`mongodb://${DB_USER}:${DB_PWD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
     logger.info(`connecting to mongodb on url: ${connectionUri}`);
     await mongoose.connect(connectionUri,{
       authSource: "admin",

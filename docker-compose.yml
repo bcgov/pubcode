@@ -6,8 +6,9 @@ services:
     build:
       context: database
     environment:
-      MONGO_INITDB_ROOT_USERNAME: public-code
+      MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: DPEPGHbjUluRjetU
+      MONGODB_DATABASE: public-code
     image: mongo
     ports:
       - "27017:27017"
@@ -25,7 +26,7 @@ services:
       ME_CONFIG_MONGODB_AUTH_PASSWORD: default
       ME_CONFIG_MONGODB_ADMINUSERNAME: default
       ME_CONFIG_MONGODB_ADMINPASSWORD: default
-      ME_CONFIG_MONGODB_URL: mongodb://public-code:DPEPGHbjUluRjetU@database:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://admin:DPEPGHbjUluRjetU@database:27017/
     depends_on:
       database:
         condition: service_started
@@ -36,8 +37,9 @@ services:
       context: backend
     environment:
       DB_HOST: database
-      DB_USER: default
-      DB_PWD: default
+      DB_USER: admin
+      DB_PWD: DPEPGHbjUluRjetU
+      DB_NAME: public-code
     ports:
       - "3005:3000"
     restart: unless-stopped

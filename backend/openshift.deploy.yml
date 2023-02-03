@@ -102,7 +102,12 @@ objects:
                   valueFrom:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-database
-                      key: database-user
+                      key: database-admin-user
+                - name: DB_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-database
+                      key: database-name
                 - name: API_KEY
                   valueFrom:
                     secretKeyRef:

@@ -14,8 +14,8 @@ parameters:
     description: Dummy param, for convenience in deployments
     generate: expression
   - name: GENERATED_ADMIN_PASSWORD
-    description: Password for the mongodb connection user.
-    from: "[a-z]{32}"
+    description: Password for the mongodb connection admin user.
+    from: "[a-zA-Z0-9]{32}"
     generate: expression
   - name: API_KEY
     description: KEY for the API
@@ -30,7 +30,8 @@ objects:
         app: ${NAME}-${ZONE}
     stringData:
       database-admin-password: ${GENERATED_ADMIN_PASSWORD}
-      database-admin-user: default
+      database-admin-user: admin
+      database-name: ${NAME}
   - apiVersion: v1
     kind: Secret
     metadata:
