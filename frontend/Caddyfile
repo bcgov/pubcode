@@ -4,6 +4,15 @@
     debug
 }
 :3000 {
+    if {path} not_match ^\/api\/ {
+        root * /app/dist
+        file_server
+    }
+     rewrite {
+        auto_https off
+        admin off
+        debug
+    }
     log {
         output stdout
         format console {
