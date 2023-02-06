@@ -46,3 +46,17 @@ services:
     depends_on:
       database:
         condition: service_started
+
+  #Run npm run build-watch in local before this.
+  frontend:
+    image: caddy:2.4.6-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend/Caddyfile:/etc/caddy/Caddyfile
+      - ./frontend/dist:/app/dist
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "3002:3000"
+    restart: unless-stopped

@@ -37,7 +37,8 @@ const useStyles = makeStyles((theme) => ({
   },
   footerButton: {
     margin: "0.2em",
-    padding: "0.2em"
+    padding: "0.2em",
+    backgroundColor: "#ffffff"
   },
   headerTitle: {
     flexGrow: 0.9,
