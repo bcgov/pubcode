@@ -26,7 +26,7 @@ parameters:
     value: ghcr.io
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    required: true
+    value: bcgov/public-code/database:test
 objects:
   - kind: PersistentVolumeClaim
     apiVersion: v1
@@ -95,7 +95,7 @@ objects:
                 claimName: ${NAME}-${ZONE}-${COMPONENT}
           initContainers:
             - name: ${NAME}-init
-              image: ghcr.io/bcgov/public-code/${COMPONENT}:${ZONE}
+              image: ${REGISTRY}/${PROMOTE}
               command: ["sh", "-c", "mkdir -p /data/db"]
               volumeMounts:
                 - name: ${NAME}-${ZONE}-${COMPONENT}
