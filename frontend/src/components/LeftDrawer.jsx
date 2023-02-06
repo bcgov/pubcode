@@ -25,7 +25,7 @@ export default function LeftDrawer() {
   };
   return (
     <div>
-      <Drawer style={{ zIndex: "0 !important", top: "4em !important" }}
+      <Drawer style={{ zIndex: "0 !important", backgroundColor:"#fafafa", top: "4em !important" }}
               variant="permanent"
               open={true}
       >
