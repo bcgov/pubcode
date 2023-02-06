@@ -40,7 +40,7 @@ parameters:
     value: bcgov
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/public-code/backend:prod
+    value: bcgov/public-code/backend:test
 objects:
   - apiVersion: v1
     kind: ImageStream
