@@ -1,28 +1,34 @@
 "use strict";
 const logger = require("../logger");
 const pubcodeEntity = require("../entities/pub-code-entity");
+let results;
 /**
  * The below method will be called from the router after validating the x-api-key in the router layer.
  * it will take the request body and parse it into a json object array. it is expected that the request body is a json array of objects.
  * the json array of objects will be validated against the schema and then inserted into the database.
  * it will delete and add all these new in a single transaction into mongoDB.
  */
+async function insertOrUpdate(payload, notInsertedArray) {
+  for (const pubcode of payload) {
+    const foundEntity = await pubcodeEntity.findOneAndReplace({ repo_name: pubcode.repo_name }, pubcode).exec();
+    if (!foundEntity) {
+      notInsertedArray.push(pubcode);
+    }
+  }
+  if (notInsertedArray.length > 0) {
+    await pubcodeEntity.insertMany(notInsertedArray);
+  }
+}
 
 const bulkLoad = async (req, res) => {
   try {
     const notInsertedArray = [];
     const payload = req.body;
     if (payload && Array.isArray(payload) && payload.length > 0) {
-      for (const pubcode of payload) {
-        const foundEntity = await pubcodeEntity.findOneAndReplace({ repo_name: pubcode.repo_name }, pubcode).exec();
-        if (!foundEntity) {
-          notInsertedArray.push(pubcode);
-        }
-      }
-      if (notInsertedArray.length > 0) {
-        await pubcodeEntity.insertMany(notInsertedArray);
-      }
-      res.status(200).json({ });
+      insertOrUpdate(payload, notInsertedArray).catch((error) => {
+        logger.error("bulkLoad: ", error);
+      });
+      res.status(200).json({});
     } else {
       res.status(400).json({ message: "Invalid request body" });
     }
@@ -34,8 +40,10 @@ const bulkLoad = async (req, res) => {
 };
 const readAll = async (req, res) => {
   try {
-    const result = await pubcodeEntity.find({});
-    res.status(200).json(result);
+    if(!results){
+      results = await pubcodeEntity.find({});
+    }
+    res.status(200).json(results);
   } catch (error) {
     logger.error("readAll: ", error);
     res.status(500).json(error);
