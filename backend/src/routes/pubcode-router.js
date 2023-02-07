@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { bulkLoad, readAll, findById, health } = require("../services/pub-code-service");
 
+router.get("/ip/trace", (request, response) => response.send(request.ip));
 router.get("/health", health);
 router.post("/bulk-load", (req, res, next) => {
   if (req.header("X-API-KEY") && req.header("X-API-KEY") === process.env.API_KEY) {

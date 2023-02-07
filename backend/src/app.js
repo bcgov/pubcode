@@ -8,12 +8,20 @@ const app = express();
 const apiRouter = express.Router();
 const pubcodeRouter = require("./routes/pubcode-router");
 const log = require("./logger");
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 1 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
 const logStream = {
   write: (message) => {
     log.info(message);
   }
 };
 app.set("trust proxy", 1);
+app.use(limiter);
 app.use(cors());
 app.use(helmet());
 app.use(nocache());
