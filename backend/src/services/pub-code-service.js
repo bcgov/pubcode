@@ -43,7 +43,7 @@ const readAll = async (req, res) => {
     if(!results){
       results = await pubcodeEntity.find({});
     }
-    res.status(200).json(result);
+    res.status(200).json(results);
   } catch (error) {
     logger.error("readAll: ", error);
     res.status(500).json(error);
