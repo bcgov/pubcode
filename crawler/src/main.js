@@ -3,7 +3,6 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 const token = process.env.GIT_TOKEN;
-const apiKey = process.env.API_KEY;
 const repoWithDetailsArray = [];
 const yamlArray = [];
 
@@ -88,6 +87,4 @@ const performCrawling = async () => {
   await getAllPubCodeYamls();
 };
 
-// REMOVE THIS BEFORE USING A REAL API_KEY!
-console.log(apiKey);
 await performCrawling();
