@@ -44,13 +44,13 @@ export default function LeftDrawer() {
                 description: "Edit an existing bcgovpubcode yml file",
                 icon: "Edit"
               },
-              {
+              /*{
                 key: "Search",
                 route: "/search",
                 icon: "Search",
                 description: "Search for a repository",
                 disabled: true
-              }].map((element) => (
+              }*/].map((element) => (
               <ListItem key={element.key}>
                 <Button className={element.disabled ? `${classes.disabled}` : `${classes.leftDrawer}`} disabled={element.disabled}
                         onClick={() => buttonClicked(element)}>

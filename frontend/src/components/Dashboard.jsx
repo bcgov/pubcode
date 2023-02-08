@@ -7,7 +7,7 @@ export default function Dashboard() {
       <span style={{textAlign:"left"}}>This tool allows you to achieve the below. <ol>
           <li>Create a BCGov Public Code yaml(bcgovpubcode.yml) file from scratch.</li>
           <li>Import a BCGov Public Code yaml(bcgovpubcode.yml) file from github and edit.</li>
-          <li>Search on various attributes of all the BCGov Public Code yaml file from github (TBD).</li>
+         {/* <li>Search on various attributes of all the BCGov Public Code yaml file from github (TBD).</li>*/}
         </ol></span>
     </Paper>
   );
