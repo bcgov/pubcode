@@ -1,13 +1,10 @@
 name: public-code-crawler
 
-env:
-  GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 on:
   workflow_dispatch:
   schedule:
     # * is a special character in YAML, so you have to quote this string, everyday at 8am GMT
-    - cron:  '0 8 * * *'
+    - cron: "0 8 * * *"
 
 concurrency:
   group: ${{ github.workflow }}
@@ -17,6 +14,7 @@ jobs:
   pubcode-crawler:
     name: Crawl Git Repos for bcgovpubcode.yml
     runs-on: ubuntu-22.04
+    environment: prod
     defaults:
       run:
         working-directory: crawler
@@ -27,7 +25,7 @@ jobs:
       - name: Add Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: "18.x"
 
       - uses: actions/cache@v3
         with:
@@ -40,6 +38,8 @@ jobs:
         run: npm ci
 
       - name: process script
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          API_TOKEN: ${{ secrets.OC_PROJECT}}
         run: |
           node src/main.js
-
