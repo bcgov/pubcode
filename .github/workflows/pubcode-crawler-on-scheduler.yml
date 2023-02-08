@@ -6,8 +6,8 @@ env:
 on:
   workflow_dispatch:
   schedule:
-    # * is a special character in YAML, so you have to quote this string
-    - cron:  '0 0 * * *'
+    # * is a special character in YAML, so you have to quote this string, everyday at 8am GMT
+    - cron:  '0 8 * * *'
 
 concurrency:
   group: ${{ github.workflow }}

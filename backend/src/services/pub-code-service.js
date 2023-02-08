@@ -1,7 +1,8 @@
 "use strict";
 const logger = require("../logger");
 const pubcodeEntity = require("../entities/pub-code-entity");
-let results;
+const cacheService = require("../services/cache-service");
+
 /**
  * The below method will be called from the router after validating the x-api-key in the router layer.
  * it will take the request body and parse it into a json object array. it is expected that the request body is a json array of objects.
@@ -40,10 +41,7 @@ const bulkLoad = async (req, res) => {
 };
 const readAll = async (req, res) => {
   try {
-    if(!results){
-      results = await pubcodeEntity.find({});
-    }
-    res.status(200).json(results);
+    res.status(200).json(cacheService.getAllPubCodes());
   } catch (error) {
     logger.error("readAll: ", error);
     res.status(500).json(error);
@@ -68,7 +66,8 @@ const health = async (req, res) => {
     logger.error("health: ", error);
     res.status(500).json(error);
   }
-}
+};
+
 module.exports = {
   bulkLoad,
   readAll,

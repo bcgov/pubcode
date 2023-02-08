@@ -1,5 +1,4 @@
 "use strict";
-
 const http = require("http");
 const log = require("./logger");
 const dotenv = require("dotenv");
@@ -7,6 +6,7 @@ dotenv.config();
 const app = require("./app");
 const { database } = require("./db/database");
 const port = normalizePort(process.env.PORT || 3000);
+const cacheService = require("./services/cache-service");
 app.set("port", port);
 const server = http.createServer(app);
 database().then(() => {
@@ -14,6 +14,11 @@ database().then(() => {
   server.listen(port);
   server.on("error", onError);
   server.on("listening", onListening);
+  cacheService.loadAllPubCodes().then(() => {
+    log.info("pub codes loaded to cache");
+  }).catch((error) => {
+    log.error(error);
+  });
 }).catch((error) => {
   log.error(error);
   process.exit(1);
