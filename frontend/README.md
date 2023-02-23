@@ -15,7 +15,7 @@ The user fills out a form, which generates a bcgovpubcode.yml file, which can be
 
 ## OpenShift Deployment
 
-Each [Pull Request workflow](.github/workflows/pr-open.yml) creates a sandboxed environment deployed in OpenShift. A temporary URL is provided as part of the PR's checks.  Environments are removed when their PRs are closed.
+Each [Pull Request workflow](./../.github/workflows/pr-open.yml) creates a sandboxed environment deployed in OpenShift. A temporary URL is provided as part of the PR's checks.  Environments are removed when their PRs are closed.
 
 ## Local Development
 
