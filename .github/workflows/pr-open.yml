@@ -51,7 +51,7 @@ jobs:
             triggers: ('backend/')
     steps:
       - uses: actions/checkout@v3
-      - uses: bcgov-nr/action-builder-ghcr@v1.0.0
+      - uses: bcgov-nr/action-builder-ghcr@v1.1.0
         with:
           package: ${{ matrix.package }}
           tag: ${{ github.event.number }}
@@ -83,7 +83,7 @@ jobs:
             file: common/openshift.init.yml
             overwrite: false
     steps:
-      - uses: bcgov-nr/action-deployer-openshift@v1.0.1
+      - uses: bcgov-nr/action-deployer-openshift@v1.0.2
         with:
           file: ${{ matrix.file }}
           oc_namespace: ${{ secrets.OC_NAMESPACE }}
