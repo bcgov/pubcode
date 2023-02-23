@@ -3,7 +3,7 @@ name: public-code-crawler
 on:
   workflow_dispatch:
   schedule:
-    # * is a special character in YAML, so you have to quote this string, everyday at 8am GMT
+    # * is a special character in YAML, so you have to quote this string, every day at 8am GMT
     - cron: "0 8 * * *"
 
 concurrency:
@@ -40,6 +40,7 @@ jobs:
       - name: Process script
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          API_URL: ${{ secrets.API_URL }}
         run: |
           oc login --token=${{ secrets.OC_TOKEN }} --server=${{ secrets.OC_SERVER }}
           oc project ${{ secrets.OC_NAMESPACE }}

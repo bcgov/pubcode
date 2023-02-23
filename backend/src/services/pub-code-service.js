@@ -11,6 +11,13 @@ const cacheService = require("../services/cache-service");
  */
 async function insertOrUpdate(payload, notInsertedArray) {
   for (const pubcode of payload) {
+    const entity = new pubcodeEntity({...pubcode});
+    const errors = entity.validateSync();
+    if(errors){
+      console.info(`insertOrUpdate: ${pubcode.repo_name} is not valid`);
+      logger.error("insertOrUpdate: ", errors);
+      continue;
+    }
     const foundEntity = await pubcodeEntity.findOneAndReplace({ repo_name: pubcode.repo_name }, pubcode).exec();
     if (!foundEntity) {
       notInsertedArray.push(pubcode);
