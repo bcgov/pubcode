@@ -16,7 +16,10 @@ function removeBlankFields(jsonData) {
         _.unset(jsonData, replaceProp);
       }
     }
-    return _.pickBy(jsonData, value => !_.isEmpty(value));
+    const trimmedData = _.pickBy(jsonData, value => {
+      return !_.isEmpty(value);
+    });
+    trimmedData.bcgov_pubcode_version = jsonData.bcgov_pubcode_version; // special case for this field as it is not in the props array
   }
   return jsonData;
 }

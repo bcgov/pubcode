@@ -1,0 +1,35 @@
+bcgov_pubcode_version: 1
+data_management_roles:
+  data_custodian: Om
+  data_steward: Om
+  product_owner: Jeff Card
+product_information:
+  ministry:
+    - Water, Land and Resource Stewardship
+  product_acronym: PUBCODE
+  product_description: Public Code Asset Management Schema
+  product_name: Public Code
+  product_status: active
+  product_urls:
+    - https://public-code-prod-frontend.apps.silver.devops.gov.bc.ca
+    - https://public-code-prod-backend.apps.silver.devops.gov.bc.ca/api/pub-code
+  program_area: Arch & Bus Strategy
+product_technology_information:
+  backend_frameworks:
+    - name: Express
+      version: 4.x
+  backend_languages_version:
+    - name: JavaScript
+      version: es2022
+  ci_cd_tools:
+    - GitHub-Actions
+  data_storage_platforms:
+    - Mongodb
+  frontend_frameworks:
+    - name: React
+      version: 18.x
+  frontend_languages:
+    - name: JavaScript
+      version: es2022
+  hosting_platforms:
+    - Private-Cloud-Openshift
