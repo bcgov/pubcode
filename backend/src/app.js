@@ -32,7 +32,9 @@ app.use(bodyParser.urlencoded({
   extended: true,
   limit: "50mb"
 }));
-app.use(morgan("dev", { stream: logStream }));
+app.use(morgan("dev", { stream: logStream,
+  skip: (req, _res) => req.url === '/health' || req.url === '/'
+}));
 app.get("/", (req, res, next) => {
   res.sendStatus(200);// generally for route verification.
 });
