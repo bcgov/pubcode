@@ -15,7 +15,6 @@
     encode gzip
 	handle /env-config.js {
             header Content-Type text/javascript
-            respond `window.config = {"VITE_BACKEND_URL": "{$BACKEND_URL}"};`
     }
 	handle {
 		root * /app/dist
