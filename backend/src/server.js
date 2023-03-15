@@ -19,6 +19,7 @@ database().then(() => {
   }).catch((error) => {
     log.error(error);
   });
+  require("./schedulers/refresh-cache");
 }).catch((error) => {
   log.error(error);
   process.exit(1);
