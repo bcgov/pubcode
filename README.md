@@ -1,9 +1,9 @@
 <!-- PROJECT SHIELDS -->
 
 
-[![Issues](https://img.shields.io/github/issues/bcgov/public-code)](/../../issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/bcgov/public-code)](/../../pulls)
-[![MIT License](https://img.shields.io/github/license/bcgov/public-code.svg)](/LICENSE.md)
+[![Issues](https://img.shields.io/github/issues/bcgov/pubcode)](/../../issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/bcgov/pubcode)](/../../pulls)
+[![MIT License](https://img.shields.io/github/license/bcgov/pubcode.svg)](/LICENSE.md)
 [![Lifecycle](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
 
 
@@ -51,7 +51,7 @@ sequenceDiagram
 
 Please see README.md files in each component's folder to learn more.
 
-[backend/README.md](backend/README.md)
+[api/README.md](api/README.md)
 
 [schema/README.md](schema/README.md)
 

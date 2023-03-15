@@ -23,10 +23,10 @@ jobs:
   #   runs-on: ubuntu-22.04
   #   strategy:
   #     matrix:
-  #       dir: [backend, frontend]
+  #       dir: [api, frontend]
   #       include:
-  #         - dir: backend
-  #           sonar_projectKey: bcgov_public-code_backend
+  #         - dir: api
+  #           sonar_projectKey: bcgov_public-code_api
   #           token: SONAR_TOKEN_BACKEND
   #         - dir: frontend
   #           sonar_projectKey: bcgov_public-code_frontend

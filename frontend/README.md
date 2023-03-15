@@ -26,11 +26,11 @@ Steps:
 
 1. Clone the repository
     ```bash
-    git clone https://github.com/bcgov/public-code.git
+    git clone https://github.com/bcgov/pubcode.git
     ```
     OR
     ```bash
-    git clone git@github.com:bcgov/public-code.git
+    git clone git@github.com:bcgov/pubcode.git
     ```
 2. Install dependencies
     ```bash

@@ -6,18 +6,19 @@ labels:
 parameters:
   - name: NAME
     description: Module name
-    value: public-code
+    value: pubcode
   - name: COMPONENT
     description: Component name
-    value: backend
+    value: api
   - name: ZONE
     description: Deployment zone, e.g. pr-### or prod
     required: true
   - name: IMAGE_TAG
     description: Image tag to use
     value: latest
-  - name: DOMAIN
-    value: apps.silver.devops.gov.bc.ca
+  - name: ROUTE
+    description: URL for route
+    required: true
   - name: CPU_REQUEST
     value: "25m"
   - name: MEMORY_REQUEST
@@ -40,7 +41,7 @@ parameters:
     value: bcgov
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/public-code/backend:test
+    value: bcgov/pubcode/api:test
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -111,7 +112,7 @@ objects:
                 - name: API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-backend
+                      name: ${NAME}-${ZONE}-api
                       key: api_key
               ports:
                 - containerPort: 3000
@@ -164,7 +165,7 @@ objects:
         app: ${NAME}-${ZONE}
       name: ${NAME}-${ZONE}-${COMPONENT}
     spec:
-      host: ${NAME}-${ZONE}-${COMPONENT}.${DOMAIN}
+      host: ${ROUTE}
       port:
         targetPort: 3000-tcp
       to:
