@@ -32,7 +32,7 @@ services:
         condition: service_started
 
   backend:
-    image: pub-code-backend:latest
+    image: pub-code-api:latest
     build:
       context: backend
     environment:

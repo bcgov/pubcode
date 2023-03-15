@@ -112,7 +112,7 @@ objects:
                 - name: API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: ${NAME}-${ZONE}-backend
+                      name: ${NAME}-${ZONE}-api
                       key: api_key
               ports:
                 - containerPort: 3000

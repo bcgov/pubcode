@@ -35,7 +35,7 @@ objects:
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: ${NAME}-${ZONE}-backend
+      name: ${NAME}-${ZONE}-api
       labels:
         app: ${NAME}-${ZONE}
     stringData:

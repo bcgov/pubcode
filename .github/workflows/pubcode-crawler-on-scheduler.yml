@@ -46,5 +46,5 @@ jobs:
           oc project ${{ secrets.OC_NAMESPACE }}
 
           # Get API key
-          API_KEY=$(oc get secrets/pubcode-backend --template={{.data.api_key}} | base64 -d)
+          API_KEY=$(oc get secrets/pubcode-api --template={{.data.api_key}} | base64 -d)
           API_KEY="${API_KEY}" node src/main.js
