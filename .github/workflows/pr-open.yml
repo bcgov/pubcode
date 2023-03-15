@@ -74,7 +74,9 @@ jobs:
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
-            parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
+            parameters:
+              -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
+              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
           - name: backend
             file: backend/openshift.deploy.yml
             overwrite: true
