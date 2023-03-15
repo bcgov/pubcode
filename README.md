@@ -51,7 +51,7 @@ sequenceDiagram
 
 Please see README.md files in each component's folder to learn more.
 
-[backend/README.md](backend/README.md)
+[api/README.md](api/README.md)
 
 [schema/README.md](schema/README.md)
 

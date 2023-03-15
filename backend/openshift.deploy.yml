@@ -9,7 +9,7 @@ parameters:
     value: pubcode
   - name: COMPONENT
     description: Component name
-    value: backend
+    value: api
   - name: ZONE
     description: Deployment zone, e.g. pr-### or prod
     required: true
@@ -41,7 +41,7 @@ parameters:
     value: bcgov
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/pubcode/backend:test
+    value: bcgov/pubcode/api:test
 objects:
   - apiVersion: v1
     kind: ImageStream

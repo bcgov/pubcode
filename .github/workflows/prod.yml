@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        name: [backend, database, frontend, init]
+        name: [api, database, frontend, init]
         include:
-          - name: backend
-            file: backend/openshift.deploy.yml
+          - name: api
+            file: api/openshift.deploy.yml
             overwrite: true
           - name: database
             file: database/openshift.deploy.yml
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        component: [backend, frontend]
+        component: [api, database, frontend]
     steps:
       - uses: shrink/actions-docker-registry-tag@v3
         with:

@@ -28,8 +28,8 @@ jobs:
             Thanks for the PR!
 
             Any successful deployments (not always required) will be available below.
+            [API](https://${{ env.PREFIX }}-api.${{ env.DOMAIN }}/) available
             [Frontend](https://${{ env.PREFIX }}.${{ env.DOMAIN }}/) available
-            [Backend](https://${{ env.PREFIX }}-api.${{ env.DOMAIN }}/) available
 
             Once merged, code will be promoted and handed off to following workflow run.
             [Main Merge Workflow](https://github.com/${{ github.repository }}/actions/workflows/merge-main.yml)
@@ -41,14 +41,14 @@ jobs:
       packages: write
     strategy:
       matrix:
-        package: [database, frontend, backend]
+        package: [api, database, frontend]
         include:
           - package: database
             triggers: ('database/')
           - package: frontend
             triggers: ('frontend/')
-          - package: backend
-            triggers: ('backend/')
+          - package: api
+            triggers: ('api/')
     steps:
       - uses: actions/checkout@v3
       - uses: bcgov-nr/action-builder-ghcr@v1.1.0
@@ -66,8 +66,14 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        name: [database, frontend, init, backend]
+        name: [api, database, frontend, init]
         include:
+          - name: api
+            file: api/openshift.deploy.yml
+            overwrite: true
+            parameters:
+              -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
+              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
           - name: database
             file: database/openshift.deploy.yml
             overwrite: false
@@ -76,12 +82,6 @@ jobs:
             overwrite: true
             parameters:
               -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
-              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
-          - name: backend
-            file: backend/openshift.deploy.yml
-            overwrite: true
-            parameters:
-              -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
               -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
           - name: init
             file: common/openshift.init.yml
