@@ -3,7 +3,7 @@ kind: Template
 parameters:
   - name: NAME
     description: Product name
-    value: public-code
+    value: pubcode
   - name: COMPONENT
     description: Component name
     value: database
@@ -26,7 +26,7 @@ parameters:
     value: ghcr.io
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
-    value: bcgov/public-code/database:test
+    value: bcgov/pubcode/database:test
 objects:
   - kind: PersistentVolumeClaim
     apiVersion: v1

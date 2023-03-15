@@ -8,7 +8,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: DPEPGHbjUluRjetU
-      MONGODB_DATABASE: public-code
+      MONGODB_DATABASE: pubcode
     image: mongo
     ports:
       - "27017:27017"
@@ -39,7 +39,7 @@ services:
       DB_HOST: database
       DB_USER: admin
       DB_PWD: DPEPGHbjUluRjetU
-      DB_NAME: public-code
+      DB_NAME: pubcode
     ports:
       - "3005:3000"
     restart: unless-stopped

@@ -11,8 +11,8 @@ product_information:
   product_name: Public Code
   product_status: active
   product_urls:
-    - https://public-code-prod-frontend.apps.silver.devops.gov.bc.ca
-    - https://public-code-prod-backend.apps.silver.devops.gov.bc.ca/api/pub-code
+    - https://pubcode.apps.silver.devops.gov.bc.ca
+    - https://pubcode-prod-backend.apps.silver.devops.gov.bc.ca/api/pub-code
   program_area: Arch & Bus Strategy
 product_technology_information:
   backend_frameworks:
