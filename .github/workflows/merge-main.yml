@@ -57,6 +57,7 @@ jobs:
           - name: backend
             file: backend/openshift.deploy.yml
             overwrite: true
+            parameters: -p ROUTE=pubcode-test-api.apps.silver.devops.gov.bc.ca
           - name: init
             file: common/openshift.init.yml
             overwrite: false

@@ -16,8 +16,9 @@ parameters:
   - name: IMAGE_TAG
     description: Image tag to use
     value: latest
-  - name: DOMAIN
-    value: apps.silver.devops.gov.bc.ca
+  - name: ROUTE
+    description: URL for route
+    required: true
   - name: CPU_REQUEST
     value: "25m"
   - name: MEMORY_REQUEST
@@ -164,7 +165,7 @@ objects:
         app: ${NAME}-${ZONE}
       name: ${NAME}-${ZONE}-${COMPONENT}
     spec:
-      host: ${NAME}-${ZONE}-${COMPONENT}.${DOMAIN}
+      host: ${ROUTE}
       port:
         targetPort: 3000-tcp
       to:

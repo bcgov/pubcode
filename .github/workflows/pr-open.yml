@@ -80,7 +80,9 @@ jobs:
           - name: backend
             file: backend/openshift.deploy.yml
             overwrite: true
-            parameters: -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
+            parameters:
+              -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
+              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
           - name: init
             file: common/openshift.init.yml
             overwrite: false
