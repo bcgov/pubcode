@@ -7,6 +7,9 @@ parameters:
   - name: DATABASE
     description: Postgres database name
     value: database
+  - name: API
+    description: API name
+    value: api
   - name: ZONE
     description: Deployment zone, e.g. pr-### or prod
     required: true
@@ -35,12 +38,11 @@ objects:
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: ${NAME}-${ZONE}-api
+      name: ${NAME}-${ZONE}-${API}
       labels:
         app: ${NAME}-${ZONE}
     stringData:
       api_key: ${API_KEY}
-
   - apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
