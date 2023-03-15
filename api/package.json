@@ -1,5 +1,5 @@
 {
-  "name": "public-code-api",
+  "name": "pubcode-api",
   "version": "1.0.0",
   "main": "server.js",
   "dependencies": {
@@ -28,8 +28,8 @@
   "description": "Public Code API",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bcgov/public-code.git",
-    "directory": "backend",
+    "url": "https://github.com/bcgov/pubcode.git",
+    "directory": "api",
     "branch": "main"
   },
   "nodemonConfig": {

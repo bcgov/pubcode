@@ -62,7 +62,7 @@ const FormComponent = () => {
     async function fetchData() {
       try {
         const response = await fetch(
-          "https://raw.githubusercontent.com/bcgov/public-code/main/schema/bcgovpubcode.json"
+          "https://raw.githubusercontent.com/bcgov/pubcode/main/schema/bcgovpubcode.json"
         );
         const data = await response.json();
         setSchema(data);
