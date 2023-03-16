@@ -26,6 +26,9 @@ const pubcode = new Schema(
     bcgov_pubcode_version: {
       type: Number,
       required: true
+    },
+    github_info: {
+      type: Object
     }
   },
   { collection: "pubcode" }
