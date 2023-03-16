@@ -40,11 +40,11 @@ jobs:
       - name: Process script
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          API_URL: ${{ secrets.API_URL }}
         run: |
           oc login --token=${{ secrets.OC_TOKEN }} --server=${{ secrets.OC_SERVER }}
           oc project ${{ secrets.OC_NAMESPACE }}
 
           # Get API key
           API_KEY=$(oc get secrets/pubcode-prod-api --template={{.data.api_key}} | base64 -d)
-          API_KEY="${API_KEY}" node src/main.js
+          API_URL=$(oc get route/pubcode-prod-api --template={{.spec.host}})
+          API_KEY="${API_KEY}" API_URL="${API_URL}" node src/main.js
