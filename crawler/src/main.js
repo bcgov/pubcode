@@ -17,10 +17,12 @@ async function getAllPubCodeYamlsAsJSON() {
       const yaml = yamlResponse.data;
       const yamlJson = jsYaml.load(yaml);
       yamlJson.repo_name = repoWithDetails.name;
-      yamlJson.stars = repoWithDetails.stars;
-      yamlJson.last_updated = repoWithDetails.lastUpdated?.substring(0, 10);
-      yamlJson.license = repoWithDetails.license;
-      yamlJson.watchers = repoWithDetails.watchers;
+      const githubInfo = {
+        last_updated : repoWithDetails.lastUpdated?.substring(0, 10),
+        license : repoWithDetails.license,
+        watchers : repoWithDetails.watchers
+      }
+      yamlJson.github_info = githubInfo;
       yamlArray.push(yamlJson);
     } catch (e) {
       console.error(e.response?.status);

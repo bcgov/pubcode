@@ -13,16 +13,13 @@
         level debug
     }
     encode gzip
-	handle /env-config.js {
-            header Content-Type text/javascript
-            respond `window.config = {"VITE_BACKEND_URL": "{$BACKEND_URL}"};`
+
+    handle {
+        root * /app/dist
+        try_files {path} {path}/ /index.html
+        file_server
     }
-	handle {
-		root * /app/dist
-		try_files {path} {path}/ /index.html
-		file_server
-	}
-	header {
+    header {
         X-Frame-Options "SAMEORIGIN"
         X-XSS-Protection "1;mode=block"
         Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate"
