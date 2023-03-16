@@ -19,10 +19,10 @@ jobs:
           - name: api
             file: api/openshift.deploy.yml
             overwrite: true
+            parameters: -p ROUTE=pubcode-api.apps.silver.devops.gov.bc.ca
           - name: database
             file: database/openshift.deploy.yml
             overwrite: false
-            parameters: -p ROUTE=pubcode-api.apps.silver.devops.gov.bc.ca
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
