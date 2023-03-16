@@ -46,5 +46,5 @@ jobs:
 
           # Get API key
           API_KEY=$(oc get secrets/pubcode-prod-api --template={{.data.api_key}} | base64 -d)
-          API_URL=$(oc get route/pubcode-prod-api --template={{.spec.host}})
+          API_URL=https://$(oc get route/pubcode-prod-api --template={{.spec.host}})
           API_KEY="${API_KEY}" API_URL="${API_URL}" node src/main.js
