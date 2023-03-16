@@ -1,6 +1,7 @@
 import axios from "axios";
 import * as dotenv from "dotenv";
 import jsYaml from "js-yaml";
+
 dotenv.config();
 const token = process.env.GIT_TOKEN;
 const repoWithDetailsArray = [];
@@ -25,18 +26,17 @@ async function getAllPubCodeYamlsAsJSON() {
   return yamlArray;
 
 }
+
 async function bulkLoadPubCodes(yamlArrayAsJson) {
   if (yamlArrayAsJson.length > 0) {
     console.info(`Found ${yamlArrayAsJson.length} yaml files to load into database.`);
-    console.info(yamlArrayAsJson);
     //send to backend api bulk load endpoint
     try {
-      const response = await axios.post(`${API_URL}/api/pub-code/bulk-load`, yamlArrayAsJson, {
+      await axios.post(`${API_URL}/api/pub-code/bulk-load`, yamlArrayAsJson, {
         headers: {
           "X-API-KEY": API_KEY
         }
       });
-      console.info(response.data);
       console.info(`Successfully loaded ${yamlArrayAsJson.length} yaml files into database.`);
     } catch (e) {
       console.error(e.response?.status);
@@ -117,5 +117,7 @@ const performCrawling = async () => {
 if (!token || !API_KEY || !API_URL) {
   console.error("Please provide GIT_TOKEN, API_KEY and API_URL in .env file");
   process.exit(1);
+}else {
+  console.info("Starting crawling... and API_URL is ", API_URL);
 }
 await performCrawling();
