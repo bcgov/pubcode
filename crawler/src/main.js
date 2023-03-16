@@ -17,6 +17,10 @@ async function getAllPubCodeYamlsAsJSON() {
       const yaml = yamlResponse.data;
       const yamlJson = jsYaml.load(yaml);
       yamlJson.repo_name = repoWithDetails.name;
+      yamlJson.stars = repoWithDetails.stars;
+      yamlJson.last_updated = repoWithDetails.lastUpdated?.substring(0, 10);
+      yamlJson.license = repoWithDetails.license;
+      yamlJson.watchers = repoWithDetails.watchers;
       yamlArray.push(yamlJson);
     } catch (e) {
       console.error(e.response?.status);
@@ -66,7 +70,17 @@ const performCrawling = async () => {
                             isArchived,
                             defaultBranchRef{
                               name
-                            }
+                            },
+                            stargazers {
+                              totalCount
+                            },
+                            watchers {
+                              totalCount
+                            },
+                            licenseInfo {
+                              name
+                            },
+                            updatedAt
                           }
                           cursor
                         }
@@ -92,7 +106,11 @@ const performCrawling = async () => {
             repoWithDetailsArray.push(
               {
                 name: edge.node.name,
-                defaultBranch: edge.node.defaultBranchRef.name
+                defaultBranch: edge.node.defaultBranchRef.name,
+                stars: edge.node.stargazers?.totalCount,
+                lastUpdated: edge.node.updatedAt,
+                license: edge.node.licenseInfo?.name,
+                watchers: edge.node.watchers?.totalCount
               });
           } else {
             console.warn(`skipping ${edge.node.name} as it does not have default branch or is archived., Default branch: '${edge.node.defaultBranchRef?.name}', isArchived: '${edge.node.isArchived}'`);
@@ -117,7 +135,7 @@ const performCrawling = async () => {
 if (!token || !API_KEY || !API_URL) {
   console.error("Please provide GIT_TOKEN, API_KEY and API_URL in .env file");
   process.exit(1);
-}else {
+} else {
   console.info("Starting crawling... and API_URL is ", API_URL);
 }
 await performCrawling();
