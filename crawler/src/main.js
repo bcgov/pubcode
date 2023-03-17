@@ -20,7 +20,8 @@ async function getAllPubCodeYamlsAsJSON() {
       const githubInfo = {
         last_updated : repoWithDetails.lastUpdated?.substring(0, 10),
         license : repoWithDetails.license,
-        watchers : repoWithDetails.watchers
+        watchers : repoWithDetails.watchers,
+        stars: repoWithDetails.stars
       }
       yamlJson.github_info = githubInfo;
       yamlArray.push(yamlJson);
