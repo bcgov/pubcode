@@ -11,7 +11,8 @@ const cacheService = {
         ...individualData.product_information,
         ...individualData.product_technology_information,
         ...individualData.product_external_dependencies,
-        ...individualData.data_management_roles
+        ...individualData.data_management_roles,
+        ...individualData.github_info,
       };
       newPubCodes.push(normalizedResult);
     }
