@@ -6,7 +6,7 @@ COPY . ./
 RUN npm ci --omit=dev
 
 # Deployment container
-FROM node:lts-alpine
+FROM node:lts-alpine@sha256:ffc770cdc09c9e83cccd99d663bb6ed56cfaa1bab94baf1b12b626aebeca9c10
 
 # Set node to production
 ENV NODE_ENV production

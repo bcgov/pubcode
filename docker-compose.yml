@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   mongo-express: # The admin UI container for mongoDB
-    image: mongo-express
+    image: mongo-express@sha256:dcfcf89bf91238ff129469a5a94523b3025913dcc41597d72d4d5f4a0339cc7d
     restart: unless-stopped
     ports:
       - "8001:8081"
@@ -49,7 +49,7 @@ services:
 
   #Run npm run build-watch in local before this.
   frontend:
-    image: caddy:2.4.6-alpine
+    image: caddy:2.4.6-alpine@sha256:15e576e7d00b1f41a648c5295a03677c24da5fede09131edcb1e6d809c7dc8aa
     working_dir: /app
     volumes:
       - ./frontend/Caddyfile:/etc/caddy/Caddyfile
