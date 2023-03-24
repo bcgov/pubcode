@@ -28,7 +28,7 @@ export default function EditForm() {
   const [formDisabled, setFormDisabled] = useState(false);
   const onSubmit = async ({ formData }) => {
     setFormDisabled(true);
-    if (formData.bcgovpubcode_url && formData.bcgovpubcode_url.includes("bcgovpubcode.yml")) {
+    if (formData.bcgovpubcode_url && (formData.bcgovpubcode_url.includes("bcgovpubcode.yml") || formData.bcgovpubcode_url.includes("bcgovpubcode.yaml"))) {
       try {
         let url;
         if (formData.bcgovpubcode_url && formData.bcgovpubcode_url.includes("raw.githubusercontent.com")) {
@@ -49,11 +49,11 @@ export default function EditForm() {
         }
       } catch (e) {
         console.error(e);
-        toast.error("Please provide a valid link to bcgovpubcode.yml :(");
+        toast.error("Please provide a valid link to bcgovpubcode.yml or bcgovpubcode.yaml :(");
         setFormDisabled(false);
       }
     } else {
-      toast.error("Please provide a valid link to bcgovpubcode.yml :(");
+      toast.error("Please provide a valid link to bcgovpubcode.yml or bcgovpubcode.yaml :(");
       setFormDisabled(false);
     }
   };
