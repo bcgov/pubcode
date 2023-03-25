@@ -29,7 +29,7 @@ async function getYamlFromRepo(repoName, branchName) {
 }
 
 /**
- *  convert yaml response to a JSON object and add additional github attributes
+ *  convert yaml response to a JSON object and add additional GitHub attributes
  * @param yamlResponse
  * @param repoWithDetails
  * @returns {JSON object of yaml with additional github attributes}
@@ -46,20 +46,30 @@ function processYamlFromHttpResponse(yamlResponse, repoWithDetails) {
     stars: repoWithDetails.stars
   };
   yamlJson.github_info = githubInfo;
+  if (yamlJson.bcgov_pubcode_version) { //backwards compatibility
+    yamlJson.version = yamlJson.bcgov_pubcode_version;
+    delete yamlJson.bcgov_pubcode_version;
+  }
+
   return yamlJson;
 }
 
 const DAY_IN_MILLIS = 1 * 24 * 60 * 60 * 1000;
 
+/**
+ * Fetches all the bcgovpubcode yaml files from the specified repos and converts them to JSON
+ * @param compareLastUpdateDate
+ * @returns {Promise<*[]>}
+ */
 async function getAllPubCodeYamlsAsJSON(compareLastUpdateDate) {
   const yamlArray = [];
   for (const repoWithDetails of repoWithDetailsArray) {
-    //if  date comparison is enabled for this workflow and last_updated is not within last 15 days skip
+    //if  date comparison is enabled for this workflow and last_updated is not within last 2 days skip
     if (compareLastUpdateDate) {
       const currentDate = new Date();
       const lastUpdatedDate = new Date(repoWithDetails.lastUpdated);
-      if (currentDate.getTime() - lastUpdatedDate.getTime() > (15 * DAY_IN_MILLIS)) {
-        console.info(`Skipping ${repoWithDetails.name} repo as last updated date is more than 15 days.`);
+      if (currentDate.getTime() - lastUpdatedDate.getTime() > (2 * DAY_IN_MILLIS)) {
+        console.info(`Skipping ${repoWithDetails.name} repo as last updated date is more than 2 days.`);
         continue;
       }
     }
@@ -77,6 +87,11 @@ async function getAllPubCodeYamlsAsJSON(compareLastUpdateDate) {
 
 }
 
+/**
+ * upload all the JSON to api
+ * @param yamlArrayAsJson
+ * @returns {Promise<void>}
+ */
 async function bulkLoadPubCodes(yamlArrayAsJson) {
   if (yamlArrayAsJson.length > 0) {
     console.info(`Found ${yamlArrayAsJson.length} yaml files to load into database.`);
@@ -97,7 +112,11 @@ async function bulkLoadPubCodes(yamlArrayAsJson) {
   }
 }
 
-
+/**
+ * execute graphql query and return the response.
+ * @param query
+ * @returns {Promise<*|{}|number[]>}
+ */
 async function getGraphQlResponseOnQuery(query) {
   const response = await axios({
     method: "post",
@@ -114,6 +133,10 @@ async function getGraphQlResponseOnQuery(query) {
   return responseData;
 }
 
+/**
+ *  start crawling.
+ * @returns {Promise<void>}
+ */
 const performCrawling = async () => {
   let moreRecords = true;
   let cursor = "";
@@ -213,18 +236,19 @@ if (REPO_NAMES?.length > 0) {
                      }
                     }`;
       const responseData = await getGraphQlResponseOnQuery(query);
+      const repo = responseData.data?.repository;
       repoWithDetailsArray.push(
         {
-          name: responseData.data?.repository?.name,
-          defaultBranch: responseData.data?.repository?.defaultBranchRef.name,
-          stars: responseData.data?.repository?.stargazers?.totalCount,
-          lastUpdated: responseData.data?.repository?.updatedAt,
-          license: responseData.data?.repository?.licenseInfo?.name,
-          watchers: responseData.data?.repository?.watchers?.totalCount
+          name: repo?.name,
+          defaultBranch: repo?.defaultBranchRef?.name,
+          stars: repo?.stargazers?.totalCount,
+          lastUpdated: repo?.updatedAt,
+          license: repo?.licenseInfo?.name,
+          watchers: repo?.watchers?.totalCount
         });
 
     } catch (e) {
-      console.error(`Error while fetching yaml file for ${name} repo. Error: ${e.message}`);
+      console.error(`Error while fetching yaml file for ${repoName} repo. Error: ${e.message}`);
     }
   }
   const yamlAsJsons = await getAllPubCodeYamlsAsJSON(false);

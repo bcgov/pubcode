@@ -34,7 +34,7 @@ const FormComponent = () => {
   }
   // keep the below in sync with the schema so that the form in UI works properly with showing the correct fields for all of
   const [formData, setFormData] = useState(initialFormData || {
-    "bcgov_pubcode_version": 1,
+    "version": 1,
     "data_management_roles": {
       "data_custodian": undefined,
       "product_owner": undefined

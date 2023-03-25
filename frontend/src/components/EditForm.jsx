@@ -41,6 +41,10 @@ export default function EditForm() {
           const data = await response.text();
           const existingYamlAsJson = YAML.load(data);
           const updatedData = matchFormattingForFormDisplay(existingYamlAsJson);
+          if(updatedData.bcgov_pubcode_version){
+            updatedData.version = updatedData.bcgov_pubcode_version;
+            delete updatedData.bcgov_pubcode_version;
+          }
           navigate("/form", { state: { data: updatedData } });
         }else {
           console.error('looks like there was a problem, status code: ' + response.status);
