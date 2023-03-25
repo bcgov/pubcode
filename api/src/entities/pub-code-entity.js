@@ -23,7 +23,7 @@ const pubcode = new Schema(
     product_external_dependencies: {
       type: Object
     },
-    bcgov_pubcode_version: {
+    version: {
       type: Number,
       required: true
     },
