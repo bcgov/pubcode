@@ -844,7 +844,7 @@
       "type": "object",
       "$ref": "#/definitions/external_dependencies"
     },
-    "bcgov_pubcode_version": {
+    "version": {
       "title": "BCGov Pubcode Version",
       "description": "This key defines which version of the yaml is being filled",
       "type": "number",
@@ -858,7 +858,7 @@
     "product_information",
     "data_management_roles",
     "product_technology_information",
-    "bcgov_pubcode_version"
+    "version"
   ],
   "title": "JSON schema for bcgovpubcode.yml",
   "type": "object"

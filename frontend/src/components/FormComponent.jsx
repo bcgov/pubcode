@@ -8,6 +8,7 @@ import { Backdrop, CircularProgress } from "@material-ui/core";
 import * as _ from "lodash";
 // below props needs to be treated properly for the form to work properly as the nesting does not work if they are undefined.
 const props = ["product_information.business_capabilities_standard", "product_technology_information.ci_cd_tools", "product_technology_information.data_storage_platforms", "product_technology_information.frontend_frameworks", "product_technology_information.hosting_platforms", "product_technology_information.spatial_mapping_technologies", "product_external_dependencies.common_components", "product_external_dependencies.identity_authorization"];
+
 function removeBlankFields(jsonData) {
   if (jsonData) {
     for (const replaceProp of props) {
@@ -33,7 +34,7 @@ const FormComponent = () => {
   }
   // keep the below in sync with the schema so that the form in UI works properly with showing the correct fields for all of
   const [formData, setFormData] = useState(initialFormData || {
-    "bcgov_pubcode_version": 1,
+    "version": 1,
     "data_management_roles": {
       "data_custodian": undefined,
       "product_owner": undefined
@@ -81,7 +82,9 @@ const FormComponent = () => {
 
   const onSubmit = ({ formData }) => {
     const updatedData = removeBlankFields(formData);
-    const yaml = YAML.dump(updatedData, { indent: 2, sortKeys: true });
+    let yaml = YAML.dump(updatedData, { indent: 2, sortKeys: true });
+    console.info(typeof yaml);
+    yaml = "---\n" + yaml; // add standard header for yaml file
     navigate("/yaml", { state: { data: yaml } });
   };
 
