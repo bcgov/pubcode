@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ubi:8.7-1090@sha256:70fc843d4eb70159799e065d2830726b884c93950f8891e263d6328af6141173 AS builder
+FROM registry.access.redhat.com/ubi8/ubi:8.7-1112@sha256:e3311058176628ad7f0f288f894ed2afef61be77ad01d53d5b69bca0f6b6cec1 AS builder
 RUN dnf module install -y nodejs:18
 
 WORKDIR /app
