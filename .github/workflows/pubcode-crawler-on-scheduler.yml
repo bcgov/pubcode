@@ -46,8 +46,8 @@ jobs:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_NAMES: ${{ github.event.inputs.REPO_NAMES }}
         run: |
-          oc login --token=${{ secrets.OC_TOKEN }} --server=${{ secrets.OC_SERVER }}
-          oc project ${{ secrets.OC_NAMESPACE }}
+          oc login --token=${{ secrets.OC_TOKEN }} --server=${{ vars.OC_SERVER }}
+          oc project ${{ vars.OC_NAMESPACE }}
 
           # Get API key
           API_KEY=$(oc get secrets/pubcode-prod-api --template={{.data.api_key}} | base64 -d)
