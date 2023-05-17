@@ -7,9 +7,6 @@ on:
     paths-ignore:
       - ".github/ISSUE_TEMPLATE/*"
       - "**.md"
-      - "crawler/**"
-      - "docs/**"
-      - "schema/**"
   workflow_dispatch:
 
 concurrency:
