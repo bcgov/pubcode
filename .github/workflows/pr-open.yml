@@ -45,6 +45,7 @@ jobs:
         include:
           - package: database
             triggers: ('database/','common/openshift.init.yml')
+            paramets: -p DB_PVC_SIZE=50Mi
           - package: frontend
             triggers: ('frontend/')
           - package: api
