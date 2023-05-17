@@ -78,6 +78,7 @@ jobs:
           - name: database
             file: database/openshift.deploy.yml
             overwrite: false
+            parameters: -p DB_PVC_SIZE=50Mi
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
