@@ -63,7 +63,7 @@ objects:
         app: ${NAME}-${ZONE}
       name: ${NAME}-${ZONE}-${COMPONENT}
     data:
-      config.js: |
+      mongod.conf: |
         systemLog:
           destination: syslog
         storage:
@@ -166,7 +166,8 @@ objects:
                 - name: ${NAME}-${ZONE}-${COMPONENT}
                   mountPath: ${PVC_MOUNT_PATH}
                 - name: mongod-conf
-                  mountPath: /etc/mongo
+                  mountPath: /etc/mongo/
+                  defaultMode: 777
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
               imagePullPolicy: Always
