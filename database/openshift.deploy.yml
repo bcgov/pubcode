@@ -56,6 +56,29 @@ objects:
             name: ${REGISTRY}/${PROMOTE}
           referencePolicy:
             type: Local
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      labels:
+        app: ${NAME}-${ZONE}
+      name: ${NAME}-${ZONE}-${COMPONENT}
+    data:
+      config.js: |
+        systemLog:
+          destination: syslog
+        storage:
+          journal:
+              enabled: false
+          directoryPerDB: false
+          wiredTiger:
+              engineConfig:
+                cacheSizeGB: 0.25
+                journalCompressor: zstd
+                zstdCompressionLevel: 22
+              collectionConfig:
+                blockCompressor: zstd
+        setParameter:
+          enableLocalhostAuthBypass: true
   - kind: DeploymentConfig
     apiVersion: v1
     metadata:
@@ -89,6 +112,9 @@ objects:
             deploymentconfig: ${NAME}-${ZONE}-${COMPONENT}
         spec:
           volumes:
+            - name: mongod-conf
+              configMap:
+                name: ${NAME}-${ZONE}-${COMPONENT}
             - name: ${NAME}-${ZONE}-${COMPONENT}
               persistentVolumeClaim:
                 claimName: ${NAME}-${ZONE}-${COMPONENT}
@@ -102,6 +128,7 @@ objects:
           containers:
             - name: ${NAME}
               image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
+              command: ["mongod", "--config", "/etc/mongo/mongod.conf"]
               ports:
                 - containerPort: 27017
                   protocol: TCP
@@ -138,6 +165,8 @@ objects:
               volumeMounts:
                 - name: ${NAME}-${ZONE}-${COMPONENT}
                   mountPath: ${PVC_MOUNT_PATH}
+                - name: mongod-conf
+                  mountPath: /etc/mongo
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
               imagePullPolicy: Always
