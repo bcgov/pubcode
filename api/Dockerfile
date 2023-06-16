@@ -17,8 +17,6 @@ COPY --from=builder /app/src ./src
 # Expose port - mostly a convention, for readability
 EXPOSE 3000
 
-# Non-privileged user
-RUN adduser -D app
 USER app
 
 # Start up command
