@@ -37,7 +37,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
-  deploys-init-test:
+  init:
     name: Deploys Init to TEST
     needs:
       - codeql
@@ -51,12 +51,11 @@ jobs:
           oc_server: ${{ vars.OC_SERVER }}
           oc_token: ${{ secrets.OC_TOKEN }}
           overwrite: false
-          parameters: -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }}
-            -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }} -p EMAIL_RECIPIENTS=${{ secrets.EMAIL_RECIPIENTS }} -p CHES_TOKEN_URL=${{ secrets.CHES_TOKEN_URL }} -p CHES_CLIENT_ID=${{ secrets.CHES_CLIENT_ID }} -p CHES_CLIENT_SECRET=${{ secrets.CHES_CLIENT_SECRET }} -p CHES_API_URL=${{ secrets.CHES_API_URL }}
-  deploys-test:
+          parameters: -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }} -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }} -p EMAIL_RECIPIENTS=${{ secrets.EMAIL_RECIPIENTS }} -p CHES_TOKEN_URL=${{ secrets.CHES_TOKEN_URL }} -p CHES_CLIENT_ID=${{ secrets.CHES_CLIENT_ID }} -p CHES_CLIENT_SECRET=${{ secrets.CHES_CLIENT_SECRET }} -p CHES_API_URL=${{ secrets.CHES_API_URL }}
+  deploys:
     name: TEST Deployments
     needs:
-      - deploys-init-test
+      - init
     environment: test
     runs-on: ubuntu-22.04
     strategy:
