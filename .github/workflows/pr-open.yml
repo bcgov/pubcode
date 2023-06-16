@@ -61,7 +61,7 @@ jobs:
           triggers: ${{ matrix.triggers }}
 
   deploys-init:
-    name: Deploys
+    name: Deploys Init on PR
     needs:
       - builds
     runs-on: ubuntu-22.04
@@ -74,8 +74,7 @@ jobs:
           oc_server: ${{ vars.OC_SERVER }}
           oc_token: ${{ secrets.OC_TOKEN }}
           overwrite: false
-          parameters: -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }}
-            -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }} -p EMAIL_RECIPIENTS=${{ secrets.EMAIL_RECIPIENTS }} -p CHES_TOKEN_URL=${{ secrets.CHES_TOKEN_URL }} -p CHES_CLIENT_ID=${{ secrets.CHES_CLIENT_ID }} -p CHES_CLIENT_SECRET=${{ secrets.CHES_CLIENT_SECRET }} -p CHES_API_URL=${{ secrets.CHES_API_URL }}
+          parameters: -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }} -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }} -p EMAIL_RECIPIENTS=${{ secrets.EMAIL_RECIPIENTS }} -p CHES_TOKEN_URL=${{ secrets.CHES_TOKEN_URL }} -p CHES_CLIENT_ID=${{ secrets.CHES_CLIENT_ID }} -p CHES_CLIENT_SECRET=${{ secrets.CHES_CLIENT_SECRET }} -p CHES_API_URL=${{ secrets.CHES_API_URL }}
   deploys:
     name: Deploys
     needs:
