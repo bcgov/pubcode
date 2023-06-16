@@ -37,19 +37,36 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
+  deploys-init-test:
+    name: Deploys Init to TEST
+    needs:
+      - codeql
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: bcgov-nr/action-deployer-openshift@v1.1.1
+        name: Deploy init to OpenShift
+        with:
+          file: common/openshift.init.yml
+          oc_namespace: ${{ vars.OC_NAMESPACE }}
+          oc_server: ${{ vars.OC_SERVER }}
+          oc_token: ${{ secrets.OC_TOKEN }}
+          overwrite: false
+          parameters: -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }}
+            -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }} -p EMAIL_RECIPIENTS=${{ secrets.EMAIL_RECIPIENTS }} -p CHES_TOKEN_URL=${{ secrets.CHES_TOKEN_URL }} -p CHES_CLIENT_ID=${{ secrets.CHES_CLIENT_ID }} -p CHES_CLIENT_SECRET=${{ secrets.CHES_CLIENT_SECRET }} -p CHES_API_URL=${{ secrets.CHES_API_URL }}
   deploys-test:
     name: TEST Deployments
     needs:
-      - codeql
+      - deploys-init-test
     environment: test
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        name: [api, database, frontend, init]
+        name: [api, database, frontend]
         include:
           - name: api
             file: api/openshift.deploy.yml
             overwrite: true
+            triggers: ('api/' 'common/')
             parameters: -p ROUTE=pubcode-test-api.apps.silver.devops.gov.bc.ca
           - name: database
             file: database/openshift.deploy.yml
@@ -57,12 +74,10 @@ jobs:
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
+            triggers: ('frontend/')
             parameters: -p ROUTE=pubcode-test.apps.silver.devops.gov.bc.ca
-          - name: init
-            file: common/openshift.init.yml
-            overwrite: false
     steps:
-      - uses: bcgov-nr/action-deployer-openshift@v1.1.0
+      - uses: bcgov-nr/action-deployer-openshift@v1.1.1
         with:
           file: ${{ matrix.file }}
           oc_namespace: ${{ vars.OC_NAMESPACE }}
@@ -73,3 +88,4 @@ jobs:
             -p ZONE=test -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:test
             -p NAME=${{ github.event.repository.name }} ${{ matrix.parameters }}
           penetration_test: true
+          triggers: ${{ matrix.triggers }}

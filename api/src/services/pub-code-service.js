@@ -2,6 +2,8 @@
 const logger = require("../logger");
 const pubcodeEntity = require("../entities/pub-code-entity");
 const cacheService = require("../services/cache-service");
+const emailService = require("../email");
+const EMAIL_RECIPIENTS = process.env.EMAIL_RECIPIENTS;
 
 /**
  * The below method will be called from the router after validating the x-api-key in the router layer.
@@ -10,12 +12,14 @@ const cacheService = require("../services/cache-service");
  * it will delete and add all these new in a single transaction into mongoDB.
  */
 async function insertOrUpdate(payload, notInsertedArray) {
+  let repoWithErrors = [];
   for (const pubcode of payload) {
-    const entity = new pubcodeEntity({...pubcode});
+    const entity = new pubcodeEntity({ ...pubcode });
     const errors = entity.validateSync();
-    if(errors){
+    if (errors) {
       console.info(`insertOrUpdate: ${pubcode.repo_name} is not valid`);
       logger.error("insertOrUpdate: ", errors);
+      repoWithErrors.push(pubcode.repo_name);
       continue;
     }
     const foundEntity = await pubcodeEntity.findOneAndReplace({ repo_name: pubcode.repo_name }, pubcode).exec();
@@ -26,6 +30,25 @@ async function insertOrUpdate(payload, notInsertedArray) {
   if (notInsertedArray.length > 0) {
     await pubcodeEntity.insertMany(notInsertedArray);
   }
+  if (repoWithErrors?.length > 0 && EMAIL_RECIPIENTS) {
+    try {
+      const email = emailService.generateHtmlEmail("no-reply-bcgovpubcode@gov.bc.ca", "Error During Bulk Load of Pub Codes Some Repo Contains are not valid.", [EMAIL_RECIPIENTS], "Error During Bulk Load of Pub Codes Some Repo Contains are not valid.", repoWithErrors.join(","));
+      await emailService.send(email);
+    } catch (e) {
+      logger.error("bulkLoad: ", e);
+    }
+  }
+}
+
+async function sendEmailForError(error) {
+  if (EMAIL_RECIPIENTS) {
+    try {
+      const email = emailService.generateHtmlEmail("no-reply-bcgovpubcode@gov.bc.ca", "Error During Bulk Load of Pub Codes Saving to Database Failed.", [EMAIL_RECIPIENTS], "Error During Bulk Load of Pub Codes Saving to Database Failed..", error.message);
+      await emailService.send(email);
+    } catch (e) {
+      logger.error("bulkLoad: ", e);
+    }
+  }
 }
 
 const bulkLoad = async (req, res) => {
@@ -33,7 +56,8 @@ const bulkLoad = async (req, res) => {
     const notInsertedArray = [];
     const payload = req.body;
     if (payload && Array.isArray(payload) && payload.length > 0) {
-      insertOrUpdate(payload, notInsertedArray).catch((error) => {
+      insertOrUpdate(payload, notInsertedArray).catch(async (error) => {
+        await sendEmailForError(error);
         logger.error("bulkLoad: ", error);
       });
       res.status(200).json({});
@@ -43,6 +67,15 @@ const bulkLoad = async (req, res) => {
 
   } catch (error) {
     logger.error("bulkLoad: ", error);
+    if (EMAIL_RECIPIENTS) {
+      try {
+        const email = emailService.generateHtmlEmail("no-reply-bcgovpubcode@gov.bc.ca", "Error During Bulk Load of Pub Codes", [EMAIL_RECIPIENTS], "Error During Bulk Load of Pub Codes", error.message);
+        await emailService.send(email);
+      } catch (e) {
+        logger.error("bulkLoad: ", e);
+      }
+    }
+
     res.status(500).json(error);
   }
 };
@@ -51,6 +84,14 @@ const readAll = async (req, res) => {
     res.status(200).json(cacheService.getAllPubCodes());
   } catch (error) {
     logger.error("readAll: ", error);
+    if (EMAIL_RECIPIENTS) {
+      try {
+        const email = emailService.generateHtmlEmail("no-reply-bcgovpubcode@gov.bc.ca", "Error During Read ALl of Pub Codes", [EMAIL_RECIPIENTS], "Error During Read ALl of Pub Codes", error.message);
+        await emailService.send(email);
+      } catch (e) {
+        logger.error("bulkLoad: ", e);
+      }
+    }
     res.status(500).json(error);
   }
 };
