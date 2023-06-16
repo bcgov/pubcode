@@ -45,7 +45,6 @@ jobs:
         include:
           - package: database
             triggers: ('database/' 'common/openshift.init.yml')
-            paramets: -p DB_PVC_SIZE=50Mi
           - package: frontend
             triggers: ('frontend/')
           - package: api
@@ -62,8 +61,6 @@ jobs:
 
   deploys-init:
     name: Deploys Init on PR
-    needs:
-      - builds
     runs-on: ubuntu-22.04
     steps:
       - uses: bcgov-nr/action-deployer-openshift@v1.1.1
@@ -78,11 +75,12 @@ jobs:
   deploys:
     name: Deploys
     needs:
+      - builds
       - deploys-init
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        name: [api, database, frontend, init]
+        name: [api, database, frontend]
         include:
           - name: api
             file: api/openshift.deploy.yml
@@ -94,7 +92,7 @@ jobs:
           - name: database
             file: database/openshift.deploy.yml
             overwrite: false
-            parameters: -p DB_PVC_SIZE=50Mi
+            parameters: -p DB_PVC_SIZE=500Mi
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
@@ -104,7 +102,7 @@ jobs:
               -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
 
     steps:
-      - uses: bcgov-nr/action-deployer-openshift@v1.1.0
+      - uses: bcgov-nr/action-deployer-openshift@v1.1.1
         with:
           file: ${{ matrix.file }}
           oc_namespace: ${{ vars.OC_NAMESPACE }}
@@ -116,3 +114,4 @@ jobs:
             -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }}
             -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }}
             ${{ matrix.parameters }}
+          triggers: ${{ matrix.triggers }}

@@ -61,11 +61,12 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        name: [api, database, frontend, init]
+        name: [api, database, frontend]
         include:
           - name: api
             file: api/openshift.deploy.yml
             overwrite: true
+            triggers: ('api/' 'common/')
             parameters: -p ROUTE=pubcode-test-api.apps.silver.devops.gov.bc.ca
           - name: database
             file: database/openshift.deploy.yml
@@ -73,9 +74,10 @@ jobs:
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
+            triggers: ('frontend/')
             parameters: -p ROUTE=pubcode-test.apps.silver.devops.gov.bc.ca
     steps:
-      - uses: bcgov-nr/action-deployer-openshift@v1.1.0
+      - uses: bcgov-nr/action-deployer-openshift@v1.1.1
         with:
           file: ${{ matrix.file }}
           oc_namespace: ${{ vars.OC_NAMESPACE }}
@@ -86,3 +88,4 @@ jobs:
             -p ZONE=test -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:test
             -p NAME=${{ github.event.repository.name }} ${{ matrix.parameters }}
           penetration_test: true
+          triggers: ${{ matrix.triggers }}
