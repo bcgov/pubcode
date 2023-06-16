@@ -60,10 +60,26 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           triggers: ${{ matrix.triggers }}
 
-  deploys:
+  deploys-init:
     name: Deploys
     needs:
       - builds
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: bcgov-nr/action-deployer-openshift@v1.1.1
+        name: Deploy init to OpenShift
+        with:
+          file: common/openshift.init.yml
+          oc_namespace: ${{ vars.OC_NAMESPACE }}
+          oc_server: ${{ vars.OC_SERVER }}
+          oc_token: ${{ secrets.OC_TOKEN }}
+          overwrite: false
+          parameters: -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }}
+            -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }} -p EMAIL_RECIPIENTS=${{ secrets.EMAIL_RECIPIENTS }} -p CHES_TOKEN_URL=${{ secrets.CHES_TOKEN_URL }} -p CHES_CLIENT_ID=${{ secrets.CHES_CLIENT_ID }} -p CHES_CLIENT_SECRET=${{ secrets.CHES_CLIENT_SECRET }} -p CHES_API_URL=${{ secrets.CHES_API_URL }}
+  deploys:
+    name: Deploys
+    needs:
+      - deploys-init
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -87,11 +103,7 @@ jobs:
             parameters:
               -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
               -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
-          - name: init
-            file: common/openshift.init.yml
-            overwrite: false
-            triggers: ('common/')
-            parameters: -p EMAIL_RECIPIENTS=${{ secrets.EMAIL_RECIPIENTS }} -p CHES_TOKEN_URL=${{ secrets.CHES_TOKEN_URL }} -p CHES_CLIENT_ID=${{ secrets.CHES_CLIENT_ID }} -p CHES_CLIENT_SECRET=${{ secrets.CHES_CLIENT_SECRET }} -p CHES_API_URL=${{ secrets.CHES_API_URL }}
+
     steps:
       - uses: bcgov-nr/action-deployer-openshift@v1.1.0
         with:
