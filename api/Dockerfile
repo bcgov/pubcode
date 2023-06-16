@@ -1,14 +1,12 @@
-FROM registry.access.redhat.com/ubi8/ubi:8.8-854 AS builder
-RUN dnf module install -y nodejs:18
-
+FROM node:18-bullseye-slim AS build
 WORKDIR /app
-COPY . ./
-RUN npm ci --omit=dev
+COPY *.json ./
+RUN npm ci --omit=dev --ignore-scripts
+COPY ./src ./src
 
 # Deployment container
-FROM node:lts-alpine
-
-# Set node to production
+# Deployment container
+FROM gcr.io/distroless/nodejs:18
 ENV NODE_ENV production
 
 # Copy over app
@@ -25,4 +23,4 @@ USER app
 
 # Start up command
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
-ENTRYPOINT ["node", "src/server"]
+CMD ["--max-old-space-size=100", "src/server"]

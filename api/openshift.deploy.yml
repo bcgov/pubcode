@@ -114,6 +114,32 @@ objects:
                     secretKeyRef:
                       name: ${NAME}-${ZONE}-api
                       key: api_key
+                - name: EMAIL_RECIPIENTS
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-api
+                      key: email_recipients
+                - name: CHES_TOKEN_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-api
+                      key: ches_token_url
+                - name: CHES_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-api
+                      key: ches_client_id
+                - name: CHES_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-api
+                      key: ches_client_secret
+                - name: CHES_API_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${NAME}-${ZONE}-api
+                      key: ches_api_url
+
               ports:
                 - containerPort: 3000
                   protocol: TCP

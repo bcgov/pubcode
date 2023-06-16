@@ -24,6 +24,22 @@ parameters:
     description: KEY for the API
     from: "[a-zA-Z0-9]{32}"
     generate: expression
+  - name: EMAIL_RECIPIENTS
+    description: Email Recipients
+    required: true
+  - name: CHES_TOKEN_URL
+    description: Token URL for CHES
+    required: true
+  - name: CHES_CLIENT_ID
+    description: Client ID for CHES
+    required: true
+  - name: CHES_CLIENT_SECRET
+    description: Client Secret for CHES
+    required: true
+  - name: CHES_API_URL
+    description: URL for CHES API
+    required: true
+
 objects:
   - apiVersion: v1
     kind: Secret
@@ -43,6 +59,11 @@ objects:
         app: ${NAME}-${ZONE}
     stringData:
       api_key: ${API_KEY}
+      email_recipients: ${EMAIL_RECIPIENTS}
+      ches_token_url: ${CHES_TOKEN_URL}
+      ches_client_id: ${CHES_CLIENT_ID}
+      ches_client_secret: ${CHES_CLIENT_SECRET}
+      ches_api_url: ${CHES_API_URL}
   - apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
