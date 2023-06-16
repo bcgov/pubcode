@@ -59,7 +59,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           triggers: ${{ matrix.triggers }}
 
-  deploys-init:
+  init:
     name: Deploys Init on PR
     runs-on: ubuntu-22.04
     steps:
@@ -76,7 +76,7 @@ jobs:
     name: Deploys
     needs:
       - builds
-      - deploys-init
+      - init
     runs-on: ubuntu-22.04
     strategy:
       matrix:
