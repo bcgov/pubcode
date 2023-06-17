@@ -35,7 +35,6 @@ jobs:
           - name: api
             file: api/openshift.deploy.yml
             overwrite: true
-            triggers: ('api/' 'common/')
             parameters: -p ROUTE=pubcode-api.apps.silver.devops.gov.bc.ca
           - name: database
             file: database/openshift.deploy.yml
@@ -43,7 +42,6 @@ jobs:
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
-            triggers: ('frontend/')
             parameters: -p ROUTE=pubcode.apps.silver.devops.gov.bc.ca
     steps:
       - uses: bcgov-nr/action-deployer-openshift@v1.1.0
