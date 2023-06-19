@@ -85,7 +85,6 @@ jobs:
           - name: api
             file: api/openshift.deploy.yml
             overwrite: true
-            triggers: ('api/' 'common/')
             parameters:
               -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
               -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
@@ -96,7 +95,6 @@ jobs:
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
-            triggers: ('api/' 'common/' 'frontend/')
             parameters:
               -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
               -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
@@ -115,3 +113,18 @@ jobs:
             -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }}
             ${{ matrix.parameters }}
           triggers: ${{ matrix.triggers }}
+  cypress-e2e:
+    name: Cypress end to end test
+    needs:
+      - deploys
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        browser: [ chrome, firefox, edge ]
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout
+      - uses: cypress-io/github-action@v5
+        name: Cypress run
+        with:
+          browser: ${{ matrix.browser }}

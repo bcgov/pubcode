@@ -80,7 +80,8 @@ export default function EditForm() {
   const uiSchema = {
     "ui:submitButtonOptions": {
       "props": {
-        "disabled": formDisabled
+        "disabled": formDisabled,
+        id: "submit"
       }
     }
   };

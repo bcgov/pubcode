@@ -78,7 +78,14 @@ const FormComponent = () => {
     }
   }, []);
 
-  const uiSchema = {};
+  const uiSchema = {
+    "ui:submitButtonOptions": {
+      "props": {
+        id: "submit"
+      },
+      submitText: "Submit"
+    }
+  };
 
   const onSubmit = ({ formData }) => {
     const updatedData = removeBlankFields(formData);

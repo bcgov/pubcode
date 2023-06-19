@@ -7,7 +7,8 @@
     "dev": "vite --cors --strictPort",
     "build": "vite build",
     "build-watch": "vite build --watch",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "tsc cypress run --browser chrome"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",
@@ -38,7 +39,7 @@
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
     "@vitejs/plugin-react": "^4.0.0",
-    "cypress": "^12.12.0",
-    "vite": "^4.3.7"
+    "cypress": "^12.14.0",
+    "vite": "^4.3.9"
   }
 }
