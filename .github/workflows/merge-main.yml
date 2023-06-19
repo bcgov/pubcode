@@ -86,3 +86,22 @@ jobs:
             -p NAME=${{ github.event.repository.name }} ${{ matrix.parameters }}
           penetration_test: true
           triggers: ${{ matrix.triggers }}
+  cypress-e2e:
+    name: Cypress end to end test
+    needs:
+      - deploys
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        browser: [ chrome, firefox, edge ]
+    steps:
+      -
+        uses: actions/checkout@v3
+        name: Checkout
+      -
+        uses: cypress-io/github-action@v5
+        name: Cypress run
+        with:
+          working-directory: frontend
+          browser: ${{ matrix.browser }}
+          command: npx cypress run --browser chromium --config baseUrl=https://pubcode-test.apps.silver.devops.gov.bc.ca/
