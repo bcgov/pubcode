@@ -129,4 +129,4 @@ jobs:
         with:
           working-directory: frontend
           browser: ${{ matrix.browser }}
-          command: npx cypress run --browser chromium --config baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
+          command: npx cypress run --config baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
