@@ -127,6 +127,12 @@ jobs:
       - uses: cypress-io/github-action@v5
         name: Cypress run
         with:
-          working-directory: frontend
+          config: pageLoadTimeout=10000,baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
+          project: ./frontend
           browser: ${{ matrix.browser }}
-          command: npx cypress run --config baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ./frontend/cypress/screenshots
+          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
