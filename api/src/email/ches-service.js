@@ -171,21 +171,12 @@ class ChesService {
     }
   }
 
-  generateHtmlEmail(from,subjectLine, to, title, body) {
+  generateHtmlEmail(subjectLine, to, title, body) {
 
     const emailContents= `<!DOCTYPE html>
             <html lang="en">
               <head>
                 <title>${title}</title>
-                <style>
-                  table,
-                  th,
-                  td {
-                    border: 1px solid black;
-                    border-collapse: collapse;
-                    padding: 5px;
-                  }
-                </style>
               </head>
               <body>
                 ${body}
@@ -196,7 +187,7 @@ class ChesService {
       body: emailContents,
       delayTS: 0,
       encoding: 'utf-8',
-      from: from,
+      from: "no-reply-bcgovpubcode@gov.bc.ca",
       priority: 'normal',
       subject: subjectLine,
       to: to

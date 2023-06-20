@@ -111,3 +111,4 @@ test-report.xml
 .volumes
 frontend/.env.local
 .idea
+/util/

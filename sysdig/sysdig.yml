@@ -1,0 +1,13 @@
+apiVersion: ops.gov.bc.ca/v1alpha1
+kind: SysdigTeam
+metadata:
+  name: d5f525-sysdigteam
+  namespace: d5f525-tools
+spec:
+  team:
+    description: The Sysdig Team for the OpenShift Project Set BCGovPubcode
+    users:
+      - name: omprakashmishra3978@gmail.com
+        role: ROLE_TEAM_EDIT
+      - name: derek.roberts@gmail.com
+        role: ROLE_TEAM_EDIT

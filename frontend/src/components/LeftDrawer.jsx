@@ -52,7 +52,7 @@ export default function LeftDrawer() {
                 disabled: true
               }*/].map((element) => (
               <ListItem key={element.key}>
-                <Button className={element.disabled ? `${classes.disabled}` : `${classes.leftDrawer}`} disabled={element.disabled}
+                <Button id={element.key} className={element.disabled ? `${classes.disabled}` : `${classes.leftDrawer}`} disabled={element.disabled}
                         onClick={() => buttonClicked(element)}>
                   <ListItemText primary={element.key} />
                   <Tooltip title={element.description}>
