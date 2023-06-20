@@ -128,7 +128,7 @@ jobs:
         name: Cypress run
         with:
           config: pageLoadTimeout=10000,baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
-          project: ./frontend
+          working-directory: ./frontend
           browser: ${{ matrix.browser }}
       - uses: actions/upload-artifact@v3
         if: failure()
