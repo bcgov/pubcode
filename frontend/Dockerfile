@@ -1,7 +1,7 @@
 FROM node:alpine AS build
 WORKDIR /app
 COPY . .
-RUN npm ci --legacy-peer-deps ;\
+RUN npm ci ;\
     npm run build
 
 FROM caddy:2.4.6-alpine
