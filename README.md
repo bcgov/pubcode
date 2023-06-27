@@ -11,6 +11,9 @@
 
 This contains schema definitions for yml and a web application to assist end users to create/edit bcgovpubcode.yml files, store them in a MongoDB database and retrieve them using a Node/Express API.
 
+## FAQ
+Please click [here](https://github.com/bcgov/pubcode/wiki/Frequently-Asked-Questions)
+
 ## Components
 
 1. Database (MongoDB): Stores all bcgovpubcode.yml files, converted to JSON, for each participating repo in the bcgov organization.
