@@ -16,7 +16,7 @@
     "lodash": "^4.17.21",
     "mongoose": "^7.1.0",
     "morgan": "^1.10.0",
-    "nocache": "^3.0.4",
+    "nocache": "^4.0.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {
