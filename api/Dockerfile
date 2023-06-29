@@ -1,4 +1,4 @@
-FROM node:18-bullseye-slim AS builder
+FROM node:20-bullseye-slim AS builder
 WORKDIR /app
 COPY *.json ./
 RUN npm ci --omit=dev --ignore-scripts
