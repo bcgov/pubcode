@@ -87,8 +87,6 @@ objects:
           containers:
             - image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
               securityContext:
-                runAsUser: 1015550005
-                allowPrivilegeEscalation: false
                 capabilities:
                   add: ["NET_BIND_SERVICE"]
               imagePullPolicy: Always
