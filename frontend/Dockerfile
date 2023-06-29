@@ -5,7 +5,8 @@ COPY . .
 RUN npm ci --ignore-scripts && \
     npm run build
 
-FROM caddy:2.7-alpine
+# Caddy
+FROM caddy:2.6.4-alpine
 
 WORKDIR /app
 COPY --from=build /app/Caddyfile /etc/caddy/Caddyfile
