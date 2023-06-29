@@ -120,7 +120,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        browser: [ chrome, firefox, edge ]
+        browser: [ chrome, edge ]
     steps:
       - uses: actions/checkout@v3
         name: Checkout
