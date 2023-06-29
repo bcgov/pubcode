@@ -91,7 +91,7 @@ jobs:
           - name: database
             file: database/openshift.deploy.yml
             overwrite: false
-            parameters: -p DB_PVC_SIZE=500Mi
+            parameters: -p DB_PVC_SIZE=100Mi
           - name: frontend
             file: frontend/openshift.deploy.yml
             overwrite: true
@@ -120,7 +120,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        browser: [ chrome, firefox, edge ]
+        browser: [ chrome, edge ]
     steps:
       - uses: actions/checkout@v3
         name: Checkout

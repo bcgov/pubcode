@@ -30,3 +30,9 @@
 		Feature-Policy "fullscreen 'self'; camera 'none'; microphone 'none'"
 	}
 }
+
+:3001 {
+  handle /health {
+    respond "OK"
+  }
+}
