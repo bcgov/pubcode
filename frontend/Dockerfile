@@ -16,6 +16,8 @@ RUN apk add --no-cache ca-certificates && \
 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3001/health
 EXPOSE 3000 3001
+
+RUN chmod -R 777 /tmp
 USER 1001
 
-CMD ["caddy", "run"]
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
