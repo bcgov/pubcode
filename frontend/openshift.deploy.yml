@@ -91,6 +91,9 @@ objects:
                   add: ["NET_BIND_SERVICE"]
               imagePullPolicy: Always
               name: ${NAME}
+              env:
+                - name: LOG_LEVEL # Set to debug to see all logs
+                  value: info
               ports:
                 - containerPort: 3000
                   protocol: TCP
