@@ -6,7 +6,7 @@ COPY ./src ./src
 
 # Deployment container
 # Deployment container
-FROM gcr.io/distroless/nodejs20-debian11
+FROM gcr.io/distroless/nodejs20:nonroot
 ENV NODE_ENV production
 
 # Copy over app
