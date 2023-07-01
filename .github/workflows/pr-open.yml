@@ -87,7 +87,7 @@ jobs:
             overwrite: true
             parameters:
               -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
-              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
+              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=25Mi -p MEMORY_LIMIT=50Mi -p CPU_REQUEST=10m -p CPU_LIMIT=25m
           - name: database
             file: database/openshift.deploy.yml
             overwrite: false
@@ -97,7 +97,7 @@ jobs:
             overwrite: true
             parameters:
               -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
-              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2
+              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=25Mi -p MEMORY_LIMIT=50Mi -p CPU_REQUEST=10m -p CPU_LIMIT=25m
 
     steps:
       - uses: bcgov-nr/action-deployer-openshift@v1.1.1

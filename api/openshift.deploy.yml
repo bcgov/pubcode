@@ -190,6 +190,8 @@ objects:
       labels:
         app: ${NAME}-${ZONE}
       name: ${NAME}-${ZONE}-${COMPONENT}
+      annotations:
+        haproxy.router.openshift.io/balance: roundrobin
     spec:
       host: ${ROUTE}
       port:
