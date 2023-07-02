@@ -26,6 +26,14 @@ parameters:
   - name: PROMOTE
     description: Image (namespace/name:tag) to promote/import
     value: bcgov/pubcode/database:test
+  - name: CPU_REQUEST
+    value: "50m"
+  - name: MEMORY_REQUEST
+    value: "75Mi"
+  - name: CPU_LIMIT
+    value: "150m"
+  - name: MEMORY_LIMIT
+    value: "250Mi"
 objects:
   - kind: PersistentVolumeClaim
     apiVersion: v1
@@ -105,6 +113,13 @@ objects:
               ports:
                 - containerPort: 27017
                   protocol: TCP
+              resources:
+                requests:
+                  cpu: ${CPU_REQUEST}
+                  memory: ${MEMORY_REQUEST}
+                limits:
+                  cpu: ${CPU_LIMIT}
+                  memory: ${MEMORY_LIMIT}
               readinessProbe:
                 tcpSocket:
                   port: 27017
