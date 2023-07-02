@@ -69,7 +69,7 @@ async function getAllPubCodeYamlsAsJSON(compareLastUpdateDate) {
       const currentDate = new Date();
       const lastUpdatedDate = new Date(repoWithDetails.lastUpdated);
       if (currentDate.getTime() - lastUpdatedDate.getTime() > (2 * DAY_IN_MILLIS)) {
-        console.info(`Skipping ${repoWithDetails.name} repo as last updated date is more than 2 days.`);
+        console.debug(`Skipping ${repoWithDetails.name} repo as last updated date is more than 2 days.`);
         continue;
       }
     }
@@ -78,9 +78,10 @@ async function getAllPubCodeYamlsAsJSON(compareLastUpdateDate) {
       let yamlResponse;
       yamlResponse = await getYamlFromRepo(repoWithDetails.name, repoWithDetails.defaultBranch);
       const yamlJson = processYamlFromHttpResponse(yamlResponse, repoWithDetails);
+      console.info(`found yaml file for ${repoWithDetails.name} repo.`);
       yamlArray.push(yamlJson);
     } catch (e) {
-      console.error(`Error while fetching yaml file for ${repoWithDetails.name} repo. Error: ${e.message}`);
+      console.debug(`Error while fetching yaml file for ${repoWithDetails.name} repo. Error: ${e.message}`);
     }
   }
   return yamlArray;
@@ -94,7 +95,7 @@ async function getAllPubCodeYamlsAsJSON(compareLastUpdateDate) {
  */
 async function bulkLoadPubCodes(yamlArrayAsJson) {
   if (yamlArrayAsJson.length > 0) {
-    console.info(`Found ${yamlArrayAsJson.length} yaml files to load into database.`);
+    console.debug(`Found ${yamlArrayAsJson.length} yaml files to load into database.`);
     //send to backend api bulk load endpoint
     try {
       await axios.post(`${API_URL}/api/pub-code/bulk-load`, yamlArrayAsJson, {
@@ -102,13 +103,13 @@ async function bulkLoadPubCodes(yamlArrayAsJson) {
           "X-API-KEY": API_KEY
         }
       });
-      console.info(`Successfully loaded ${yamlArrayAsJson.length} yaml files into database.`);
+      console.debug(`Successfully loaded ${yamlArrayAsJson.length} yaml files into database.`);
     } catch (e) {
       console.error(e.response?.status);
       console.error(e.response?.config?.url);
     }
   } else {
-    console.info(`No yaml files found at the root of repositories under bcgov.`);
+    console.debug(`No yaml files found at the root of repositories under bcgov.`);
   }
 }
 
@@ -129,8 +130,7 @@ async function getGraphQlResponseOnQuery(query) {
       query
     }
   });
-  const responseData = response.data;
-  return responseData;
+  return response.data;
 }
 
 /**
