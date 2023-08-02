@@ -54,7 +54,7 @@ function processYamlFromHttpResponse(yamlResponse, repoWithDetails) {
   return yamlJson;
 }
 
-const DAY_IN_MILLIS = 1 * 24 * 60 * 60 * 1000;
+const DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
 
 /**
  * Fetches all the bcgovpubcode yaml files from the specified repos and converts them to JSON
@@ -64,12 +64,12 @@ const DAY_IN_MILLIS = 1 * 24 * 60 * 60 * 1000;
 async function getAllPubCodeYamlsAsJSON(compareLastUpdateDate) {
   const yamlArray = [];
   for (const repoWithDetails of repoWithDetailsArray) {
-    //if  date comparison is enabled for this workflow and last_updated is not within last 2 days skip
+    //if  date comparison is enabled for this workflow and last_updated is not within last 4 days skip
     if (compareLastUpdateDate) {
       const currentDate = new Date();
       const lastUpdatedDate = new Date(repoWithDetails.lastUpdated);
-      if (currentDate.getTime() - lastUpdatedDate.getTime() > (2 * DAY_IN_MILLIS)) {
-        console.debug(`Skipping ${repoWithDetails.name} repo as last updated date is more than 2 days.`);
+      if ((currentDate.getTime() - lastUpdatedDate.getTime()) > (4 * DAY_IN_MILLIS)) {
+        console.debug(`Skipping ${repoWithDetails.name} repo as last updated date is more than 4 days.`);
         continue;
       }
     }
