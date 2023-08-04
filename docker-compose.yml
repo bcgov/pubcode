@@ -49,7 +49,7 @@ services:
 
   #Run npm run build-watch in local before this.
   frontend:
-    image: caddy:2.4.6-alpine
+    image: caddy:2.7.2-alpine
     working_dir: /app
     volumes:
       - ./frontend/Caddyfile:/etc/caddy/Caddyfile
