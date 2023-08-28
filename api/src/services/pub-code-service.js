@@ -3,7 +3,7 @@ const logger = require("../logger");
 const pubcodeEntity = require("../entities/pub-code-entity");
 const cacheService = require("../services/cache-service");
 const emailService = require("../email");
-const EMAIL_RECIPIENTS = process.env.EMAIL_RECIPIENTS;
+const EMAIL_RECIPIENTS = process.env.EMAIL_RECIPIENTS?.split(",");
 
 /**
  * The below method will be called from the router after validating the x-api-key in the router layer.
@@ -32,7 +32,7 @@ async function insertOrUpdate(payload, notInsertedArray) {
   }
   if (repoWithErrors?.length > 0 && EMAIL_RECIPIENTS) {
     try {
-      const email = emailService.generateHtmlEmail("Error During Bulk Load of Pub Codes Some Repo Contains are not valid.", [EMAIL_RECIPIENTS], "Error During Bulk Load of Pub Codes Some Repo Contains are not valid.", `<p>${repoWithErrors.join(",")}</p>`);
+      const email = emailService.generateHtmlEmail("Error During Bulk Load of Pub Codes Some Repo Contains are not valid.", EMAIL_RECIPIENTS, "Error During Bulk Load of Pub Codes Some Repo Contains are not valid.", `<p>${repoWithErrors.join(",")}</p>`);
       await emailService.send(email);
     } catch (e) {
       logger.error("bulkLoad: ", e);
@@ -43,7 +43,7 @@ async function insertOrUpdate(payload, notInsertedArray) {
 async function sendEmailForError(error) {
   if (EMAIL_RECIPIENTS) {
     try {
-      const email = emailService.generateHtmlEmail("Error During Bulk Load of Pub Codes Saving to Database Failed", [EMAIL_RECIPIENTS], "Error During Bulk Load of Pub Codes Saving to Database Failed.", `<p>${error.message}</p>`);
+      const email = emailService.generateHtmlEmail("Error During Bulk Load of Pub Codes Saving to Database Failed", EMAIL_RECIPIENTS, "Error During Bulk Load of Pub Codes Saving to Database Failed.", `<p>${error.message}</p>`);
       await emailService.send(email);
     } catch (e) {
       logger.error("bulkLoad: ", e);
@@ -69,7 +69,7 @@ const bulkLoad = async (req, res) => {
     logger.error("bulkLoad: ", error);
     if (EMAIL_RECIPIENTS) {
       try {
-        const email = emailService.generateHtmlEmail("Error During Bulk Load of Pub Codes", [EMAIL_RECIPIENTS], "Error During Bulk Load of Pub Codes", error.message);
+        const email = emailService.generateHtmlEmail("Error During Bulk Load of Pub Codes", EMAIL_RECIPIENTS, "Error During Bulk Load of Pub Codes", error.message);
         await emailService.send(email);
       } catch (e) {
         logger.error("bulkLoad: ", e);
@@ -86,7 +86,7 @@ const readAll = async (req, res) => {
     logger.error("readAll: ", error);
     if (EMAIL_RECIPIENTS) {
       try {
-        const email = emailService.generateHtmlEmail("Error During Read ALl of Pub Codes", [EMAIL_RECIPIENTS], "Error During Read ALl of Pub Codes", error.message);
+        const email = emailService.generateHtmlEmail("Error During Read ALl of Pub Codes", EMAIL_RECIPIENTS, "Error During Read ALl of Pub Codes", error.message);
         await emailService.send(email);
       } catch (e) {
         logger.error("bulkLoad: ", e);
