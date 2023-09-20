@@ -1,4 +1,4 @@
-name: Crawler
+name: Schedule Jobs
 
 on:
   workflow_dispatch:
@@ -79,14 +79,17 @@ jobs:
 
       - name: Process script
         id: validate-ministry-list
-        run: node index.js
+        run: node ./index.js
 
       - name: create a branch, commit and push changes
         if: steps.validate-ministry-list.outputs.schemaChanged == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config --local user.name  ${{ github.actor }}
           git checkout -b chore/ministry-name-schema
+          git add ../bcgovpubcode.json
           git commit -m "Updating the Schema as changes to ministry names were detected."
           git push origin chore/ministry-name-schema
           # Create a Pull Request
-          gh pr create --assignee "@mishraomp" --base main --label "chore" --title "Updating the Schema as changes to ministry names were detected." --body "Updating the Schema as changes to ministry names were detected."
+          gh pr create --assignee "mishraomp" --base main --label "chore" --title "Updating the Schema as changes to ministry names were detected." --body "Updating the Schema as changes to ministry names were detected."
