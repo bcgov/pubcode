@@ -18,7 +18,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.1",
     "@mui/styles": "^5.13.1",
-    "@rjsf/core": "^5.7.2",
+    "@rjsf/core": "^5.12.1",
     "@rjsf/material-ui": "^5.7.2",
     "@rjsf/utils": "^5.7.2",
     "@rjsf/validator-ajv8": "^5.7.2",
