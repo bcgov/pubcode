@@ -86,6 +86,7 @@ jobs:
         run: |
           git config --local user.name  ${{ github.actor }}
           git checkout -b chore/ministry-name-schema
+          git add ../bcgovpubcode.json
           git commit -m "Updating the Schema as changes to ministry names were detected."
           git push origin chore/ministry-name-schema
           # Create a Pull Request
