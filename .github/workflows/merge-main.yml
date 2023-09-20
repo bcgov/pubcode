@@ -1,12 +1,9 @@
 name: Merge to Main
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - ".github/ISSUE_TEMPLATE/*"
-      - "**.md"
+  workflow_run:
+    workflows: [PR Closed]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
