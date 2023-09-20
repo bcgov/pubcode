@@ -61,6 +61,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      
+      - name: Add Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
 
       - name: Install Dependencies
         run: npm ci
