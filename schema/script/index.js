@@ -2,6 +2,7 @@ import * as fs from "fs";
 import axios from "axios";
 import core from "@actions/core";
 import * as cheerio from "cheerio";
+import { isEqual } from "lodash";
 
 const fs_promises = fs.promises;
 const jsonSchemaResponse = await axios({
@@ -23,23 +24,15 @@ if (ministryNames) {
   });
   const dom = cheerio.load(htmlResponse.data);
   const items = dom(`#body li `);
-  const notFoundNames = [];
   let index = 0;
+  const ministryNamesFromWeb = [];
   items.each(function(idx, el) {
     const name = dom(el).text().replace(/\u00a0/g, " ");
-    const currentIndex = ministryNames.indexOf(name);
-    if (currentIndex === -1) {
-      ++index;
-      ministryNames.splice(index, 0, name);
-      notFoundNames.push(name);
-    } else {
-      index = currentIndex;
-    }
-    // and the rest of your code
+    ministryNamesFromWeb.push(name);
   });
-  if (notFoundNames.length > 0) {
-    console.error("Below Ministry names not found in pubcode JSON schema");
-    jsonSchema.definitions.product_information.properties.ministry.items["enum"] = ministryNames;
+  if (!isEqual(ministryNamesFromWeb, ministryNames)) {
+    console.error("Ministry name mismatch between web and schema", ministryNamesFromWeb, ministryNames);
+    jsonSchema.definitions.product_information.properties.ministry.items["enum"] = ministryNamesFromWeb;
     core.setOutput("schemaChanged", "true");
     await fs_promises.writeFile("../bcgovpubcode.json", JSON.stringify(jsonSchema, null, 2));
   } else {
