@@ -83,6 +83,8 @@ jobs:
 
       - name: create a branch, commit and push changes
         if: steps.validate-ministry-list.outputs.schemaChanged == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config --local user.name  ${{ github.actor }}
           git checkout -b chore/ministry-name-schema
