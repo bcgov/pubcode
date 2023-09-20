@@ -1,4 +1,4 @@
-name: Crawler
+name: Schedule Jobs
 
 on:
   workflow_dispatch:
@@ -79,7 +79,7 @@ jobs:
 
       - name: Process script
         id: validate-ministry-list
-        run: node index.js
+        run: node ./index.js
 
       - name: create a branch, commit and push changes
         if: steps.validate-ministry-list.outputs.schemaChanged == 'true'
