@@ -104,6 +104,13 @@ objects:
             - name: ${NAME}-init
               image: ${REGISTRY}/${PROMOTE}
               command: ["sh", "-c", "mkdir -p /data/db"]
+              resources:
+                requests:
+                  cpu: ${CPU_REQUEST}
+                  memory: ${MEMORY_REQUEST}
+                limits:
+                  cpu: ${CPU_LIMIT}
+                  memory: ${MEMORY_LIMIT}
               volumeMounts:
                 - name: ${NAME}-${ZONE}-${COMPONENT}
                   mountPath: ${PVC_MOUNT_PATH}
