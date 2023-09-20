@@ -92,4 +92,4 @@ jobs:
           git commit -m "Updating the Schema as changes to ministry names were detected."
           git push origin chore/ministry-name-schema
           # Create a Pull Request
-          gh pr create --assignee "@me" --base main --label "chore" --title "Updating the Schema as changes to ministry names were detected." --body "Updating the Schema as changes to ministry names were detected."
+          gh pr create --assignee "mishraomp" --base main --label "chore" --title "Updating the Schema as changes to ministry names were detected." --body "Updating the Schema as changes to ministry names were detected."
