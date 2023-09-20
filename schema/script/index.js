@@ -2,7 +2,8 @@ import * as fs from "fs";
 import axios from "axios";
 import core from "@actions/core";
 import * as cheerio from "cheerio";
-import { isEqual } from "lodash";
+import pkg from 'lodash';
+const { isEqual } = pkg;
 
 const fs_promises = fs.promises;
 const jsonSchemaResponse = await axios({
