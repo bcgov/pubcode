@@ -126,6 +126,7 @@
               "Agriculture and Food",
               "Attorney General",
               "Children and Family Development",
+              "Citizens' Services",
               "Citizens Services",
               "Education and Child Care",
               "Emergency Management and Climate Readiness",
@@ -267,8 +268,7 @@
               }
             }
           },
-          "else": {
-          }
+          "else": {}
         }
       ]
     },
@@ -593,8 +593,7 @@
               "spatial_mapping_technologies_custom"
             ]
           },
-          "else": {
-          }
+          "else": {}
         }
       ]
     },
