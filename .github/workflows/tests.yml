@@ -7,9 +7,9 @@ on:
       - reopened
       - synchronize
       - ready_for_review
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [PR Closed]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
