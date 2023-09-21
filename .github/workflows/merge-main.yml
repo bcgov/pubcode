@@ -2,7 +2,7 @@ name: Merge to Main
 
 on:
   workflow_run:
-    workflows: [PR Closed]
+    workflows: [Pull Request Closed]
     types: [completed]
   workflow_dispatch:
 
