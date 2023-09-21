@@ -8,7 +8,7 @@ on:
       - synchronize
       - ready_for_review
   workflow_run:
-    workflows: [PR Closed]
+    workflows: [Pull Request Closed]
     types: [completed]
   workflow_dispatch:
 
