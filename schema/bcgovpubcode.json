@@ -119,7 +119,7 @@
         "ministry": {
           "uniqueItems": true,
           "title": "Ministry",
-          "description": "This key contains the ministry name. link: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries",
+          "description": "This key contains the ministry name. -> link: https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries",
           "type": "array",
           "items": {
             "enum": [

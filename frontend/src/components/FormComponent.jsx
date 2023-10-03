@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import Form from "@rjsf/material-ui";
 import validator from "@rjsf/validator-ajv8";
 import * as YAML from "js-yaml";
-//import * as localSchema from "../../../schema/bcgovpubcode.json";
+import { env } from "../../env";
+//import * as localSchema from "../../../schema/bcgovpubcode.json"; // uncmmment this line for local schema for testing
 import { useLocation, useNavigate } from "react-router";
 import { Backdrop, CircularProgress } from "@material-ui/core";
 import * as _ from "lodash";
 // below props needs to be treated properly for the form to work properly as the nesting does not work if they are undefined.
 const props = ["product_information.business_capabilities_standard", "product_technology_information.ci_cd_tools", "product_technology_information.data_storage_platforms", "product_technology_information.frontend_frameworks", "product_technology_information.hosting_platforms", "product_technology_information.spatial_mapping_technologies", "product_external_dependencies.common_components", "product_external_dependencies.identity_authorization"];
-
+const jsonSchemaBranch = env.VITE_SCHEMA_BRANCH || "main";
 function removeBlankFields(jsonData) {
   if (jsonData) {
     for (const replaceProp of props) {
@@ -57,13 +58,14 @@ const FormComponent = () => {
   });
 
   const [schema, setSchema] = useState(null);
+  //const [schema, setSchema] = useState(localSchema); // uncomment this line for local schema for testing
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
     async function fetchData() {
       try {
         const response = await fetch(
-          "https://raw.githubusercontent.com/bcgov/pubcode/main/schema/bcgovpubcode.json"
+          `https://raw.githubusercontent.com/bcgov/pubcode/${jsonSchemaBranch}/schema/bcgovpubcode.json`
         );
         const data = await response.json();
         setSchema(data);
