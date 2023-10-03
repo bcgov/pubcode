@@ -42,6 +42,9 @@ parameters:
   - name: LOG_LEVEL
     description: Caddy logging level DEBUG, INFO, WARN, ERROR, PANIC, and FATAL (https://github.com/caddyserver/caddy/blob/master/logging.go)
     value: "info"
+  - name: VITE_SCHEMA_BRANCH
+    description: Vite schema branch to use
+    value: "main" # override with values for PR based deployment.
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -97,6 +100,8 @@ objects:
               env:
                 - name: LOG_LEVEL
                   value: ${LOG_LEVEL}
+                - name: VITE_SCHEMA_BRANCH
+                  value: ${VITE_SCHEMA_BRANCH}
               ports:
                 - containerPort: 3000
                   protocol: TCP

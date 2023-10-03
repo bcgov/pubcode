@@ -13,6 +13,10 @@
 	}
 	encode gzip
 
+  handle /config.js {
+		header Content-Type "text/javascript"
+		respond `window.config = {"VITE_SCHEMA_BRANCH":"{$VITE_SCHEMA_BRANCH}"};`
+	}
 	handle {
 		root * /app/dist
 		try_files {path} {path}/ /index.html
