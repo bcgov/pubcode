@@ -39,13 +39,13 @@ function processYamlFromHttpResponse(yamlResponse, repoWithDetails) {
   const yaml = yamlResponse.data;
   const yamlJson = jsYaml.load(yaml);
   yamlJson.repo_name = repoWithDetails.name;
-  const githubInfo = {
+  yamlJson.github_info = {
     last_updated: repoWithDetails.lastUpdated?.substring(0, 10),
     license: repoWithDetails.license,
     watchers: repoWithDetails.watchers,
-    stars: repoWithDetails.stars
+    stars: repoWithDetails.stars,
+    default_branch: repoWithDetails.defaultBranch
   };
-  yamlJson.github_info = githubInfo;
   if (yamlJson.bcgov_pubcode_version) { //backwards compatibility
     yamlJson.version = yamlJson.bcgov_pubcode_version;
     delete yamlJson.bcgov_pubcode_version;

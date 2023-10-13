@@ -29,6 +29,10 @@ const pubcode = new Schema(
     },
     github_info: {
       type: Object
+    },
+    is_deleted: {
+      type: Boolean,
+      default: false
     }
   },
   { collection: "pubcode" }
