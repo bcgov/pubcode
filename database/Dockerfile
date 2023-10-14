@@ -1,4 +1,4 @@
-FROM mongo:6.0.8
+FROM mongo:6.0.11
 USER mongodb
 COPY --chown=mongodb:mongodb mongod.conf /etc/mongo/
 HEALTHCHECK --interval=15s --timeout=5s --retries=3 CMD ["mongosh", "--eval", "db.adminCommand('ping')"]
