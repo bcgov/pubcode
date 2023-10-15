@@ -57,7 +57,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           triggers: ${{ matrix.triggers }}
 
-  deploy:
+  deploys:
     name: Deploys
     needs:
       - builds
