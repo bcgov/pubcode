@@ -42,9 +42,3 @@ dependencies:
     version: 0.0.4
     repository: https://bcgov.github.io/helm-service/
     alias: database
-
-  - name: component
-    condition: backup.enabled
-    version: 0.0.4
-    repository: https://bcgov.github.io/helm-service/
-    alias: backup
