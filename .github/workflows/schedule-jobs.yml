@@ -95,6 +95,7 @@ jobs:
           gh pr create --assignee "mishraomp" --base main --label "chore" --title "Updating the Schema as changes to ministry names were detected." --body "Updating the Schema as changes to ministry names were detected."
 
   soft-delete-removed-pubcodes:
+    needs: [pubcode-crawler]
     name: Soft Delete pubcodes In the Databse which are removed from the repo.
     runs-on: ubuntu-22.04
     defaults:
