@@ -100,20 +100,20 @@ objects:
             - name: ${NAME}-${ZONE}-${COMPONENT}
               persistentVolumeClaim:
                 claimName: ${NAME}-${ZONE}-${COMPONENT}
-          # initContainers:
-          #   - name: ${NAME}-init
-          #     image: ${REGISTRY}/${PROMOTE}
-          #     command: ["sh", "-c", "mkdir -p /data/db"]
-          #     resources:
-          #       requests:
-          #         cpu: ${CPU_REQUEST}
-          #         memory: ${MEMORY_REQUEST}
-          #       limits:
-          #         cpu: ${CPU_LIMIT}
-          #         memory: ${MEMORY_LIMIT}
-          #     volumeMounts:
-          #       - name: ${NAME}-${ZONE}-${COMPONENT}
-          #         mountPath: ${PVC_MOUNT_PATH}
+          initContainers:
+            - name: ${NAME}-init
+              image: ${REGISTRY}/${PROMOTE}
+              command: ["sh", "-c", "mkdir -p /data/db"]
+              resources:
+                requests:
+                  cpu: ${CPU_REQUEST}
+                  memory: ${MEMORY_REQUEST}
+                limits:
+                  cpu: ${CPU_LIMIT}
+                  memory: ${MEMORY_LIMIT}
+              volumeMounts:
+                - name: ${NAME}-${ZONE}-${COMPONENT}
+                  mountPath: ${PVC_MOUNT_PATH}
           containers:
             - name: ${NAME}
               image: ${NAME}-${ZONE}-${COMPONENT}:${IMAGE_TAG}
@@ -127,20 +127,20 @@ objects:
                 limits:
                   cpu: ${CPU_LIMIT}
                   memory: ${MEMORY_LIMIT}
-              # readinessProbe:
-              #   tcpSocket:
-              #     port: 27017
-              #   failureThreshold: 5
-              #   initialDelaySeconds: 30
-              #   periodSeconds: 15
-              #   timeoutSeconds: 1
-              # livenessProbe:
-              #   failureThreshold: 5
-              #   initialDelaySeconds: 30
-              #   periodSeconds: 15
-              #   tcpSocket:
-              #     port: 27017
-              #   timeoutSeconds: 1
+              readinessProbe:
+                tcpSocket:
+                  port: 27017
+                failureThreshold: 5
+                initialDelaySeconds: 30
+                periodSeconds: 15
+                timeoutSeconds: 10
+              livenessProbe:
+                failureThreshold: 5
+                initialDelaySeconds: 30
+                periodSeconds: 15
+                tcpSocket:
+                  port: 27017
+                timeoutSeconds: 10
               env:
                 - name: MONGO_INITDB_ROOT_USERNAME
                   valueFrom:
