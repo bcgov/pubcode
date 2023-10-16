@@ -21,7 +21,7 @@ jobs:
           oc project ${{ vars.OC_NAMESPACE }}
 
           # Remove old build runs, build pods and deployment pods
-          oc delete all,pvc,secret -l app=${{ github.event.repository.name }}-${{ github.event.number }}
+          helm uninstall pubcode-${{ github.event.number }}
 
   # If merged into main, then handle any image promotions
   image-promotions:
