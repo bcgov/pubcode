@@ -29,11 +29,11 @@ parameters:
   - name: CPU_REQUEST
     value: "50m"
   - name: MEMORY_REQUEST
-    value: "150Mi"
+    value: "75Mi"
   - name: CPU_LIMIT
     value: "150m"
   - name: MEMORY_LIMIT
-    value: "500Mi"
+    value: "250Mi"
 objects:
   - kind: PersistentVolumeClaim
     apiVersion: v1

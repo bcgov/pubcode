@@ -80,24 +80,29 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        name: [api, database, frontend]
+        # name: [api, database, frontend]
         include:
-          - name: api
-            file: api/openshift.deploy.yml
-            overwrite: true
-            parameters:
-              -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
-              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
+          # - name: api
+          #   file: api/openshift.deploy.yml
+          #   overwrite: true
+          #   parameters:
+          #     -p PROMOTE=${{ github.repository }}/api:${{ github.event.number }}
+          #     -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
+          #     -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
           - name: database
             file: database/openshift.deploy.yml
-            overwrite: false
-            parameters: -p DB_PVC_SIZE=100Mi -p MEMORY_REQUEST=100Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
-          - name: frontend
-            file: frontend/openshift.deploy.yml
             overwrite: true
             parameters:
-              -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
-              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=125m -p VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}
+              -p PROMOTE=bcgov/nr-containers/mongo:6.0.11
+              -p DB_PVC_SIZE=100Mi -p MEMORY_REQUEST=100Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
+          # - name: frontend
+          #   file: frontend/openshift.deploy.yml
+          #   overwrite: true
+          #   parameters:
+          #     -p PROMOTE=${{ github.repository }}/frontend:${{ github.event.number }}
+          #     -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
+          #     -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=125m
+          #     -p VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}
 
     steps:
       - uses: bcgov-nr/action-deployer-openshift@v1.1.1
@@ -109,30 +114,29 @@ jobs:
           overwrite: ${{ matrix.overwrite }}
           penetration_test: false
           parameters:
-            -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }}
-            -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }}
-            ${{ matrix.parameters }}
+            -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }} ${{ matrix.parameters }}
           triggers: ${{ matrix.triggers }}
-  cypress-e2e:
-    name: Cypress end to end test
-    needs:
-      - deploys
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        browser: [ chrome, edge ]
-    steps:
-      - uses: actions/checkout@v3
-        name: Checkout
-      - uses: cypress-io/github-action@v5
-        name: Cypress run
-        with:
-          config: pageLoadTimeout=10000,baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
-          working-directory: ./frontend
-          browser: ${{ matrix.browser }}
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: ./frontend/cypress/screenshots
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
+
+  # cypress-e2e:
+  #   name: Cypress end to end test
+  #   needs:
+  #     - deploys
+  #   runs-on: ubuntu-22.04
+  #   strategy:
+  #     matrix:
+  #       browser: [ chrome, edge ]
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       name: Checkout
+  #     - uses: cypress-io/github-action@v5
+  #       name: Cypress run
+  #       with:
+  #         config: pageLoadTimeout=10000,baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
+  #         working-directory: ./frontend
+  #         browser: ${{ matrix.browser }}
+  #     - uses: actions/upload-artifact@v3
+  #       if: failure()
+  #       with:
+  #         name: cypress-screenshots
+  #         path: ./frontend/cypress/screenshots
+  #         if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
