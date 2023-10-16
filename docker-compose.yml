@@ -9,7 +9,14 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: DPEPGHbjUluRjetU
       MONGODB_DATABASE: pubcode
-    image: mongo
+    #image: ghcr.io/bcgov/nr-containers/mongo:6.0.11
+    #image: mongo:6.0.11
+    healthcheck:
+      test:  CMD ["/usr/bin/mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+    volumes:
+      - ./database/mongod.conf:/etc/mongo/mongod.conf
     ports:
       - "27017:27017"
     restart: unless-stopped
