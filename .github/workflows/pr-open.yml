@@ -9,55 +9,55 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # pr-greeting:
-  #   name: PR Greeting
-  #   env:
-  #     DOMAIN: apps.silver.devops.gov.bc.ca
-  #     PREFIX: ${{ github.event.repository.name }}-${{ github.event.number }}
-  #   runs-on: ubuntu-22.04
-  #   permissions:
-  #     pull-requests: write
-  #   steps:
-  #     - name: PR Greeting
-  #       uses: bcgov-nr/action-pr-description-add@v0.0.2
-  #       with:
-  #         github_token: ${{ secrets.GITHUB_TOKEN }}
-  #         add_markdown: |
-  #           ---
+  pr-greeting:
+    name: PR Greeting
+    env:
+      DOMAIN: apps.silver.devops.gov.bc.ca
+      PREFIX: ${{ github.event.repository.name }}-${{ github.event.number }}
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+    steps:
+      - name: PR Greeting
+        uses: bcgov-nr/action-pr-description-add@v0.0.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          add_markdown: |
+            ---
 
-  #           Thanks for the PR!
+            Thanks for the PR!
 
-  #           Any successful deployments (not always required) will be available below.
-  #           [API](https://${{ env.PREFIX }}-api.${{ env.DOMAIN }}/) available
-  #           [Frontend](https://${{ env.PREFIX }}.${{ env.DOMAIN }}/) available
+            Any successful deployments (not always required) will be available below.
+            [API](https://${{ env.PREFIX }}-api.${{ env.DOMAIN }}/) available
+            [Frontend](https://${{ env.PREFIX }}.${{ env.DOMAIN }}/) available
 
-  #           Once merged, code will be promoted and handed off to following workflow run.
-  #           [Main Merge Workflow](https://github.com/${{ github.repository }}/actions/workflows/merge-main.yml)
+            Once merged, code will be promoted and handed off to following workflow run.
+            [Main Merge Workflow](https://github.com/${{ github.repository }}/actions/workflows/merge-main.yml)
 
-  # builds:
-  #   name: Builds
-  #   runs-on: ubuntu-22.04
-  #   permissions:
-  #     packages: write
-  #   strategy:
-  #     matrix:
-  #       package: [api, database, frontend]
-  #       include:
-  #         - package: database
-  #           triggers: ('database/' 'common/openshift.init.yml')
-  #         - package: frontend
-  #           triggers: ('frontend/')
-  #         - package: api
-  #           triggers: ('api/' 'common/openshift.init.yml')
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: bcgov-nr/action-builder-ghcr@v1.1.2
-  #       with:
-  #         package: ${{ matrix.package }}
-  #         tag: ${{ github.event.number }}
-  #         tag_fallback: test
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         triggers: ${{ matrix.triggers }}
+  builds:
+    name: Builds
+    runs-on: ubuntu-22.04
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        package: [api, database, frontend]
+        include:
+          - package: database
+            triggers: ('database/' 'common/openshift.init.yml')
+          - package: frontend
+            triggers: ('frontend/')
+          - package: api
+            triggers: ('api/' 'common/openshift.init.yml')
+    steps:
+      - uses: actions/checkout@v3
+      - uses: bcgov-nr/action-builder-ghcr@v1.1.2
+        with:
+          package: ${{ matrix.package }}
+          tag: ${{ github.event.number }}
+          tag_fallback: test
+          token: ${{ secrets.GITHUB_TOKEN }}
+          triggers: ${{ matrix.triggers }}
 
   init:
     name: Deploys Init on PR
@@ -75,36 +75,35 @@ jobs:
 
   deploys:
     name: Deploys
-    # needs:
-    #   - builds
-    #   - init
+    needs:
+      - builds
+      - init
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        # name: [api, database, frontend]
+        name: [api, database, frontend]
         include:
-          # - name: api
-          #   file: api/openshift.deploy.yml
-          #   overwrite: true
-          #   parameters:
-          #     -p PROMOTE=${{ github.repository }}/api:${{ github.event.number }}
-          #     -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
-          #     -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
+          - name: api
+            file: api/openshift.deploy.yml
+            overwrite: true
+            parameters:
+              -p PROMOTE=${{ github.repository }}/api:${{ github.event.number }}
+              -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
+              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
           - name: database
             file: database/openshift.deploy.yml
             overwrite: true
             parameters:
               -p PROMOTE=bcgov/nr-containers/mongo:6.0.11
               -p DB_PVC_SIZE=125Mi -p MEMORY_REQUEST=175Mi -p MEMORY_LIMIT=250Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
-              # -p DB_PVC_SIZE=100Mi -p MEMORY_REQUEST=100Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
-          # - name: frontend
-          #   file: frontend/openshift.deploy.yml
-          #   overwrite: true
-          #   parameters:
-          #     -p PROMOTE=${{ github.repository }}/frontend:${{ github.event.number }}
-          #     -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
-          #     -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=125m
-          #     -p VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}
+          - name: frontend
+            file: frontend/openshift.deploy.yml
+            overwrite: true
+            parameters:
+              -p PROMOTE=${{ github.repository }}/frontend:${{ github.event.number }}
+              -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
+              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=125m
+              -p VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}
 
     steps:
       - uses: bcgov-nr/action-deployer-openshift@v1.1.1
@@ -119,26 +118,26 @@ jobs:
             -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }} ${{ matrix.parameters }}
           triggers: ${{ matrix.triggers }}
 
-  # cypress-e2e:
-  #   name: Cypress end to end test
-  #   needs:
-  #     - deploys
-  #   runs-on: ubuntu-22.04
-  #   strategy:
-  #     matrix:
-  #       browser: [ chrome, edge ]
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       name: Checkout
-  #     - uses: cypress-io/github-action@v5
-  #       name: Cypress run
-  #       with:
-  #         config: pageLoadTimeout=10000,baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
-  #         working-directory: ./frontend
-  #         browser: ${{ matrix.browser }}
-  #     - uses: actions/upload-artifact@v3
-  #       if: failure()
-  #       with:
-  #         name: cypress-screenshots
-  #         path: ./frontend/cypress/screenshots
-  #         if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
+  cypress-e2e:
+    name: Cypress end to end test
+    needs:
+      - deploys
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        browser: [ chrome, edge ]
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout
+      - uses: cypress-io/github-action@v5
+        name: Cypress run
+        with:
+          config: pageLoadTimeout=10000,baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
+          working-directory: ./frontend
+          browser: ${{ matrix.browser }}
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ./frontend/cypress/screenshots
+          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
