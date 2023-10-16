@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-22.04
     defaults:
       run:
-        working-directory: ./charts/pubcode
+        working-directory: charts/pubcode
     steps:
       - name: Deploy to OpenShift
         shell: bash
