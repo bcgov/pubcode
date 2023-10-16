@@ -165,7 +165,8 @@ database:
   enabled: true
   deployment: # can be either a statefulSet or a deployment not both
     enabled: true
-  deploymentStrategy: Recreate
+  deploymentStrategy:
+    type: Recreate
   volumes:
     - name: '{{ .Release.Name }}-database'
       persistentVolumeClaim:
