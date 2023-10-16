@@ -202,11 +202,11 @@ database:
         - "mkdir -p /data/db"
       resources: # this is optional
         limits:
-          cpu: 200m
-          memory: 150Mi
+          cpu: 350m
+          memory: 500Mi
         requests:
-          cpu: 50m
-          memory: 50Mi
+          cpu: 150m
+          memory: 250Mi
       volumeMounts:
         - name: '{{ .Release.Name }}-database'
           mountPath: /data/db
@@ -229,11 +229,11 @@ database:
           protocol: TCP
       resources: # this is optional
         limits:
-          cpu: 250m
-          memory: 250Mi
+          cpu: 350m
+          memory: 500Mi
         requests:
           cpu: 150m
-          memory: 150Mi
+          memory: 250Mi
       readinessProbe:
         tcpSocket:
           port: 27017
