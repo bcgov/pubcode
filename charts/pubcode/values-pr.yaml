@@ -246,4 +246,4 @@ database:
     enabled: true
     size: 256Mi
     storageClassName: netapp-file-standard
-    accessModes: ReadWriteOnce
+    accessModes: ReadWriteMany
