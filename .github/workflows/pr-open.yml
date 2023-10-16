@@ -92,7 +92,7 @@ jobs:
               -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
           - name: database
             file: database/openshift.deploy.yml
-            overwrite: true
+            overwrite: false
             parameters:
               -p PROMOTE=bcgov/nr-containers/mongo:6.0.11
               -p DB_PVC_SIZE=125Mi -p MEMORY_REQUEST=175Mi -p MEMORY_LIMIT=250Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
