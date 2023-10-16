@@ -94,8 +94,8 @@ jobs:
             file: database/openshift.deploy.yml
             overwrite: true
             parameters:
-              -p PROMOTE=bcgov/nr-containers/mongo:6.0.11 -p DB_PVC_SIZE=1Gi
-              -p DB_PVC_SIZE=100Mi -p MEMORY_REQUEST=100Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
+              -p PROMOTE=bcgov/nr-containers/mongo:6.0.11
+              -p DB_PVC_SIZE=1Gi -p MEMORY_REQUEST=100Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
           # - name: frontend
           #   file: frontend/openshift.deploy.yml
           #   overwrite: true
