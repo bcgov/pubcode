@@ -127,20 +127,20 @@ objects:
                 limits:
                   cpu: ${CPU_LIMIT}
                   memory: ${MEMORY_LIMIT}
-              readinessProbe:
-                tcpSocket:
-                  port: 27017
-                failureThreshold: 5
-                initialDelaySeconds: 30
-                periodSeconds: 15
-                timeoutSeconds: 1
-              livenessProbe:
-                failureThreshold: 5
-                initialDelaySeconds: 30
-                periodSeconds: 15
-                tcpSocket:
-                  port: 27017
-                timeoutSeconds: 1
+              # readinessProbe:
+              #   tcpSocket:
+              #     port: 27017
+              #   failureThreshold: 5
+              #   initialDelaySeconds: 30
+              #   periodSeconds: 15
+              #   timeoutSeconds: 1
+              # livenessProbe:
+              #   failureThreshold: 5
+              #   initialDelaySeconds: 30
+              #   periodSeconds: 15
+              #   tcpSocket:
+              #     port: 27017
+              #   timeoutSeconds: 1
               env:
                 - name: MONGO_INITDB_ROOT_USERNAME
                   valueFrom:
