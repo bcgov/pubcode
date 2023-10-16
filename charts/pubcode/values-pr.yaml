@@ -244,6 +244,6 @@ database:
         protocol: TCP
   pvc:
     enabled: true
-    size: 256Mi
+    size: 512Mi
     storageClassName: netapp-file-standard
     accessModes: ReadWriteMany
