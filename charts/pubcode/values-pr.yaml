@@ -165,24 +165,6 @@ database:
   enabled: true
   deployment: # can be either a statefulSet or a deployment not both
     enabled: true
-  configmap:
-    enabled: true
-    data:
-      mongod.conf: |-
-        systemLog:
-          destination: syslog
-        storage:
-          directoryPerDB: false
-          wiredTiger:
-              engineConfig:
-                cacheSizeGB: 0.25
-                journalCompressor: zstd
-                zstdCompressionLevel: 22
-              collectionConfig:
-                blockCompressor: zstd
-        setParameter:
-          enableLocalhostAuthBypass: true        
-
   volumes:
     - name: '{{ .Release.Name }}-database'
       persistentVolumeClaim:
@@ -202,8 +184,8 @@ database:
         - "mkdir -p /data/db"
       resources: # this is optional
         limits:
-          cpu: 350m
-          memory: 500Mi
+          cpu: 500m
+          memory: 600Mi
         requests:
           cpu: 150m
           memory: 250Mi
@@ -226,7 +208,7 @@ database:
       resources: # this is optional
         limits:
           cpu: 350m
-          memory: 500Mi
+          memory: 600Mi
         requests:
           cpu: 150m
           memory: 250Mi
@@ -247,9 +229,6 @@ database:
       volumeMounts:
         - name: '{{ .Release.Name }}-database'
           mountPath: /data/db
-        - name: '{{ include "component.fullname" . }}-config'
-          mountPath: "/etc/mongo"
-
   autoscaling:
     enabled: false
     minReplicas: 1
