@@ -198,7 +198,10 @@ database:
       repository: 'bcgov/nr-containers' # example, it includes repository
       image: mongo # the exact component name, be it backend, api-1 etc...
       tag: 7.0.2 # the tag of the image, it can be latest, 1.0.0 etc..., or the sha256 hash
-      command: ["mongod", "--config", "/etc/mongo/mongod.conf"]
+      command:
+        - "mongod"
+        - "--config"
+        - "/etc/mongo/mongod.conf"
       envFrom:
         secretRef:
           name: '{{ .Release.Name }}'
@@ -208,11 +211,11 @@ database:
           protocol: TCP
       resources: # this is optional
         limits:
-          cpu: 200m
-          memory: 150Mi
+          cpu: 250m
+          memory: 250Mi
         requests:
-          cpu: 50m
-          memory: 50Mi
+          cpu: 150m
+          memory: 150Mi
       readinessProbe:
         tcpSocket:
           port: 27017
@@ -232,23 +235,7 @@ database:
           mountPath: /data/db
         - name: '{{ include "component.fullname" . }}-config'
           mountPath: "/etc/mongo"
-  initContainers:
-    - name: database-init
-      registry: 'ghcr.io' # example, it includes registry
-      repository: 'bcgov/nr-containers' # example, it includes repository
-      image: mongo # the exact component name, be it backend, api-1 etc...
-      tag: 7.0.2 # the tag of the image, it can be latest, 1.0.0 etc..., or the sha256 hash
-      command: [ "sh", "-c", "mkdir -p /data/db" ]
-      resources: # this is optional
-        limits:
-          cpu: 200m
-          memory: 150Mi
-        requests:
-          cpu: 50m
-          memory: 50Mi
-      volumeMounts:
-        - name: '{{ .Release.Name }}-database'
-          mountPath: /data/db
+
   autoscaling:
     enabled: false
     minReplicas: 1
