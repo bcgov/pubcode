@@ -62,6 +62,9 @@ jobs:
     needs:
       - builds
     runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ./charts/pubcode
     steps:
       - name: Deploy to OpenShift
         shell: bash
@@ -74,7 +77,7 @@ jobs:
           oc project ${{ vars.oc_namespace }}
     
           # Deploy Helm Chart
-          helm upgrade --install --wait --atomic ${{ github.event.repository.name }}-${{ github.event.number }} --values values-pr.yaml --set-string global.repository=${{ github.repository }}  --set-string api.containers[0].tag="${{ github.sha }}" --set-string frontend.containers[0].tag="${{ github.sha }}" --set-string global.secrets.emailRecipients=${{ secrets.EMAIL_RECIPIENTS }} --set-string global.secrets.chesTokenURL=${{ secrets.CHES_TOKEN_URL }} --set-string global.secrets.chesClientID=${{ secrets.CHES_CLIENT_ID }} --set-string global.secrets.chesClientSecret=${{ secrets.CHES_CLIENT_SECRET }} --set-string global.secrets.chesAPIURL=${{ secrets.CHES_API_URL }} --set-string global.secrets.databaseAdminPassword=${{ secrets.DB_PWD }} --set-string namespace=${{ vars.oc_namespace }}  --timeout 10m charts/pubcode
+          helm upgrade --install --wait --atomic ${{ github.event.repository.name }}-${{ github.event.number }} --values values-pr.yaml --set-string global.repository=${{ github.repository }}  --set-string api.containers[0].tag="${{ github.sha }}" --set-string frontend.containers[0].tag="${{ github.sha }}" --set-string global.secrets.emailRecipients=${{ secrets.EMAIL_RECIPIENTS }} --set-string global.secrets.chesTokenURL=${{ secrets.CHES_TOKEN_URL }} --set-string global.secrets.chesClientID=${{ secrets.CHES_CLIENT_ID }} --set-string global.secrets.chesClientSecret=${{ secrets.CHES_CLIENT_SECRET }} --set-string global.secrets.chesAPIURL=${{ secrets.CHES_API_URL }} --set-string global.secrets.databaseAdminPassword=${{ secrets.DB_PWD }} --set-string namespace=${{ vars.oc_namespace }}  --timeout 10m .
 
   cypress-e2e:
     name: Cypress end to end test
