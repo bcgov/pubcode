@@ -3,15 +3,12 @@ version: "3.9"
 
 services:
   database:
-    build:
-      context: database
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: DPEPGHbjUluRjetU
       MONGODB_DATABASE: pubcode
-    image: mongo
-    ports:
-      - "27017:27017"
+    image: ghcr.io/bcgov/nr-containers/mongo:6.0.11
+    ports: ["27017:27017"]
     restart: unless-stopped
 
   mongo-express: # The admin UI container for mongoDB
