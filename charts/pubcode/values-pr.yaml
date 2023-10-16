@@ -235,7 +235,7 @@ database:
   initContainers:
     - name: database-init
       registry: 'ghcr.io' # example, it includes registry
-      repository: 'bcgov/nr-containers/mongo' # example, it includes repository
+      repository: 'bcgov/nr-containers' # example, it includes repository
       image: mongo # the exact component name, be it backend, api-1 etc...
       tag: 7.0.2 # the tag of the image, it can be latest, 1.0.0 etc..., or the sha256 hash
       command: [ "sh", "-c", "mkdir -p /data/db" ]
