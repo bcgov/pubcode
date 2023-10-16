@@ -41,78 +41,55 @@ jobs:
       packages: write
     strategy:
       matrix:
-        package: [api, database, frontend]
+        package: [api, frontend, database]
         include:
-          - package: database
-            triggers: ('database/' 'common/openshift.init.yml')
           - package: frontend
             triggers: ('frontend/')
           - package: api
-            triggers: ('api/' 'common/openshift.init.yml')
+            triggers: ('api/')
+          - package: database
+            triggers: ('database/')
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: bcgov-nr/action-builder-ghcr@v1.1.2
         with:
           package: ${{ matrix.package }}
-          tag: ${{ github.event.number }}
+          tag: ${{ github.sha }}
           tag_fallback: test
           token: ${{ secrets.GITHUB_TOKEN }}
           triggers: ${{ matrix.triggers }}
-
-  init:
-    name: Deploys Init on PR
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: bcgov-nr/action-deployer-openshift@v1.1.1
-        name: Deploy init to OpenShift
+      - uses: shrink/actions-docker-registry-tag@v3
         with:
-          file: common/openshift.init.yml
-          oc_namespace: ${{ vars.OC_NAMESPACE }}
-          oc_server: ${{ vars.OC_SERVER }}
-          oc_token: ${{ secrets.OC_TOKEN }}
-          overwrite: false
-          parameters: -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }} -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }} -p EMAIL_RECIPIENTS=${{ secrets.EMAIL_RECIPIENTS }} -p CHES_TOKEN_URL=${{ secrets.CHES_TOKEN_URL }} -p CHES_CLIENT_ID=${{ secrets.CHES_CLIENT_ID }} -p CHES_CLIENT_SECRET=${{ secrets.CHES_CLIENT_SECRET }} -p CHES_API_URL=${{ secrets.CHES_API_URL }}
+          registry: ghcr.io
+          repository: ${{ github.repository }}/${{ matrix.package }}
+          target: ${{ github.sha }}
+          tags: ${{ github.event.number }}
+
   deploys:
     name: Deploys
     needs:
       - builds
-      - init
     runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        name: [api, database, frontend]
-        include:
-          - name: api
-            file: api/openshift.deploy.yml
-            overwrite: true
-            parameters:
-              -p ROUTE=pubcode-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca
-              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
-          - name: database
-            file: database/openshift.deploy.yml
-            overwrite: false
-            parameters: -p DB_PVC_SIZE=100Mi -p MEMORY_REQUEST=100Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=200m
-          - name: frontend
-            file: frontend/openshift.deploy.yml
-            overwrite: true
-            parameters:
-              -p ROUTE=pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca
-              -p MIN_REPLICAS=1 -p MAX_REPLICAS=2 -p MEMORY_REQUEST=75Mi -p MEMORY_LIMIT=150Mi -p CPU_REQUEST=100m -p CPU_LIMIT=125m -p VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}
-
     steps:
-      - uses: bcgov-nr/action-deployer-openshift@v1.1.1
-        with:
-          file: ${{ matrix.file }}
-          oc_namespace: ${{ vars.OC_NAMESPACE }}
-          oc_server: ${{ vars.OC_SERVER }}
-          oc_token: ${{ secrets.OC_TOKEN }}
-          overwrite: ${{ matrix.overwrite }}
-          penetration_test: false
-          parameters:
-            -p ZONE=${{ github.event.number }} -p NAME=${{ github.event.repository.name }}
-            -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }}
-            ${{ matrix.parameters }}
-          triggers: ${{ matrix.triggers }}
+      - uses: actions/checkout@v4
+        name: Checkout
+      - name: Deploy to OpenShift
+        shell: bash
+        run: |
+          # Allow pipefail, since we could be catching oc create errors
+          set +o pipefail
+    
+          # Login to OpenShift (NOTE: project command is a safeguard)
+          oc login --token=${{ secrets.oc_token }} --server=${{ vars.oc_server }}
+          oc project ${{ vars.oc_namespace }}
+          
+          cd charts/pubcode
+          
+          # Deploy Helm Chart
+          helm dependency update
+          helm upgrade --install --wait --atomic  pubcode-${{ github.event.number }} --values values-pr.yaml --set-string global.repository=${{ github.repository }}  --set-string api.containers[0].tag="${{ github.sha }}" --set-string frontend.containers[0].tag="${{ github.sha }}" --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" --set-string global.secrets.chesClientID="${{ secrets.CHES_CLIENT_ID }}" --set-string global.secrets.chesClientSecret="${{ secrets.CHES_CLIENT_SECRET }}" --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}  --set-string namespace="${{ vars.oc_namespace }}" --timeout 5m  .
+
   cypress-e2e:
     name: Cypress end to end test
     needs:
@@ -122,7 +99,7 @@ jobs:
       matrix:
         browser: [ chrome, edge ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout
       - uses: cypress-io/github-action@v5
         name: Cypress run

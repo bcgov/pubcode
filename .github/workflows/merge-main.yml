@@ -34,55 +34,64 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
-  init:
-    name: Deploys Init to TEST
-    needs:
-      - codeql
+  semantic-version:
+    outputs:
+      semanticVersion: ${{ steps.changelog.outputs.version }}
+      tag: ${{ steps.changelog.outputs.tag }}
+      clean_changelog: ${{ steps.changelog.outputs.clean_changelog }}
     runs-on: ubuntu-22.04
+    timeout-minutes: 1
     steps:
-      - uses: bcgov-nr/action-deployer-openshift@v1.1.1
-        name: Deploy init to OpenShift
+      - uses: actions/checkout@v4
+      - name: Conventional Changelog Update
+        uses: TriPSs/conventional-changelog-action@v3
+        id: changelog
+        continue-on-error: true
         with:
-          file: common/openshift.init.yml
-          oc_namespace: ${{ vars.OC_NAMESPACE }}
-          oc_server: ${{ vars.OC_SERVER }}
-          oc_token: ${{ secrets.OC_TOKEN }}
-          overwrite: false
-          parameters: -p ZONE=test -p NAME=${{ github.event.repository.name }} -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:${{ github.event.number }} -p EMAIL_RECIPIENTS=${{ secrets.EMAIL_RECIPIENTS }} -p CHES_TOKEN_URL=${{ secrets.CHES_TOKEN_URL }} -p CHES_CLIENT_ID=${{ secrets.CHES_CLIENT_ID }} -p CHES_CLIENT_SECRET=${{ secrets.CHES_CLIENT_SECRET }} -p CHES_API_URL=${{ secrets.CHES_API_URL }}
-  deploys:
-    name: TEST Deployments
-    needs:
-      - init
-    environment: test
+          github-token: ${{ github.token }}
+          output-file: 'CHANGELOG.md'
+          skip-version-file: 'true'
+          skip-commit: 'true'
+          skip-on-empty: 'false'
+          git-push: 'true'
+  retag-images:
+    needs: [ semantic-version ]
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        name: [api, database, frontend]
-        include:
-          - name: api
-            file: api/openshift.deploy.yml
-            overwrite: true
-            parameters: -p ROUTE=pubcode-test-api.apps.silver.devops.gov.bc.ca
-          - name: database
-            file: database/openshift.deploy.yml
-            overwrite: false
-          - name: frontend
-            file: frontend/openshift.deploy.yml
-            overwrite: true
-            parameters: -p ROUTE=pubcode-test.apps.silver.devops.gov.bc.ca
+        package: [ api, database, frontend ]
     steps:
-      - uses: bcgov-nr/action-deployer-openshift@v1.1.1
+      - name: Tag Docker Images
+        uses: shrink/actions-docker-registry-tag@v3
         with:
-          file: ${{ matrix.file }}
-          oc_namespace: ${{ vars.OC_NAMESPACE }}
-          oc_server: ${{ vars.OC_SERVER }}
-          oc_token: ${{ secrets.OC_TOKEN }}
-          overwrite: ${{ matrix.overwrite }}
-          parameters:
-            -p ZONE=test -p PROMOTE=${{ github.repository }}/${{ matrix.name }}:test
-            -p NAME=${{ github.event.repository.name }} ${{ matrix.parameters }}
-          penetration_test: true
-          triggers: ${{ matrix.triggers }}
+          registry: ghcr.io
+          repository: ${{ github.repository }}/${{ matrix.package }}
+          target: test
+          tags: ${{ needs.semantic-version.outputs.semanticVersion }}
+  deploys:
+    name: TEST Deployments
+    needs: [retag-images, semantic-version]
+    environment: test
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy
+        shell: bash
+        run: |
+          # Allow pipefail, since we could be catching oc create errors
+          set +o pipefail
+
+          # Login to OpenShift (NOTE: project command is a safeguard)
+          oc login --token=${{ secrets.oc_token }} --server=${{ vars.oc_server }}
+          oc project ${{ vars.oc_namespace }}
+          
+          cd charts/pubcode
+          
+          # Deploy Helm Chart
+          helm dependency update
+          helm upgrade --install --wait --atomic pubcode-test --set-string global.repository=${{ github.repository }}  --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" --set-string global.secrets.chesClientID="${{ secrets.CHES_CLIENT_ID }}" --set-string global.secrets.chesClientSecret="${{ secrets.CHES_CLIENT_SECRET }}" --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" --set-string namespace="${{ vars.oc_namespace }}"  --timeout 5m .
+
   cypress-e2e:
     name: Cypress end to end test
     needs:

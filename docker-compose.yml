@@ -7,6 +7,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: DPEPGHbjUluRjetU
       MONGODB_DATABASE: pubcode
+
     image: ghcr.io/bcgov/nr-containers/mongo:6.0.11
     ports: ["27017:27017"]
     restart: unless-stopped
