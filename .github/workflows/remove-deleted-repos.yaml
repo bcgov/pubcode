@@ -19,7 +19,9 @@ jobs:
         with:
           node-version: "20.x"
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          cd utilities
+          npm ci
 
       - uses: actions/cache@v3
         with:
