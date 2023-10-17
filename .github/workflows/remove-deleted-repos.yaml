@@ -9,6 +9,9 @@ jobs:
   soft-delete-removed-pubcodes:
     name: Soft Delete pubcodes In the Databse which are removed from the repo.
     runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: utilities/remove-deleted-pubcode
     environment: prod
     steps:
       - name: Check out repository
@@ -19,9 +22,7 @@ jobs:
         with:
           node-version: "20.x"
       - name: Install Dependencies
-        run: |
-          cd utilities
-          npm ci
+        run: npm ci
 
       - uses: actions/cache@v3
         with:
@@ -32,11 +33,10 @@ jobs:
 
       - name: Process script
         run: |
-          cd utilities
           oc login --token=${{ secrets.OC_TOKEN }} --server=${{ vars.OC_SERVER }}
           oc project ${{ vars.OC_NAMESPACE }}
 
           # Get API key
           API_KEY=$(oc get secrets/pubcode --template={{.data.API_KEY}} | base64 -d)
           API_URL=https://$(oc get route/pubcode-api --template={{.spec.host}})
-          API_KEY="${API_KEY}" API_URL="${API_URL}" node src/remove-deleted-pubcodes.js
+          API_KEY="${API_KEY}" API_URL="${API_URL}" node index.js
