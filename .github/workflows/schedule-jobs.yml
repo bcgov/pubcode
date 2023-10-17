@@ -48,7 +48,7 @@ jobs:
           oc project ${{ vars.OC_NAMESPACE }}
 
           # Get API key
-          API_KEY=$(oc get secrets/pubcode --template={{.data.api_key}} | base64 -d)
+          API_KEY=$(oc get secrets/pubcode --template={{.data.API_KEY}} | base64 -d)
           API_URL=https://$(oc get route/pubcode-api --template={{.spec.host}})
           API_KEY="${API_KEY}" API_URL="${API_URL}" node src/main.js
 
@@ -126,6 +126,6 @@ jobs:
           oc project ${{ vars.OC_NAMESPACE }}
 
           # Get API key
-          API_KEY=$(oc get secrets/pubcode --template={{.data.api_key}} | base64 -d)
+          API_KEY=$(oc get secrets/pubcode --template={{.data.API_KEY}} | base64 -d)
           API_URL=https://$(oc get route/pubcode-api --template={{.spec.host}})
           API_KEY="${API_KEY}" API_URL="${API_URL}" node src/remove-deleted-pubcodes.js
