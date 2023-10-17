@@ -94,38 +94,3 @@ jobs:
           # Create a Pull Request
           gh pr create --assignee "mishraomp" --base main --label "chore" --title "Updating the Schema as changes to ministry names were detected." --body "Updating the Schema as changes to ministry names were detected."
 
-  soft-delete-removed-pubcodes:
-    needs: [pubcode-crawler]
-    name: Soft Delete pubcodes In the Databse which are removed from the repo.
-    runs-on: ubuntu-22.04
-    defaults:
-      run:
-        working-directory: utilities
-    environment: prod
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Add Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "20.x"
-      - name: Install Dependencies
-        run: npm ci
-
-      - uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Process script
-        run: |
-          oc login --token=${{ secrets.OC_TOKEN }} --server=${{ vars.OC_SERVER }}
-          oc project ${{ vars.OC_NAMESPACE }}
-
-          # Get API key
-          API_KEY=$(oc get secrets/pubcode --template={{.data.API_KEY}} | base64 -d)
-          API_URL=https://$(oc get route/pubcode-api --template={{.spec.host}})
-          API_KEY="${API_KEY}" API_URL="${API_URL}" node src/remove-deleted-pubcodes.js
