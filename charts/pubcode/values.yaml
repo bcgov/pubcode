@@ -41,11 +41,11 @@ api:
           protocol: TCP
       resources: # this is optional
         limits:
-          cpu: 150m
-          memory: 250Mi
-        requests:
-          cpu: 100m
+          cpu: 75m
           memory: 150Mi
+        requests:
+          cpu: 25m
+          memory: 50Mi
       readinessProbe:
         httpGet:
           path: /api/pub-code/health
@@ -118,10 +118,10 @@ frontend:
           protocol: TCP
       resources: # this is optional
         limits:
-          cpu: 100m
+          cpu: 75m
           memory: 150Mi
         requests:
-          cpu: 50m
+          cpu: 25m
           memory: 50Mi
       readinessProbe:
         httpGet:
@@ -186,11 +186,11 @@ database:
         - "mkdir -p /data/db"
       resources: # this is optional
         limits:
-          cpu: 500m
-          memory: 600Mi
+          cpu: 250m
+          memory: 450Mi
         requests:
-          cpu: 150m
-          memory: 250Mi
+          cpu: 50m
+          memory: 150Mi
       volumeMounts:
         - name: '{{ .Release.Name }}-database'
           mountPath: /data/db
@@ -209,11 +209,11 @@ database:
           protocol: TCP
       resources: # this is optional
         limits:
-          cpu: 350m
-          memory: 600Mi
+          cpu: 250m
+          memory: 450Mi
         requests:
-          cpu: 150m
-          memory: 250Mi
+          cpu: 50m
+          memory: 150Mi
       readinessProbe:
         tcpSocket:
           port: 27017
