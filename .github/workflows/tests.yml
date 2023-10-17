@@ -2,14 +2,7 @@ name: Unit Tests and Analysis
 
 on:
   pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
-  workflow_run:
-    workflows: [Pull Request Closed]
-    types: [completed]
+    types: [opened, reopened, synchronize, ready_for_review]
   workflow_dispatch:
 
 concurrency:

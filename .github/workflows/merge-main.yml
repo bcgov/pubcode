@@ -54,6 +54,7 @@ jobs:
           skip-commit: 'true'
           skip-on-empty: 'false'
           git-push: 'true'
+
   retag-images:
     needs: [ semantic-version ]
     runs-on: ubuntu-22.04
@@ -68,6 +69,7 @@ jobs:
           repository: ${{ github.repository }}/${{ matrix.package }}
           target: test
           tags: ${{ needs.semantic-version.outputs.semanticVersion }}
+
   deploys:
     name: TEST Deployments
     needs: [retag-images, semantic-version]
