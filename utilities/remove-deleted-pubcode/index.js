@@ -6,7 +6,7 @@ const API_URL = process.env.API_URL;
 const pubcodeURL = process.env.PUBCODE_URL || "https://pubcode-api.apps.silver.devops.gov.bc.ca/api/pub-code";
 // Set the URL for the secondary API call
 
-async function process() {
+async function doProcess() {
   try {
     // Perform the initial HTTP GET request
     const pubCodeResponse = await axios.get(pubcodeURL);
@@ -72,7 +72,7 @@ async function bulkLoadPubCodes(yamlArrayAsJson) {
   }
 }
 try{
-  await process();
+  await doProcess();
 }catch (e) {
   console.error(e);
   process.exit(1);
