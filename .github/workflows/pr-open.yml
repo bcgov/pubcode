@@ -87,7 +87,39 @@ jobs:
           # Deploy Helm Chart
           cd charts/pubcode
           helm dependency update
-          helm upgrade --install --wait --atomic  pubcode-${{ github.event.number }} --values values-pr.yaml --set-string global.repository=${{ github.repository }}  --set-string api.containers[0].tag="${{ github.sha }}" --set-string frontend.containers[0].tag="${{ github.sha }}" --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" --set-string global.secrets.chesClientID="${{ secrets.CHES_CLIENT_ID }}" --set-string global.secrets.chesClientSecret="${{ secrets.CHES_CLIENT_SECRET }}" --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}  --set-string namespace="${{ vars.oc_namespace }}" --timeout 5m  .
+          helm upgrade --install --wait --atomic  pubcode-${{ github.event.number }}  \
+          --set-string global.repository=${{ github.repository }}  \
+          --set-string api.containers[0].tag="${{ github.sha }}" \
+          --set-string api.containers[0].resources.limits.cpu="250m" \
+          --set-string api.containers[0].resources.limits.memory="250Mi" \
+          --set-string api.containers[0].resources.requests.cpu="100m" \
+          --set-string api.containers[0].resources.requests.memory="150Mi" \
+          --set api.autoscaling.minReplicas=1 \
+          --set api.autoscaling.maxReplicas=1 \
+          --set frontend.autoscaling.minReplicas=1 \
+          --set frontend.autoscaling.maxReplicas=1 \
+          --set-string frontend.containers[0].tag="${{ github.sha }}" \
+          --set-string frontend.containers[0].resources.limits.cpu="200m" \
+          --set-string frontend.containers[0].resources.limits.memory="150Mi" \
+          --set-string frontend.containers[0].resources.requests.cpu="100m" \
+          --set-string frontend.containers[0].resources.requests.memory="50Mi" \
+          --set-string database.containers[0].resources.limits.cpu="500m" \
+          --set-string database.containers[0].resources.limits.memory="450Mi" \
+          --set-string database.containers[0].resources.requests.cpu="100m" \
+          --set-string database.containers[0].resources.requests.memory="150Mi" \
+          --set-string database.initContainers[0].resources.limits.cpu="500m" \
+          --set-string database.initContainers[0].resources.limits.memory="450Mi" \
+          --set-string database.initContainers[0].resources.requests.cpu="100m" \
+          --set-string database.initContainers[0].resources.requests.memory="150Mi" \
+          --set-string database.pvc.size="350Mi" \
+          --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" \
+          --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" \
+          --set-string global.secrets.chesClientID="${{ secrets.CHES_CLIENT_ID }}" \
+          --set-string global.secrets.chesClientSecret="${{ secrets.CHES_CLIENT_SECRET }}" \
+          --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" \
+          --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" \
+          --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}  \
+          --set-string namespace="${{ vars.oc_namespace }}" -f values.yaml --timeout 5m  .
 
   cypress-e2e:
     name: Cypress end to end test
