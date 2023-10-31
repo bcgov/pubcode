@@ -121,7 +121,7 @@ const softDeleteRepo = async (req, res) => {
     if (!pubcodeEntityFromDB) {
       res.status(404).json({ message: "Repo Not Found" });
     } else {
-      await pubcodeEntity.updateOne({ _id: pubcodeEntityFromDB["_id"] }, { isDeleted: true }).exec();
+      await pubcodeEntity.updateOne({ _id: pubcodeEntityFromDB["_id"] }, { is_deleted: true }).exec();
       pubcodeEntityFromDB = await pubcodeEntity.findOne({ repo_name: req.params.repo_name }).exec();
       console.info(pubcodeEntityFromDB);
       res.status(200).json({ message: "Repo Marked as soft deleted." });
