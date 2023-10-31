@@ -41,11 +41,11 @@ api:
           protocol: TCP
       resources: # this is optional
         limits:
-          cpu: 75m
-          memory: 150Mi
+          cpu: 150m
+          memory: 250Mi
         requests:
-          cpu: 25m
-          memory: 50Mi
+          cpu: 50m
+          memory: 100Mi
       readinessProbe:
         httpGet:
           path: /api/pub-code/health
@@ -121,7 +121,7 @@ frontend:
           cpu: 75m
           memory: 150Mi
         requests:
-          cpu: 25m
+          cpu: 50m
           memory: 50Mi
       readinessProbe:
         httpGet:
