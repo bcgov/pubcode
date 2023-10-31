@@ -46,7 +46,7 @@ jobs:
       - name: Conventional Changelog Update
         uses: TriPSs/conventional-changelog-action@v4.1.1
         id: changelog
-        continue-on-error: true
+        continue-on-error: false
         with:
           github-token: ${{ github.token }}
           output-file: 'CHANGELOG.md'
