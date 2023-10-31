@@ -1,9 +1,25 @@
 api:
+  containers:
+    - resources: # this is optional
+      limits:
+        cpu: 250m
+        memory: 250Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
   autoscaling:
     minReplicas: 1
     maxReplicas: 1
 
 frontend:
+  containers:
+    - resources: # this is optional
+      limits:
+        cpu: 200m
+        memory: 150Mi
+      requests:
+        cpu: 100m
+        memory: 50Mi
   autoscaling:
     minReplicas: 1
     maxReplicas: 1
