@@ -40,5 +40,9 @@ app.get("/", (req, res, next) => {
 });
 app.use(/(\/api)?/, apiRouter);
 apiRouter.use("/pub-code", pubcodeRouter);
+app.use((req, res, next) => {
+  res.status(404).send(
+    "<h1>Not Found.</h1>");
+});
 
 module.exports = app;

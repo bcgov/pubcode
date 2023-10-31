@@ -115,10 +115,24 @@ const health = async (req, res) => {
     res.status(500).json(error);
   }
 };
+const softDeleteRepo = async (req, res) => {
+  try{
+    const pubcodeEntityFromDB = await pubcodeEntity.findOne({ repo_name: req.params.repo_name }).exec();
+    if(!pubcodeEntityFromDB){
+      res.status(404).json({message: "Repo Not Found"});
+    }else{
+      await pubcodeEntityFromDB.updateOne({isDeleted: true});
+      res.status(200).json({message: "Repo Marked as soft deleted."});
+    }
+  }catch (e) {
+    console.error(e);
+  }
 
+}
 module.exports = {
   bulkLoad,
   readAll,
   findById,
-  health
+  health,
+  softDeleteRepo
 };

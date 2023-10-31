@@ -26,7 +26,7 @@ class ChesService {
       });
       return { data, status };
     } catch (e) {
-      console.log(SERVICE, e);
+      console.error(SERVICE, e);
     }
   }
 
@@ -52,7 +52,7 @@ class ChesService {
         return { data, status };
       }
     } catch (e) {
-      console.log(SERVICE, e);
+      console.error(SERVICE, e);
     }
   }
 
@@ -81,7 +81,7 @@ class ChesService {
         return { data, status };
       }
     } catch (e) {
-      console.log(SERVICE, e);
+      console.error(SERVICE, e);
     }
   }
 
@@ -100,7 +100,8 @@ class ChesService {
       );
       return { data, status };
     } catch (e) {
-      console.log(SERVICE, e?.config?.data?.errors);
+      console.error(e);
+      console.error(SERVICE, e?.config?.data?.errors);
     }
   }
 
@@ -119,7 +120,7 @@ class ChesService {
       );
       return { data, status };
     } catch (e) {
-      console.log(SERVICE, e);
+      console.error(SERVICE, e);
     }
   }
 
@@ -138,7 +139,7 @@ class ChesService {
       );
       return { data, status };
     } catch (e) {
-      console.log(SERVICE, e);
+      console.error(SERVICE, e);
     }
   }
 
@@ -167,7 +168,7 @@ class ChesService {
         return { data, status };
       }
     } catch (e) {
-      console.log(SERVICE, e);
+      console.error(SERVICE, e);
     }
   }
 

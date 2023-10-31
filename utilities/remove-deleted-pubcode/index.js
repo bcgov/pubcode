@@ -28,13 +28,13 @@ async function doProcess() {
             item.is_deleted = true;
           }
         }
-        results.push(item);
+        results.push(repoName);
       } catch (error) {
         console.error(`Failed to fetch data for ${item.repo_name}:`, error);
         process.exit(1);
       }
     }
-    await bulkLoadPubCodes(results);
+    await markSoftDeleted(results);
 
   } catch (error) {
     console.error('Failed to fetch data:', error);
@@ -52,23 +52,25 @@ async function getYamlFromRepo(repoName, branchName) {
   return yamlResponse;
 }
 
-async function bulkLoadPubCodes(yamlArrayAsJson) {
-  if (yamlArrayAsJson.length > 0) {
-    console.debug(`Found ${yamlArrayAsJson.length} yaml files to load into database.`);
+async function markSoftDeleted(repoNames) {
+  if (repoNames.length > 0) {
+    console.info(`Found ${repoNames.length} yaml files to mark as soft delete.`);
+    console.info(repoNames);
     //send to backend api bulk load endpoint
-    try {
-      await axios.post(`${API_URL}/api/pub-code/bulk-load`, yamlArrayAsJson, {
-        headers: {
-          "X-API-KEY": API_KEY
-        }
-      });
-      console.debug(`Successfully loaded ${yamlArrayAsJson.length} yaml files into database.`);
-    } catch (e) {
-      console.error(e.response?.status);
-      console.error(e.response?.config?.url);
+    for (const repoName of repoNames) {
+      try {
+        await axios.delete(`${API_URL}/api/pub-code/${repoName}`, {
+          headers: {
+            "X-API-KEY": API_KEY
+          }
+        });
+      } catch (e) {
+        console.error(e.response?.status);
+        console.error(e.response?.config?.url);
+      }
     }
   } else {
-    console.debug(`No yaml files found at the root of repositories under bcgov.`);
+    console.info(`No yaml files to mark as soft delete.`);
   }
 }
 try{
