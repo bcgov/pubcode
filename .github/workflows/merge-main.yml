@@ -44,15 +44,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Conventional Changelog Update
-        uses: TriPSs/conventional-changelog-action@v3
+        uses: TriPSs/conventional-changelog-action@v4.1.1
         id: changelog
-        continue-on-error: true
         with:
           github-token: ${{ github.token }}
           output-file: 'CHANGELOG.md'
           skip-version-file: 'true'
           skip-commit: 'true'
-          skip-on-empty: 'false'
+          skip-on-empty: 'true'
           git-push: 'true'
 
   retag-images:
