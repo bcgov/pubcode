@@ -8,5 +8,6 @@ export default cypress.defineConfig({
     },
     experimentalStudio: true,
     experimentalWebKitSupport: true,
+    supportFile: false
   },
 });
