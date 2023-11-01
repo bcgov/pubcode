@@ -2,8 +2,8 @@ name: Remove Deleted pubcodes from the api
 
 on:
   workflow_dispatch:
-  schedule: # * is a special character in YAML, so you have to quote this string, every day at 8am GMT
-    - cron: "5 8 * * *"
+  #schedule: # * is a special character in YAML, so you have to quote this string, every day at 8am GMT
+  #  - cron: "5 8 * * *"
 
 jobs:
   soft-delete-removed-pubcodes:
