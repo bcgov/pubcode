@@ -25,10 +25,9 @@ async function doProcess() {
           await getYamlFromRepo(repoName, defaultBranch);
         }catch (e){
           if (e.response?.status === 404) {
-            item.is_deleted = true;
+            results.push(repoName);
           }
         }
-        results.push(repoName);
       } catch (error) {
         console.error(`Failed to fetch data for ${item.repo_name}:`, error);
         process.exit(1);
