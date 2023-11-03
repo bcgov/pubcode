@@ -107,6 +107,7 @@ async function bulkLoadPubCodes(yamlArrayAsJson) {
     } catch (e) {
       console.error(e.response?.status);
       console.error(e.response?.config?.url);
+      process.exit(1);
     }
   } else {
     console.debug(`No yaml files found at the root of repositories under bcgov.`);
