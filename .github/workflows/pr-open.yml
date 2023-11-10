@@ -19,7 +19,7 @@ jobs:
       pull-requests: write
     steps:
       - name: PR Greeting
-        uses: bcgov-nr/action-pr-description-add@v0.0.2
+        uses: bcgov-nr/action-pr-description-add@v1.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           add_markdown: |
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: bcgov-nr/action-builder-ghcr@v1.3.0
+      - uses: bcgov-nr/action-builder-ghcr@v2.0.0
         with:
           package: ${{ matrix.package }}
           tag: ${{ github.sha }}
