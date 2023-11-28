@@ -27,18 +27,18 @@ dependencies:
 
   - name: component
     condition: api.enabled
-    version: 0.2.0
+    version: 0.2.2
     repository: https://bcgov.github.io/helm-service/
     alias: api
 
   - name: component
     condition: frontend.enabled
-    version: 0.2.0
+    version: 0.2.2
     repository: https://bcgov.github.io/helm-service/
     alias: frontend
 
   - name: component
     condition: database.enabled
-    version: 0.2.0
+    version: 0.2.2
     repository: https://bcgov.github.io/helm-service/
     alias: database
