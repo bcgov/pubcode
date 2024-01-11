@@ -20,6 +20,8 @@ global:
     chesAPIURL: default
   domain: "apps.silver.devops.gov.bc.ca" # it is required, apps.silver.devops.gov.bc.ca for silver cluster
   openshiftImageRegistry: "image-registry.openshift-image-registry.svc:5000"
+  imagestreams:
+    enabled: true
 
 api:
   enabled: true
@@ -89,7 +91,7 @@ api:
     enabled: true
     host: "{{ .Release.Name }}-api.{{ .Values.global.domain }}"
     targetPort: http # look at line#164 refer to the name.
-  podAnnotations:
+  podAnnotations: |-
     prometheus.io/scrape: "true"
     prometheus.io/port: "3000"
     prometheus.io/path: "/metrics"
@@ -164,7 +166,7 @@ frontend:
     enabled: true
     host: "{{ .Release.Name }}.{{ .Values.global.domain }}"
     targetPort: http # look at line#164 refer to the name.
-  podAnnotations:
+  podAnnotations: |-
     prometheus.io/scrape: "true"
     prometheus.io/port: "3002"
     prometheus.io/path: "/metrics"
