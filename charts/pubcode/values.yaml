@@ -89,6 +89,10 @@ api:
     enabled: true
     host: "{{ .Release.Name }}-api.{{ .Values.global.domain }}"
     targetPort: http # look at line#164 refer to the name.
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+    prometheus.io/path: "/metrics"
 
 frontend:
   enabled: true
@@ -160,6 +164,10 @@ frontend:
     enabled: true
     host: "{{ .Release.Name }}.{{ .Values.global.domain }}"
     targetPort: http # look at line#164 refer to the name.
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3002"
+    prometheus.io/path: "/metrics"
 
 database:
   enabled: true
