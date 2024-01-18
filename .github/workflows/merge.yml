@@ -93,32 +93,16 @@ jobs:
           helm dependency update
           helm upgrade --install --wait --atomic pubcode-test --values values.yaml --set-string global.repository=${{ github.repository }}  --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" --set-string global.secrets.chesClientID="${{ secrets.CHES_CLIENT_ID }}" --set-string global.secrets.chesClientSecret="${{ secrets.CHES_CLIENT_SECRET }}" --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" --set-string namespace="${{ vars.oc_namespace }}"  --timeout 5m .
 
-  cypress-e2e:
-    name: Cypress end to end test
-    needs:
-      - deploys
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        browser: [ chrome, firefox, edge ]
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout
-      - uses: cypress-io/github-action@v5
-        name: Cypress run
-        with:
-          config: pageLoadTimeout=10000,baseUrl=https://pubcode-test.apps.silver.devops.gov.bc.ca/
-          working-directory: ./frontend
-          browser: ${{ matrix.browser }}
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: ./frontend/cypress/screenshots
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
+  tests:
+    name: Tests
+    needs: [deploys]
+    uses: ./.github/workflows/.tests.yml
+    with:
+      target: test
+
   deploys-prod:
     name: PROD Deployments
-    needs: [semantic-version,cypress-e2e]
+    needs: [semantic-version, tests]
     environment: prod
     runs-on: ubuntu-22.04
     timeout-minutes: 10

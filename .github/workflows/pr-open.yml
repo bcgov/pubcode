@@ -2,7 +2,7 @@ name: Pull Request
 
 on:
   pull_request:
-  workflow_dispatch:
+  merge_group:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -42,14 +42,6 @@ jobs:
     strategy:
       matrix:
         package: [api, frontend, database]
-        include:
-          - package: frontend
-            triggers: ('frontend/')
-          - package: api
-            triggers: ('api/')
-          - package: database
-            triggers: ('database/')
-
     steps:
       - uses: actions/checkout@v4
       - uses: bcgov-nr/action-builder-ghcr@v2.0.1
@@ -58,7 +50,7 @@ jobs:
           tag: ${{ github.sha }}
           tag_fallback: test
           token: ${{ secrets.GITHUB_TOKEN }}
-          triggers: ${{ matrix.triggers }}
+          triggers: ('${{ matrix.package }}/')
 
       - uses: shrink/actions-docker-registry-tag@v3
         with:
@@ -77,12 +69,11 @@ jobs:
       - name: Deploy to OpenShift
         shell: bash
         run: |
-          # Allow pipefail, since we could be catching oc create errors
+          # Expand for deployment steps
           set +o pipefail
     
-          # Login to OpenShift (NOTE: project command is a safeguard)
           oc login --token=${{ secrets.oc_token }} --server=${{ vars.oc_server }}
-          oc project ${{ vars.oc_namespace }}
+          oc project ${{ vars.oc_namespace }} # Safeguard!
           
           # Deploy Helm Chart
           cd charts/pubcode
@@ -121,26 +112,9 @@ jobs:
           --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}  \
           --set-string namespace="${{ vars.oc_namespace }}" -f values.yaml --timeout 5m  .
 
-  cypress-e2e:
-    name: Cypress end to end test
-    needs:
-      - deploys
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        browser: [ chrome, edge ]
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout
-      - uses: cypress-io/github-action@v5
-        name: Cypress run
-        with:
-          config: pageLoadTimeout=10000,baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
-          working-directory: ./frontend
-          browser: ${{ matrix.browser }}
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: ./frontend/cypress/screenshots
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
+  tests:
+    name: Tests
+    needs: [deploys]
+    uses: ./.github/workflows/.tests.yml
+    with:
+      target: ${{ github.event.number }}

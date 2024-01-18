@@ -1,0 +1,32 @@
+name: .Tests
+
+on:
+  workflow_call:
+    inputs:
+      ### Required
+      target:
+        description: PR number, test or prod
+        required: true
+        type: string
+
+jobs:
+  cypress-e2e:
+    name: Cypress E2E
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        browser: [chrome, firefox]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cypress-io/github-action@v5
+        name: Cypress run
+        with:
+          config: pageLoadTimeout=30000,baseUrl=https://pubcode-${{ inputs.target }}.apps.silver.devops.gov.bc.ca/
+          working-directory: ./frontend
+          browser: ${{ matrix.browser }}
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ./frontend/cypress/screenshots
+          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
