@@ -20,10 +20,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cypress-io/github-action@v5
         name: Cypress run
-        env:
-          pageLoadTimeout: 30000
-          baseUrl: https://pubcode-${{ inputs.target }}.apps.silver.devops.gov.bc.ca/
         with:
+          config: pageLoadTimeout=30000,baseUrl=https://pubcode-${{ inputs.target }}.apps.silver.devops.gov.bc.ca/
           working-directory: ./frontend
           browser: ${{ matrix.browser }}
       - uses: actions/upload-artifact@v3
