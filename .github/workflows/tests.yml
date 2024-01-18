@@ -1,8 +1,13 @@
-name: Unit Tests and Analysis
+name: Analysis
 
 on:
+  push:
+    branches: [main]
+  merge_group:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
+  schedule:
+    - cron: "0 12 * * 0" # 3 AM PST = 12 PM UDT, runs sundays
   workflow_dispatch:
 
 concurrency:
@@ -10,34 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # tests:
-  #   name: Unit Tests
-  #   if: github.event_name != 'pull_request' || !github.event.pull_request.draft
-  #   runs-on: ubuntu-22.04
-  #   strategy:
-  #     matrix:
-  #       dir: [api, frontend]
-  #       include:
-  #         - dir: api
-  #           sonar_projectKey: bcgov_public-code_api
-  #           token: SONAR_TOKEN_BACKEND
-  #         - dir: frontend
-  #           sonar_projectKey: bcgov_public-code_frontend
-  #           token: SONAR_TOKEN_FRONTEND
-  #   steps:
-  #     - uses: bcgov-nr/action-test-and-analyse@v0.0.1
-  #       with:
-  #         commands: |
-  #           npm ci
-  #           npm run test:cov
-  #         dir: ${{ matrix.dir }}
-  #         sonar_args: >
-  #           -Dsonar.exclusions=**/coverage/**,**/node_modules/**
-  #           -Dsonar.organization=bcgov-sonarcloud
-  #           -Dsonar.project.monorepo.enabled=true
-  #           -Dsonar.projectKey=${{ matrix.sonar_projectKey }}
-  #         sonar_project_token: ${{ secrets[matrix.token] }}
-
   # https://github.com/marketplace/actions/aqua-security-trivy
   trivy:
     name: Trivy Security Scan
