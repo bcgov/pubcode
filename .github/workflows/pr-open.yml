@@ -115,21 +115,6 @@ jobs:
   cypress-e2e:
     name: Cypress end to end test
     needs: [deploys]
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        browser: [chrome, edge]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cypress-io/github-action@v5
-        name: Cypress run
-        with:
-          config: pageLoadTimeout=10000,baseUrl=https://pubcode-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/
-          working-directory: ./frontend
-          browser: ${{ matrix.browser }}
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: ./frontend/cypress/screenshots
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
+    uses: ./.github/workflows/.tests.yml
+    with:
+      target: ${{ github.event.number }}
