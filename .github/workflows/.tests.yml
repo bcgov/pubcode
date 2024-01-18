@@ -11,7 +11,7 @@ on:
 
 jobs:
   cypress-e2e:
-    name: Cypress end to end test
+    name: Cypress E2E
     runs-on: ubuntu-22.04
     strategy:
       matrix:

@@ -112,8 +112,8 @@ jobs:
           --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}  \
           --set-string namespace="${{ vars.oc_namespace }}" -f values.yaml --timeout 5m  .
 
-  cypress-e2e:
-    name: Cypress end to end test
+  tests:
+    name: Tests
     needs: [deploys]
     uses: ./.github/workflows/.tests.yml
     with:
