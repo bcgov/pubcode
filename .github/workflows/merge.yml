@@ -95,15 +95,13 @@ jobs:
 
   cypress-e2e:
     name: Cypress end to end test
-    needs:
-      - deploys
+    needs: [deploys]
     runs-on: ubuntu-22.04
     strategy:
       matrix:
         browser: [ chrome, firefox, edge ]
     steps:
       - uses: actions/checkout@v4
-        name: Checkout
       - uses: cypress-io/github-action@v5
         name: Cypress run
         with:
@@ -116,6 +114,7 @@ jobs:
           name: cypress-screenshots
           path: ./frontend/cypress/screenshots
           if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
+
   deploys-prod:
     name: PROD Deployments
     needs: [semantic-version,cypress-e2e]

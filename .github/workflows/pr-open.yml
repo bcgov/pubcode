@@ -42,14 +42,6 @@ jobs:
     strategy:
       matrix:
         package: [api, frontend, database]
-        include:
-          - package: frontend
-            triggers: ('frontend/')
-          - package: api
-            triggers: ('api/')
-          - package: database
-            triggers: ('database/')
-
     steps:
       - uses: actions/checkout@v4
       - uses: bcgov-nr/action-builder-ghcr@v2.0.1
@@ -58,7 +50,7 @@ jobs:
           tag: ${{ github.sha }}
           tag_fallback: test
           token: ${{ secrets.GITHUB_TOKEN }}
-          triggers: ${{ matrix.triggers }}
+          triggers: ('${{ matrix.package }}/')
 
       - uses: shrink/actions-docker-registry-tag@v3
         with:
@@ -77,12 +69,11 @@ jobs:
       - name: Deploy to OpenShift
         shell: bash
         run: |
-          # Allow pipefail, since we could be catching oc create errors
+          # Expand for deployment steps
           set +o pipefail
     
-          # Login to OpenShift (NOTE: project command is a safeguard)
           oc login --token=${{ secrets.oc_token }} --server=${{ vars.oc_server }}
-          oc project ${{ vars.oc_namespace }}
+          oc project ${{ vars.oc_namespace }} # Safeguard!
           
           # Deploy Helm Chart
           cd charts/pubcode
@@ -123,15 +114,13 @@ jobs:
 
   cypress-e2e:
     name: Cypress end to end test
-    needs:
-      - deploys
+    needs: [deploys]
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        browser: [ chrome, edge ]
+        browser: [chrome, edge]
     steps:
       - uses: actions/checkout@v4
-        name: Checkout
       - uses: cypress-io/github-action@v5
         name: Cypress run
         with:

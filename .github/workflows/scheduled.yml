@@ -1,4 +1,4 @@
-name: Scheduled
+name: Schedule Jobs
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
     - cron: "0 8 * * *"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
