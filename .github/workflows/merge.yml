@@ -44,7 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Conventional Changelog Update
-        uses: TriPSs/conventional-changelog-action@v5.1.0
+        uses: TriPSs/conventional-changelog-action@v5.2.1
         id: changelog
         with:
           github-token: ${{ github.token }}
