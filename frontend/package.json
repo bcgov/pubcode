@@ -17,7 +17,7 @@
     "@material-ui/icons": "^4.11.3",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
-    "@mui/styles": "^5.13.1",
+    "@mui/styles": "^5.15.15",
     "@rjsf/core": "^5.12.1",
     "@rjsf/material-ui": "^5.7.2",
     "@rjsf/utils": "^5.7.2",
