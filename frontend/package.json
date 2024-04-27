@@ -36,13 +36,13 @@
     "vite-plugin-svgr": "^4.0.0"
   },
   "devDependencies": {
-    "@types/react": "^17.0.0",
+    "@types/react": "^17.0.80",
     "@types/react-dom": "^17.0.0",
     "@vitejs/plugin-react": "^4.0.0",
     "cypress": "^13.7.2",
     "vite": "^4.3.9"
   },
   "overrides": {
-    "@babel/traverse": "8.0.0-alpha.7"
+    "@babel/traverse": "8.0.0-alpha.8"
   }
 }
