@@ -1,18 +1,17 @@
-FROM node:20-bullseye-slim AS builder
+# Build static files
+FROM node:22.2.0-slim AS build
 WORKDIR /app
 COPY *.json ./
 RUN npm ci --omit=dev --ignore-scripts
-COPY ./src ./src
 
-# Deployment container
 # Deployment container
 FROM gcr.io/distroless/nodejs20:nonroot
 ENV NODE_ENV production
 
 # Copy over app
 WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/src ./src
+COPY --from=build /app/node_modules ./node_modules
+COPY ./src ./src
 
 # Expose port - mostly a convention, for readability
 EXPOSE 3000
