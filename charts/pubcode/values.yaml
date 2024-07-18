@@ -40,7 +40,11 @@ api:
       env:
         fromValues:
           - name: OTEL_NODE_RESOURCE_DETECTORS
-            value: all
+            value: env,host,os,http,express,mongoose
+          - name: OTEL_TRACES_EXPORTER
+            value: otlp
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: '{{ .Release.Name }}-opentelemetry-collector:4318'
           - name: OTEL_LOG_LEVEL
             value: all
       ports:
@@ -265,3 +269,8 @@ database:
     size: 750Mi
     storageClassName: netapp-file-standard
     accessModes: ReadWriteMany
+opentelemetry-collector:
+  nameOverride: '{{ .Release.Name }}-opentelemetry-collector'
+  mode: deployment
+  serviceAccount:
+    create: false
