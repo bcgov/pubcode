@@ -274,3 +274,7 @@ opentelemetry-collector:
   mode: deployment
   serviceAccount:
     create: false
+  image:
+    repository: otel/opentelemetry-collector
+  command:
+    name: "otelcol"
