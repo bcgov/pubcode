@@ -37,6 +37,12 @@ api:
       envFrom:
         secretRef:
           name: '{{ .Release.Name }}'
+      env:
+        fromValues:
+          - name: OTEL_NODE_RESOURCE_DETECTORS
+            value: all
+          - name: OTEL_LOG_LEVEL
+            value: all
       ports:
         - name: http
           containerPort: 3000
