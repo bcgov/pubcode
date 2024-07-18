@@ -271,10 +271,15 @@ database:
     accessModes: ReadWriteMany
 opentelemetry-collector:
   nameOverride: '{{ .Release.Name }}-opentelemetry-collector'
+  replicaCount: 1
   mode: deployment
   serviceAccount:
     create: false
   image:
-    repository: otel/opentelemetry-collector
+    repository: otel/opentelemetry-collector-k8s
   command:
-    name: "otelcol"
+    name: "otelcol-k8s"
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
