@@ -17,7 +17,7 @@ COPY ./src ./src
 EXPOSE 3000
 
 USER 1001
-
+RUN export NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register"
 # Start up command
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
 CMD ["--max-old-space-size=100", "src/server"]
