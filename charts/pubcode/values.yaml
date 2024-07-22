@@ -37,6 +37,16 @@ api:
       envFrom:
         secretRef:
           name: '{{ .Release.Name }}'
+      env:
+        fromValues:
+          - name: OTEL_NODE_RESOURCE_DETECTORS
+            value: env,host,os,http,express,mongoose
+          - name: OTEL_TRACES_EXPORTER
+            value: otlp
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: '{{ .Release.Name }}-opentelemetry-collector:4318'
+          - name: OTEL_LOG_LEVEL
+            value: all
       ports:
         - name: http
           containerPort: 3000
@@ -259,3 +269,17 @@ database:
     size: 750Mi
     storageClassName: netapp-file-standard
     accessModes: ReadWriteMany
+opentelemetry-collector:
+  nameOverride: '{{ .Release.Name }}-opentelemetry-collector'
+  replicaCount: 1
+  mode: deployment
+  serviceAccount:
+    create: false
+  image:
+    repository: otel/opentelemetry-collector-k8s
+  command:
+    name: "otelcol-k8s"
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi

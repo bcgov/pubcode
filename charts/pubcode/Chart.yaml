@@ -42,3 +42,7 @@ dependencies:
     version: 0.3.0
     repository: https://bcgov.github.io/helm-service/
     alias: database
+  - name: opentelemetry-collector
+    alias: opentelemetry-collector
+    version: 0.97.1
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
