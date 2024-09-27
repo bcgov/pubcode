@@ -16,7 +16,7 @@ concurrency:
 jobs:
   pubcode-crawler:
     name: Crawl Git Repos for bcgovpubcode.yml
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     environment: prod
     defaults:
       run:
@@ -58,7 +58,7 @@ jobs:
 
   validate-ministry-list:
     name: Validate Ministry List in the pubcode schema.
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: schema/script
@@ -100,7 +100,7 @@ jobs:
 
   soft-delete-removed-pubcodes:
     name: Soft Delete pubcodes In the Databse which are removed from the repo.
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: utilities/remove-deleted-pubcode
