@@ -16,7 +16,7 @@ jobs:
       semanticVersion: ${{ steps.changelog.outputs.version }}
       tag: ${{ steps.changelog.outputs.tag }}
       clean_changelog: ${{ steps.changelog.outputs.clean_changelog }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
 
   retag-images:
     needs: [ semantic-version ]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         package: [ api, database, frontend ]
@@ -50,7 +50,7 @@ jobs:
     name: TEST Deployments
     needs: [retag-images, semantic-version]
     environment: test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -84,7 +84,7 @@ jobs:
     name: PROD Deployments
     needs: [semantic-version, tests]
     environment: prod
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

@@ -12,7 +12,7 @@ on:
 jobs:
   cypress-e2e:
     name: Cypress E2E
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         browser: [chrome]

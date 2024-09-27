@@ -13,7 +13,7 @@ jobs:
   # Clean up OpenShift when PR closed, no conditions
   cleanup-openshift:
     name: Cleanup OpenShift
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: redhat-actions/openshift-tools-installer@v1
         with:
@@ -30,7 +30,7 @@ jobs:
   image-promotions:
     name: Image Promotions
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         package: [api, database, frontend]
