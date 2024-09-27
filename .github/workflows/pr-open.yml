@@ -65,7 +65,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-        name: Checkout
+      - uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: "4"
       - name: Deploy to OpenShift
         shell: bash
         run: |

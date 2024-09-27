@@ -15,6 +15,9 @@ jobs:
     name: Cleanup OpenShift
     runs-on: ubuntu-22.04
     steps:
+      - uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: "4"
       - name: Remove OpenShift artifacts
         run: |
           oc login --token=${{ secrets.OC_TOKEN }} --server=${{ vars.OC_SERVER }}

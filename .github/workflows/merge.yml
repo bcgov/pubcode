@@ -54,6 +54,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: "4"
       - name: Deploy
         shell: bash
         run: |
@@ -85,6 +88,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: "4"
       - name: Deploy
         shell: bash
         run: |
