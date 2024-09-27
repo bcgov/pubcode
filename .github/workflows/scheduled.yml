@@ -39,6 +39,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      - uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: "4"
+
       - name: Process script
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -118,6 +122,10 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+
+      - uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: "4"
 
       - name: Process script
         run: |
