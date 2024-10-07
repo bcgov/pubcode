@@ -3,32 +3,5 @@
   "description": "Presets from https://github.com/bcgov/nr-renovate",
   "extends": [
     "github>bcgov/renovate-config"
-  ],
-  "packageRules": [
-    {
-      "groupName": "Mend: high confidence minor and patch dependency updates",
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
-      "matchConfidence": [
-        "very high",
-        "high"
-      ]
-    },
-    {
-      "matchConfidence": [
-        "low"
-      ],
-      "dependencyDashboardApproval": true,
-      "commitMessagePrefix": "[LOW] "
-    },
-    {
-      "matchConfidence": [
-        "neutral"
-      ],
-      "dependencyDashboardApproval": true,
-      "commitMessagePrefix": "[NEUTRAL] "
-    }
   ]
 }
