@@ -44,7 +44,7 @@ jobs:
         package: [api, frontend, database]
     steps:
       - uses: actions/checkout@v4
-      - uses: bcgov-nr/action-builder-ghcr@v2.2.0
+      - uses: bcgov-nr/action-builder-ghcr@v2.3.0
         with:
           package: ${{ matrix.package }}
           tag: ${{ github.sha }}
