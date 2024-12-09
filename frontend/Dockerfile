@@ -1,5 +1,5 @@
 # Build static files
-FROM node:22.11.0-slim AS build
+FROM node:22.12.0-slim AS build
 
 WORKDIR /app
 COPY . .
