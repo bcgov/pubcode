@@ -43,6 +43,6 @@
     "vite": "^6.0.0"
   },
   "overrides": {
-    "@babel/traverse": "8.0.0-alpha.13"
+    "@babel/traverse": "8.0.0-alpha.14"
   }
 }
