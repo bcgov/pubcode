@@ -42,9 +42,6 @@ api:
           containerPort: 3000
           protocol: TCP
       resources: # this is optional
-        limits:
-          cpu: 150m
-          memory: 250Mi
         requests:
           cpu: 50m
           memory: 100Mi
@@ -123,9 +120,6 @@ frontend:
           containerPort: 3001
           protocol: TCP
       resources: # this is optional
-        limits:
-          cpu: 75m
-          memory: 150Mi
         requests:
           cpu: 50m
           memory: 50Mi
@@ -195,9 +189,6 @@ database:
         - "-c"
         - "mkdir -p /data/db"
       resources: # this is optional
-        limits:
-          cpu: 250m
-          memory: 450Mi
         requests:
           cpu: 50m
           memory: 150Mi
@@ -218,9 +209,6 @@ database:
           containerPort: 27017
           protocol: TCP
       resources: # this is optional
-        limits:
-          cpu: 250m
-          memory: 450Mi
         requests:
           cpu: 50m
           memory: 150Mi
