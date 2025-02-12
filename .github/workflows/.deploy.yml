@@ -111,7 +111,7 @@ jobs:
 
 
             # print history 
-            helm history ${{ inputs.release_name }}
+            helm history ${{ inputs.release_name }} || true
 
             # Remove old build runs, build pods and deployment pods
             oc delete po --field-selector=status.phase==Succeeded
