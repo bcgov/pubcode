@@ -51,9 +51,6 @@ on:
         type: string
 
 
-env:
-  package_tag: ${{ inputs.tag }}
-
 jobs:
   
   deploys:
@@ -92,7 +89,7 @@ jobs:
             [ -z "${{ inputs.directory }}" ]|| cd ${{ inputs.directory }}
             # Deploy Helm Chart
             helm dependency update
-            helm package --app-version="${{ env.package_tag }}" --version=${{ inputs.tag }} .
+            helm package --app-version="v${{ inputs.tag }}" --version=${{ inputs.tag }} .
             ls -la
             helm upgrade  ${{ inputs.release_name }} ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz \
               --set global.autoscaling=${{ inputs.autoscaling }} \
