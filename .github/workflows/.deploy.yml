@@ -51,9 +51,6 @@ on:
         type: string
 
 
-env:
-  package_tag: ${{ inputs.tag }}
-
 jobs:
   
   deploys:
@@ -92,12 +89,12 @@ jobs:
             [ -z "${{ inputs.directory }}" ]|| cd ${{ inputs.directory }}
             # Deploy Helm Chart
             helm dependency update
-            helm package --app-version="${{ env.package_tag }}" --version=${{ inputs.tag }} .
-
-            helm upgrade \
+            helm package --app-version="v${{ inputs.tag }}" --version=${{ inputs.tag }} .
+            cp ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz pubcode.tgz
+            ls -la
+            helm upgrade  ${{ inputs.release_name }} pubcode.tgz \
               --set global.autoscaling=${{ inputs.autoscaling }} \
-              --set-string global.repository=${{ github.repository }} \
-              --set-string global.tag="${{ env.package_tag }}" \
+              --set-string global.repository="${{ github.repository }}" \
               --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" \
               --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" \
               --set-string global.secrets.chesClientID="${{ secrets.CHES_CLIENT_ID }}" \
@@ -108,13 +105,12 @@ jobs:
               --install \
               --wait \
               --atomic \
-                ${{ inputs.release_name }} \
               --timeout ${{ inputs.timeout-minutes }}m \
-              --values ${{ inputs.values }} \
-              ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz
+              --values ${{ inputs.values }}
+
 
             # print history 
-            helm history ${{ inputs.release_name }}
+            helm history ${{ inputs.release_name }} || true
 
             # Remove old build runs, build pods and deployment pods
             oc delete po --field-selector=status.phase==Succeeded

@@ -82,7 +82,6 @@ jobs:
             --set-string database.initContainers[0].resources.requests.memory="50Mi" \
             --set-string database.pvc.size="350Mi" \
             --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }} \
-            --set-string namespace="${{ vars.oc_namespace }}" \
 
   tests:
     name: Tests

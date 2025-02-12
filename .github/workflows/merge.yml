@@ -13,8 +13,8 @@ concurrency:
 jobs:
   semantic-version:
     outputs:
-      semanticVersion: ${{ steps.changelog.outputs.version }}
-      tag: ${{ steps.changelog.outputs.tag }}
+      semanticVersion: ${{ steps.changelog.outputs.version }} # this is without v 1.0.0
+      tag: ${{ steps.changelog.outputs.tag }} # this is with v, v1.0.0
       clean_changelog: ${{ steps.changelog.outputs.clean_changelog }}
     runs-on: ubuntu-24.04
     timeout-minutes: 1
@@ -43,8 +43,10 @@ jobs:
         with:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}
-          target: test
-          tags: ${{ needs.semantic-version.outputs.semanticVersion }}
+          target: latest
+          tags: |
+            ${{ needs.semantic-version.outputs.semanticVersion }}
+            ${{ needs.semantic-version.outputs.tag }}
 
   deploys:
     name: TEST Deployments
@@ -54,12 +56,9 @@ jobs:
     with:
       autoscaling: true
       environment: test
-      tag: ${{ needs.semantic-version.outputs.semanticVersion }}
+      tag: ${{ needs.semantic-version.outputs.semanticVersion }} # this is without v
       release_name: pubcode-test
-      params: |
-            --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \ 
-            --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \
-            --set-string namespace="${{ vars.oc_namespace }}" \
+      params: --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.tag }}" --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.tag }}"
   tests:
     name: Tests
     needs: [deploys]
@@ -77,10 +76,7 @@ jobs:
       environment: prod
       tag: ${{ needs.semantic-version.outputs.semanticVersion }}
       release_name: pubcode
-      params: |
-            --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \ 
-            --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \
-            --set-string namespace="${{ vars.oc_namespace }}" \
+      params: --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.tag }}" --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.tag }}"
   github_release:    
     name: Create Release
     needs: [semantic-version, deploys-prod]
