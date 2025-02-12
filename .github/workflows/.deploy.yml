@@ -90,9 +90,9 @@ jobs:
             # Deploy Helm Chart
             helm dependency update
             helm package --app-version="v${{ inputs.tag }}" --version=${{ inputs.tag }} .
-            cp ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz ./pubcode.tgz
+            cp ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz pubcode.tgz
             ls -la
-            helm upgrade  ${{ inputs.release_name }} ./pubcode.tgz \
+            helm upgrade  ${{ inputs.release_name }} pubcode.tgz \
               --set global.autoscaling=${{ inputs.autoscaling }} \
               --set-string global.repository="${{ github.repository }}" \
               --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" \
