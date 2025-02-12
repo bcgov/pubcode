@@ -108,9 +108,9 @@ jobs:
               --install \
               --wait \
               --atomic \
-                ${{ inputs.release_name }} \
               --timeout ${{ inputs.timeout-minutes }}m \
               --values ${{ inputs.values }} \
+              ${{ inputs.release_name }} \
               ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz
 
             # print history 
