@@ -102,8 +102,6 @@ jobs:
               --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" \
               --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" \
                 ${{ inputs.params }} \
-              --dry-run=server \
-              --debug \
               --install \
               --wait \
               --atomic \
