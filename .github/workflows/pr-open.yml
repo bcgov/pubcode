@@ -48,7 +48,7 @@ jobs:
         with:
           package: ${{ matrix.package }}
           tag: ${{ github.sha }}
-          tag_fallback: test
+          tag_fallback: latest
           token: ${{ secrets.GITHUB_TOKEN }}
           triggers: ('${{ matrix.package }}/')
 

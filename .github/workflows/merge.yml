@@ -57,7 +57,6 @@ jobs:
       tag: ${{ needs.semantic-version.outputs.semanticVersion }}
       release_name: pubcode-test
       params: |
-            --set-string global.repository=${{ github.repository }} \  
             --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \ 
             --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \
             --set-string namespace="${{ vars.oc_namespace }}" \
@@ -79,7 +78,6 @@ jobs:
       tag: ${{ needs.semantic-version.outputs.semanticVersion }}
       release_name: pubcode
       params: |
-            --set-string global.repository=${{ github.repository }} \  
             --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \ 
             --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \
             --set-string namespace="${{ vars.oc_namespace }}" \
