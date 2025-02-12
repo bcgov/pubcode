@@ -13,9 +13,9 @@ describe("LeftDrawer", () => {
     cy.location("pathname").should("eq", "/form");
   });
 
-  it("clicks on the Edit button and navigates to /edit-form", () => {
+  it("clicks on the Edit button and navigates to /edit", () => {
     cy.get("#Edit").contains("Edit").click();
-    cy.location("pathname").should("eq", "/edit-form");
+    cy.location("pathname").should("eq", "/edit");
   });
 
   /*  it("clicks on the Edit button and navigates to /edit-form", () => {
