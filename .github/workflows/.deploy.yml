@@ -93,7 +93,7 @@ jobs:
             # Deploy Helm Chart
             helm dependency update
             helm package --app-version="${{ env.package_tag }}" --version=${{ inputs.tag }} .
-
+            ls -la
             helm upgrade \
               --set global.autoscaling=${{ inputs.autoscaling }} \
               --set-string global.repository="${{ github.repository }}" \
