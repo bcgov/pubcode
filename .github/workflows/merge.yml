@@ -43,7 +43,7 @@ jobs:
         with:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}
-          target: test
+          target: latest
           tags: ${{ needs.semantic-version.outputs.semanticVersion }}
 
   deploys:
