@@ -1,9 +1,7 @@
 {
+	metrics
 	auto_https off
-	  admin 0.0.0.0:3002
-    servers {
-      metrics
-    }
+	admin 0.0.0.0:3002
 }
 :3000 {
 	log {
@@ -16,25 +14,44 @@
 	}
 	encode gzip
 
-  handle /config.js {
+  	handle /config.js {
 		header Content-Type "text/javascript"
 		respond `window.config = {"VITE_SCHEMA_BRANCH":"{$VITE_SCHEMA_BRANCH}"};`
 	}
-	handle {
-		root * /app/dist
-		try_files {path} {path}/ /index.html
-		file_server
+	root * /app/dist
+	encode zstd gzip
+	file_server
+	@spa_router {
+		not path /api/* /env.js
+		file {
+			try_files {path} /index.html
+		}
 	}
+	rewrite @spa_router {http.matchers.file.relative}
 	header {
+		-Server
 		X-Frame-Options "SAMEORIGIN"
 		X-XSS-Protection "1;mode=block"
 		Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate"
 		X-Content-Type-Options "nosniff"
 		Strict-Transport-Security "max-age=31536000"
-		Content-Security-Policy https://raw.githubusercontent.com/bcgov/* "default-src 'self'  *.devops.gov.bc.ca data:; script-src 'self' 'unsafe-eval' https://www2.gov.bc.ca ;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://fonts.googleapis.com http://www.w3.org"
+		Content-Security-Policy 
+		    https://raw.githubusercontent.com/bcgov/*
+			"default-src 'self' https://*.gov.bc.ca; 
+			script-src 'self'  https://*.gov.bc.ca ;
+			style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com 'unsafe-inline'; 
+			font-src 'self' https://fonts.gstatic.com; 
+			img-src 'self' data: https://fonts.googleapis.com https://www.w3.org https://*.gov.bc.ca https://*.tile.openstreetmap.org;
+			frame-ancestors 'self'; 
+			form-action 'self';
+			block-all-mixed-content;
+			connect-src 'self' https://*.gov.bc.ca wss://*.gov.bc.ca;"
 		Referrer-Policy "same-origin"
-		Feature-Policy "fullscreen 'self'; camera 'none'; microphone 'none'"
+		Permissions-Policy "fullscreen=(self), camera=(), microphone=()"
+		Cross-Origin-Resource-Policy "cross-origin"
+		Cross-Origin-Opener-Policy "same-origin"
 	}
+	reverse_proxy /api* {$BACKEND_URL}
 }
 
 :3001 {

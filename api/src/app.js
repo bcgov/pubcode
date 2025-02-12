@@ -3,7 +3,6 @@ const morgan = require("morgan");
 const nocache = require("nocache");
 const helmet = require("helmet");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const app = express();
 const apiRouter = express.Router();
 const pubcodeRouter = require("./routes/pubcode-router");
@@ -27,18 +26,24 @@ const logStream = {
 app.set("trust proxy", 1);
 app.use(limiter);
 app.use(cors());
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
 app.use(nocache());
 app.get('/metrics', async (_req, res) => {
   const appMetrics = await register.metrics();
   res.end(appMetrics);
 });
 //tells the app to use json as means of transporting data
-app.use(bodyParser.json({ limit: "50mb", extended: true }));
-app.use(bodyParser.urlencoded({
-  extended: true,
-  limit: "50mb"
-}));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(morgan("dev", { stream: logStream,
   skip: (req, _res) => req.url === '/health' || req.url === '/'
 }));

@@ -1,44 +1,8 @@
-# Pub Code UI
+# React + Vite
 
-This UI is a React app built with Vite and served by Caddy.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Goal
+Currently, two official plugins are available:
 
-It helps users to:
-
-1. Produce a bcgovpubcode.yml file from scratch
-2. Edit exiting bcgovpubcode.yml files by web link
-
-## Process
-
-The user fills out a form, which generates a bcgovpubcode.yml file, which can be downloaded or copied/pasted to add their GitHub repository. It is validated using the [React json schema form library](https://react-jsonschema-form.readthedocs.io/en/latest/).
-
-## OpenShift Deployment
-
-Each [Pull Request workflow](./../.github/workflows/pr-open.yml) creates a sandboxed environment deployed in OpenShift. A temporary URL is provided as part of the PR's checks.  Environments are removed when their PRs are closed.
-
-## Local Development
-
-Prerequisites:
-- Node.js 18
-
-Steps:
-
-1. Clone the repository
-    ```bash
-    git clone https://github.com/bcgov/pubcode.git
-    ```
-    OR
-    ```bash
-    git clone git@github.com:bcgov/pubcode.git
-    ```
-2. Install dependencies
-    ```bash
-    npm ci
-    ```
-3. Run the app
-    ```bash
-    npm run dev
-    ```
-
-
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
