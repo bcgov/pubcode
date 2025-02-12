@@ -59,7 +59,6 @@ jobs:
       params: |
             --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \ 
             --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \
-            --set-string namespace="${{ vars.oc_namespace }}" \
   tests:
     name: Tests
     needs: [deploys]
@@ -80,7 +79,6 @@ jobs:
       params: |
             --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \ 
             --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.semanticVersion }}" \
-            --set-string namespace="${{ vars.oc_namespace }}" \
   github_release:    
     name: Create Release
     needs: [semantic-version, deploys-prod]
