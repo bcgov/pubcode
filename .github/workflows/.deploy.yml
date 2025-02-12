@@ -96,7 +96,7 @@ jobs:
 
             helm upgrade \
               --set global.autoscaling=${{ inputs.autoscaling }} \
-              --set-string global.repository="${{ github.repository }}"" \
+              --set-string global.repository="${{ github.repository }}" \
               --set-string global.tag="${{ env.package_tag }}" \
               --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" \
               --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" \
