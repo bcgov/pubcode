@@ -81,12 +81,6 @@ jobs:
           --set-string database.initContainers[0].resources.requests.cpu="30m" \
           --set-string database.initContainers[0].resources.requests.memory="50Mi" \
           --set-string database.pvc.size="350Mi" \
-          --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" \
-          --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" \
-          --set-string global.secrets.chesClientID="${{ secrets.CHES_CLIENT_ID }}" \
-          --set-string global.secrets.chesClientSecret="${{ secrets.CHES_CLIENT_SECRET }}" \
-          --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" \
-          --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" \
           --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }}  \
           --set-string namespace="${{ vars.oc_namespace }}"
 
