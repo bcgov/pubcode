@@ -10,34 +10,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Clean up OpenShift when PR closed, no conditions
-  cleanup-openshift:
-    name: Cleanup OpenShift
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: redhat-actions/openshift-tools-installer@v1
-        with:
-          oc: "4"
-      - name: Remove OpenShift artifacts
-        run: |
-          oc login --token=${{ secrets.OC_TOKEN }} --server=${{ vars.OC_SERVER }}
-          oc project ${{ vars.OC_NAMESPACE }}
-
-          # Remove old build runs, build pods and deployment pods
-          helm uninstall pubcode-${{ github.event.number }}
-
-  # If merged into main, then handle any image promotions
-  image-promotions:
-    name: Image Promotions
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        package: [api, database, frontend]
-    steps:
-      - uses: shrink/actions-docker-registry-tag@v4
-        with:
-          registry: ghcr.io
-          repository: ${{ github.repository }}/${{ matrix.package }}
-          target: ${{ github.event.number }}
-          tags: test
+  cleanup:
+    name: Cleanup and Image Promotion
+    uses: bcgov/quickstart-openshift-helpers/.github/workflows/.pr-close.yml@v0.8.3
+    permissions:
+      packages: write
+    secrets:
+      oc_namespace: ${{ vars.OC_NAMESPACE }}
+      oc_token: ${{ secrets.OC_TOKEN }}
+    with:
+      cleanup: helm
+      packages: api database frontend
+  
