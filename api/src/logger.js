@@ -36,7 +36,7 @@ function getDomainWinstonLoggerFormat(colors = true) {
 
 
 const logger = createLogger({
-  level: process.env.LOG_LEVEL || "info",
+  level: process.env.LOG_LEVEL || "silly",
   format: getDomainWinstonLoggerFormat(true),
   transports: [
     new transports.Console()

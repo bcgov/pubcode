@@ -1,0 +1,117 @@
+name: .Deploys
+
+on:
+  workflow_call:
+    inputs:
+      ### Typical / recommended
+      autoscaling:
+        description: Autoscaling enabled or not for the deployments
+        required: false
+        type: string
+        default: 'true'
+      environment:
+        description: Environment name; omit for PRs
+        required: false
+        type: string
+      tag:
+        description: Container tag; usually PR number
+        required: false
+        type: string
+        default: ${{ github.event.number }}
+      triggers:
+        description: Paths to trigger a deploy; omit=always; e.g. ('backend/' 'frontend/')
+        required: false
+        type: string
+
+      ### Usually a bad idea / not recommended
+      directory:
+        description: "Chart directory"
+        default: "charts/${{ github.event.repository.name }}"
+        required: false
+        type: string
+      timeout-minutes:
+        description: "Timeout minutes"
+        default: 10
+        required: false
+        type: number
+      values:
+        description: "Values file"
+        default: "values.yaml"
+        required: false
+        type: string
+      params:
+        description: "Extra parameters to pass to helm upgrade"
+        default: ""
+        required: false
+        type: string
+      release_name:
+        description: "Release name"
+        default: ${{ github.event.repository.name }}
+        required: false
+        type: string
+
+
+env:
+  package_tag: ${{ inputs.tag }}
+
+jobs:
+  
+  deploys:
+    name: Helm
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stop pre-existing deployments on PRs (status = pending-upgrade)
+        if: github.event_name == 'pull_request'
+        uses: bcgov/action-oc-runner@v0.3.0
+        with:
+          oc_namespace: ${{ vars.oc_namespace }}
+          oc_token: ${{ secrets.oc_token }}
+          oc_server: ${{ vars.oc_server }}
+          triggers: ${{ inputs.triggers }}
+          commands: |
+            # Interrupt any previous deployments (PR only)
+            PREVIOUS=$(helm status ${{ inputs.release_name }} -o json | jq .info.status || true)
+            if [[ ${PREVIOUS} =~ pending ]]; then
+              echo "Rollback triggered"
+              helm rollback ${{ inputs.release_name }} || \
+                helm uninstall ${{ inputs.release_name }}
+            fi
+
+      - name: Deploy
+        uses: bcgov/action-oc-runner@v0.3.0
+        with:
+          oc_namespace: ${{ vars.oc_namespace }}
+          oc_token: ${{ secrets.oc_token }}
+          oc_server: ${{ vars.oc_server }}
+          triggers: ${{ inputs.triggers }}
+          commands: |
+            # If directory provided, cd to it
+            [ -z "${{ inputs.directory }}" ]|| cd ${{ inputs.directory }}
+            # Deploy Helm Chart
+            helm dependency update
+            helm package --app-version="${{ env.package_tag }}" --version=${{ inputs.tag }} .
+
+            helm upgrade \
+              --set global.autoscaling=${{ inputs.autoscaling }} \
+              --set-string global.repository=${{ github.repository }} \
+              --set-string global.tag="${{ env.package_tag }}" \
+              --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" \
+              --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" \
+              --set-string global.secrets.chesClientID="${{ secrets.CHES_CLIENT_ID }}" \
+              --set-string global.secrets.chesClientSecret="${{ secrets.CHES_CLIENT_SECRET }}" \
+              --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" \
+              --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" \
+              ${{ inputs.params }} \
+              --install --wait --atomic  ${{ inputs.release_name }} \
+              --timeout ${{ inputs.timeout-minutes }}m \
+              --values ${{ inputs.values }} \
+              ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz
+
+            # print history 
+            helm history ${{ inputs.release_name }}
+
+            # Remove old build runs, build pods and deployment pods
+            oc delete po --field-selector=status.phase==Succeeded

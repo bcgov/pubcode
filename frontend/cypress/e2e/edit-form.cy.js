@@ -1,6 +1,6 @@
 describe("New Form", () => {
   beforeEach(() => {
-    cy.visit("/edit-form");
+    cy.visit("/edit");
   });
 
   it("renders the form", () => {

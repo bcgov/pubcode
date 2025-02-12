@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Form from "@rjsf/material-ui";
+import Form from "@rjsf/mui";
 import validator from "@rjsf/validator-ajv8";
 import * as YAML from "js-yaml";
 import { env } from "../../env";
 //import * as localSchema from "../../../schema/bcgovpubcode.json"; // uncmmment this line for local schema for testing
 import { useLocation, useNavigate } from "react-router";
-import { Backdrop, CircularProgress } from "@material-ui/core";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import * as _ from "lodash";
 // below props needs to be treated properly for the form to work properly as the nesting does not work if they are undefined.
 const props = ["product_information.business_capabilities_standard", "product_technology_information.ci_cd_tools", "product_technology_information.data_storage_platforms", "product_technology_information.frontend_frameworks", "product_technology_information.hosting_platforms", "product_technology_information.spatial_mapping_technologies", "product_external_dependencies.common_components", "product_external_dependencies.identity_authorization"];
@@ -83,7 +84,12 @@ const FormComponent = () => {
   const uiSchema = {
     "ui:submitButtonOptions": {
       "props": {
-        id: "submit"
+        id: "submit",
+        sx:{
+          background: "var(--surface-color-primary-button-default)",
+          color: "var(--icons-color-primary-invert)",
+          marginBottom: "1rem",
+        }
       },
       submitText: "Submit"
     }

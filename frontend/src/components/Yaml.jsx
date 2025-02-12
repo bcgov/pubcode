@@ -1,5 +1,4 @@
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router";
@@ -25,27 +24,42 @@ function YamlDisplay() {
 
   const data = location?.state?.data;
   const handleDownload = () => {
-
     const blob = new Blob([data.toString()], {
-      type: "application/x-yaml;charset=utf-8"
+      type: "application/x-yaml;charset=utf-8",
     });
     saveAs(blob, "bcgovpubcode.yml");
     toast.success("bcgovpubcode.yml downloaded!");
   };
-  const handleCopy = () => {
-    toast.success("yaml copied!");
+
+  const copyText = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("yaml copied!");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+      toast.error("Failed to copy");
+    }
   };
+
   return (
     <div className="appContent yamlContent">
-      <CopyToClipboard
-        text={data}
-        onCopy={handleCopy}
-      >
-        <Button id="copy" className="customButton" variant="contained">
-          Copy
-        </Button>
-      </CopyToClipboard>
       <Button
+        sx={{
+          background: "var(--surface-color-primary-button-default)",
+          color: "var(--icons-color-primary-invert)",
+        }}
+        onClick={() => copyText(data)}
+        id="copy"
+        className="customButton"
+        variant="contained"
+      >
+        Copy
+      </Button>
+      <Button
+        sx={{
+          background: "var(--surface-color-primary-button-default)",
+          color: "var(--icons-color-primary-invert)",
+        }}
         id="download"
         className="customButton"
         variant="contained"
@@ -54,6 +68,7 @@ function YamlDisplay() {
         Download
       </Button>
       <SyntaxHighlighter
+        id="yamlSyntaxHighlighter"
         language="yaml"
         showLineNumbers={false}
         wrapLines={true}

@@ -1,5 +1,4 @@
-# Build static files
-FROM node:22.13.1-slim AS build
+FROM node:22 AS build
 WORKDIR /app
 COPY *.json ./
 RUN npm ci --omit=dev --ignore-scripts
