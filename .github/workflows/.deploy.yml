@@ -104,8 +104,11 @@ jobs:
               --set-string global.secrets.chesClientSecret="${{ secrets.CHES_CLIENT_SECRET }}" \
               --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" \
               --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" \
-              ${{ inputs.params }} \
-              --install --wait --atomic  ${{ inputs.release_name }} \
+                ${{ inputs.params }} \
+              --install \
+              --wait \
+              --atomic \
+                ${{ inputs.release_name }} \
               --timeout ${{ inputs.timeout-minutes }}m \
               --values ${{ inputs.values }} \
               ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz
