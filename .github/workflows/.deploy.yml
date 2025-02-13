@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Stop pre-existing deployments on PRs (status = pending-upgrade)
         if: github.event_name == 'pull_request'
-        uses: bcgov/action-oc-runner@v0.3.0
+        uses: bcgov/action-oc-runner@v1.0.0
         with:
           oc_namespace: ${{ vars.oc_namespace }}
           oc_token: ${{ secrets.oc_token }}
@@ -78,7 +78,7 @@ jobs:
             fi
 
       - name: Deploy
-        uses: bcgov/action-oc-runner@v0.3.0
+        uses: bcgov/action-oc-runner@v1.0.0
         with:
           oc_namespace: ${{ vars.oc_namespace }}
           oc_token: ${{ secrets.oc_token }}
