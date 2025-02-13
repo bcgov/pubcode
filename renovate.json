@@ -12,5 +12,8 @@
       "commitMessageTopic": "dependencies",
       "commitMessageExtra": ""
     }
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true
   }
 }
