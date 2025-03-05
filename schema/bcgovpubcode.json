@@ -154,11 +154,6 @@
           "description": "This key contains the program area name. ex: It could be a ministry division branch or section. ",
           "type": "string"
         },
-        "partner_ministry": {
-          "title": "Partner Ministry",
-          "description": "This Ministry partners the build and sustainment of the product for ex: NRIDS-DDS building and sustaining for Environment & Parks",
-          "type": "string"
-        },
         "product_acronym": {
           "title": "Product Acronym",
           "description": "This key contains the product acronym. ex: Infrastructure reporting service the acronym (IRS)",
