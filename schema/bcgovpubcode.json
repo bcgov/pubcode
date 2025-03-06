@@ -335,6 +335,11 @@
               "Other"
             ]
           }
+        },
+        "other_tools": {
+          "title": "Other Tools Used",
+          "description": "This key contains the other tools used for the product or by the product team, including any tools that don't fall into the above categories. Ex: Mural, Sentry, Sysdig, ACS",
+          "type": "string"
         }
       },
       "allOf": [
@@ -595,6 +600,7 @@
           "else": {}
         }
       ]
+      
     },
     "external_dependencies": {
       "type": "object",
