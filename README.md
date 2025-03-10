@@ -11,6 +11,10 @@
 
 This contains schema definitions for yml and a web application to assist end users to create/edit bcgovpubcode.yml files, store them in a MongoDB database and retrieve them using a Node/Express API.
 
+## Architecture
+![Pub Code Architecture](.diagrams/architecture/pub-code.drawio.svg)
+
+
 ## FAQ
 Please click [here](https://github.com/bcgov/pubcode/wiki/Frequently-Asked-Questions)
 
