@@ -1,12 +1,12 @@
 dependencies:
 - name: component
   repository: https://bcgov.github.io/helm-service/
-  version: 0.3.1
+  version: 0.3.2
 - name: component
   repository: https://bcgov.github.io/helm-service/
-  version: 0.3.1
+  version: 0.3.2
 - name: component
   repository: https://bcgov.github.io/helm-service/
-  version: 0.3.1
-digest: sha256:e0b5a6f24b8bbb2664a28ca65b24f22d0d9304257adac8f8bdbf667275334f3f
-generated: "2025-02-17T19:41:17.158419068Z"
+  version: 0.3.2
+digest: sha256:f46775e9e7e534539a74126fe3c405b65831bc61bf28c64d979930671e86ce17
+generated: "2025-03-14T23:04:13.91943622Z"
