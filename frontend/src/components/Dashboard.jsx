@@ -33,6 +33,7 @@ export default function Dashboard() {
               <Typography component="li">
                 Import a BCGov Public Code yaml(bcgovpubcode.yml) file from github and edit.
               </Typography>
+              <iframe title="PubCode Dashboard" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiNmFjN2IwOWEtMmQ5NS00OTBiLWI4ZTEtODFiNTRiOTU0NTBiIiwidCI6IjZmZGI1MjAwLTNkMGQtNGE4YS1iMDM2LWQzNjg1ZTM1OWFkYyJ9" frameborder="0" allowFullScreen="true"></iframe>
             </Box>
           </Paper>
         </Container>
