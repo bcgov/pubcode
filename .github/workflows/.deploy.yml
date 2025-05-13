@@ -108,8 +108,10 @@ jobs:
             if [ -n "${{ inputs.params }}" ]; then
               PARAMS+="${{ inputs.params }}"
             fi
+            echo "PARAMS: $PARAMS"
+            echo "COMMANDS: $COMMANDS"
             # helm upgrade $PARAMS $COMMANDS pubcode.tgz 
-            helm --dry-run --debug $PARAMS pubcode.tgz
+            helm install --dry-run --debug $PARAMS pubcode.tgz
 
             # print history 
             helm history ${{ inputs.release_name }} || true
