@@ -86,12 +86,13 @@ jobs:
           triggers: ${{ inputs.triggers }}
           commands: |
             # echo current git branch
+
+            # If directory provided, cd to it
+            [ -z "${{ inputs.directory }}" ]|| cd ${{ inputs.directory }}
             echo "Current branch: ${{ github.ref }}"
             echo "values file contains"
             cat ${{ inputs.values }}
             echo "=========================="
-            # If directory provided, cd to it
-            [ -z "${{ inputs.directory }}" ]|| cd ${{ inputs.directory }}
             # Deploy Helm Chart
             helm dependency update
             helm package --app-version="v${{ inputs.tag }}" --version=${{ inputs.tag }} .
