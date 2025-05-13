@@ -1,4 +1,4 @@
-FROM node:22 AS build
+FROM node:22@sha256:a1f1274dadd49738bcd4cf552af43354bb781a7e9e3bc984cfeedc55aba2ddd8 AS build
 
 WORKDIR /app
 COPY . .
@@ -6,7 +6,7 @@ RUN npm ci --ignore-scripts && \
     npm run build
 
 # Caddy
-FROM caddy:2.10-alpine
+FROM caddy:2.10-alpine@sha256:e2e3a089760c453bc51c4e718342bd7032d6714f15b437db7121bfc2de2654a6
 
 # Copy static files and config
 COPY --from=build /app/dist /app/dist
