@@ -78,7 +78,7 @@ jobs:
             fi
 
       - name: Deploy
-        uses: bcgov/action-oc-runner@v1.2.0
+        uses: bcgov/action-oc-runner@fix/checkouts
         with:
           oc_namespace: ${{ vars.oc_namespace }}
           oc_token: ${{ secrets.oc_token }}
@@ -92,6 +92,8 @@ jobs:
             echo "Current branch: ${{ github.ref }}"
             echo "values file contains"
             cat ${{ inputs.values }}
+            echo "=========================="
+            cat ../../.github/workflows/.deploy.yml
             echo "=========================="
             # Deploy Helm Chart
             helm dependency update
