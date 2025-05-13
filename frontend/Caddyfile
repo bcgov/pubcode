@@ -16,7 +16,7 @@
 
   	handle /config.js {
 		header Content-Type "text/javascript"
-		respond `window.config = {"VITE_SCHEMA_BRANCH":"{$VITE_SCHEMA_BRANCH}"};`
+		respond `window.config = {"VITE_SCHEMA_BRANCH":"{$VITE_SCHEMA_BRANCH}", "VITE_POWERBI_URL":"{$VITE_POWERBI_URL}"};`
 	}
 	root * /app/dist
 	encode zstd gzip

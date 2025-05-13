@@ -112,3 +112,4 @@ test-report.xml
 frontend/.env.local
 .idea
 /util/
+*.http

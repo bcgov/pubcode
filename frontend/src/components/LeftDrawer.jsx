@@ -51,6 +51,12 @@ export default function LeftDrawer() {
             description: "Edit an existing bcgovpubcode yml file",
             icon: "Edit",
           },
+          {
+            key: "Dashboard",
+            route: "/powerbi-dashboard",
+            description: "View the powerbi dashboard",
+            icon: "Dashboard",
+          }
         ].map((element) => (
           <ListItem key={element.key}>
             <Button

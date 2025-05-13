@@ -1,5 +1,6 @@
 import { Paper, Box, Container, Typography } from "@mui/material";
-
+import { env } from "../../env";
+const powerBIURL = env.VITE_POWERBI_URL;
 export default function Dashboard() {
   return (
     <Box
