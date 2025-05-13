@@ -87,6 +87,9 @@ jobs:
           commands: |
             # echo current git branch
             echo "Current branch: ${{ github.ref }}"
+            echo "values file contains"
+            cat ${{ inputs.values }}
+            echo "=========================="
             # If directory provided, cd to it
             [ -z "${{ inputs.directory }}" ]|| cd ${{ inputs.directory }}
             # Deploy Helm Chart
