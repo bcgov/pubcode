@@ -50,7 +50,6 @@ jobs:
           tag: ${{ github.sha }}
           tag_fallback: latest
           token: ${{ secrets.GITHUB_TOKEN }}
-          triggers: ('${{ matrix.package }}/')
 
       - uses: shrink/actions-docker-registry-tag@f04afd0559f66b288586792eb150f45136a927fa # v4
         with:
