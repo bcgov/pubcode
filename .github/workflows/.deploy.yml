@@ -89,17 +89,10 @@ jobs:
 
             # If directory provided, cd to it
             [ -z "${{ inputs.directory }}" ]|| cd ${{ inputs.directory }}
-            echo "Current branch: ${{ github.ref }}"
-            echo "values file contains"
-            cat ${{ inputs.values }}
-            echo "=========================="
-            cat ../../.github/workflows/.deploy.yml
-            echo "=========================="
             # Deploy Helm Chart
             helm dependency update
             helm package --app-version="v${{ inputs.tag }}" --version=${{ inputs.tag }} .
             cp ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz pubcode.tgz
-            ls -la
             COMMANDS="--install --wait --atomic --timeout ${{ inputs.timeout-minutes }}m"
             PARAMS="${{ inputs.release_name }} \
               --set global.autoscaling=${{ inputs.autoscaling }} \
@@ -118,8 +111,8 @@ jobs:
             fi
             echo "PARAMS: $PARAMS"
             echo "COMMANDS: $COMMANDS"
-            # helm upgrade $PARAMS $COMMANDS pubcode.tgz 
-            helm install --dry-run --debug $PARAMS pubcode.tgz
+            helm upgrade $PARAMS $COMMANDS pubcode.tgz 
+            #helm install --dry-run --debug $PARAMS pubcode.tgz #for debugging
 
             # print history 
             helm history ${{ inputs.release_name }} || true
