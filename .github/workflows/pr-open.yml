@@ -41,7 +41,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        package: [api, frontend, database]
+        package: [api, frontend]
     steps:
       - uses: actions/checkout@v4
       - uses: bcgov/action-builder-ghcr@v2.3.0
