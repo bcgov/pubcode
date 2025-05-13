@@ -85,6 +85,8 @@ jobs:
           oc_server: ${{ vars.oc_server }}
           triggers: ${{ inputs.triggers }}
           commands: |
+            # echo current git branch
+            echo "Current branch: ${{ github.ref }}"
             # If directory provided, cd to it
             [ -z "${{ inputs.directory }}" ]|| cd ${{ inputs.directory }}
             # Deploy Helm Chart
