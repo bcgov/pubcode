@@ -92,23 +92,24 @@ jobs:
             helm package --app-version="v${{ inputs.tag }}" --version=${{ inputs.tag }} .
             cp ./${{ github.event.repository.name }}-${{ inputs.tag }}.tgz pubcode.tgz
             ls -la
-            helm upgrade  ${{ inputs.release_name }} pubcode.tgz \
+            COMMANDS="--install --wait --atomic --timeout ${{ inputs.timeout-minutes }}m"
+            PARAMS="${{ inputs.release_name }} \
               --set global.autoscaling=${{ inputs.autoscaling }} \
-              --set-string global.repository="${{ github.repository }}" \
-              --set-string global.secrets.emailRecipients="${{ secrets.EMAIL_RECIPIENTS }}" \
-              --set-string global.secrets.chesTokenURL="${{ secrets.CHES_TOKEN_URL }}" \
-              --set-string global.secrets.chesClientID="${{ secrets.CHES_CLIENT_ID }}" \
-              --set-string global.secrets.chesClientSecret="${{ secrets.CHES_CLIENT_SECRET }}" \
-              --set-string global.secrets.chesAPIURL="${{ secrets.CHES_API_URL }}" \
-              --set-string global.secrets.databaseAdminPassword="${{ secrets.DB_PWD }}" \
-              --set-string global.secrets.powerBIURL="${{ secrets.POWERBI_URL }}" \
-                ${{ inputs.params }} \
-              --install \
-              --wait \
-              --atomic \
-              --timeout ${{ inputs.timeout-minutes }}m \
-              --values ${{ inputs.values }}
+              --set-string global.repository=${{ github.repository }} \
+              --set-string global.secrets.emailRecipients=${{ secrets.EMAIL_RECIPIENTS }} \
+              --set-string global.secrets.chesTokenURL=${{ secrets.CHES_TOKEN_URL }} \
+              --set-string global.secrets.chesClientID=${{ secrets.CHES_CLIENT_ID }} \
+              --set-string global.secrets.chesClientSecret=${{ secrets.CHES_CLIENT_SECRET }} \
+              --set-string global.secrets.chesAPIURL=${{ secrets.CHES_API_URL }} \
+              --set-string global.secrets.databaseAdminPassword=${{ secrets.DB_PWD }} \
+              --set-string global.secrets.powerBIURL=${{ secrets.POWERBI_URL }} \
+              --values ${{ inputs.values }} " 
 
+            if [ -n "${{ inputs.params }}" ]; then
+              PARAMS+="${{ inputs.params }}"
+            fi
+            # helm upgrade $PARAMS $COMMANDS pubcode.tgz 
+            helm --dry-run --debug $PARAMS pubcode.tgz
 
             # print history 
             helm history ${{ inputs.release_name }} || true
