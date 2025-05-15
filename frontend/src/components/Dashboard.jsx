@@ -22,19 +22,20 @@ export default function Dashboard() {
             }}
           >
             <Typography variant="h3" gutterBottom>
-              Welcome to BCGov Pubcode tool (Alpha).
+              Welcome to BCGov Pubcode tool.
             </Typography>
-            <Typography variant="body">
-              This tool allows you to achieve the below.
-            </Typography>
+
             <Box component="ol" sx={{ ml: 2 }}>
               <Typography component="li">
-                Create a BCGov Public Code yaml(bcgovpubcode.yml) file from scratch.
+                Use this simple tool to create or update bcgovpubcode.yaml file.   
               </Typography>
               <Typography component="li">
-                Import a BCGov Public Code yaml(bcgovpubcode.yml) file from github and edit.
+                Place it in the root of your github repo.
               </Typography>
             </Box>
+            <Typography variant="body2" sx={{ mt: 2, fontStyle: 'italic', textAlign: 'left', color: 'text.secondary' }}>
+              If it seems too simple, that&apos;s because we designed it with your busy schedule in mind.
+            </Typography>
           </Paper>
         </Container>
       </Box>
