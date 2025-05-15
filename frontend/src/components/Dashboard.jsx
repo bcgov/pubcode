@@ -27,13 +27,10 @@ export default function Dashboard() {
 
             <Box component="ol" sx={{ ml: 2 }}>
               <Typography component="li">
-                Use this simple tool to create a bcgovpubcode.yaml file.   
+                Use this simple tool to create or update bcgovpubcode.yaml file.   
               </Typography>
               <Typography component="li">
                 Place it in the root of your github repo
-              </Typography>
-              <Typography component="li">
-                Enjoy being part of the government metadata community!
               </Typography>
             </Box>
             <Typography variant="body2" sx={{ mt: 2, fontStyle: 'italic', textAlign: 'left', color: 'text.secondary' }}>
