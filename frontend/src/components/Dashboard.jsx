@@ -30,7 +30,7 @@ export default function Dashboard() {
                 Use this simple tool to create or update bcgovpubcode.yaml file.   
               </Typography>
               <Typography component="li">
-                Place it in the root of your github repo
+                Place it in the root of your github repo.
               </Typography>
             </Box>
             <Typography variant="body2" sx={{ mt: 2, fontStyle: 'italic', textAlign: 'left', color: 'text.secondary' }}>
