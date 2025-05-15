@@ -29,8 +29,7 @@ export default function LeftDrawer() {
           width: drawerWidth,
           boxSizing: "border-box",
           mt: { xs: "3rem", sm: "3.5rem", md: "4rem" },
-          maxHeight: { xs: "60vh", sm: "60vh", md: "60vh" },
-          bottom: { xs: "15rem", sm: "18rem", md: "20rem" },
+          maxHeight: { xs: "45vh", sm: "45vh", md: "45vh" },
           border: "none",
         },
       }}
