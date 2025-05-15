@@ -1,20 +1,18 @@
-import * as React from "react";
-import {
-  Button,
-  Drawer,
-  Icon,
-  List,
-  ListItem,
-  ListItemText,
-  Tooltip,
-} from "@mui/material";
-import { useNavigate } from "react-router";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import SearchIcon from "@mui/icons-material/Search";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import { Button, Drawer, List, ListItem, ListItemText, useMediaQuery, useTheme } from "@mui/material";
+import { useNavigate } from "react-router";
+import { useState } from "react";
+
 export default function LeftDrawer() {
   const navigate = useNavigate();
-  const drawerWidth = "10rem";
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  
+  // Responsive drawer width
+  const drawerWidth = isMobile ? "8rem" : isTablet ? "9rem" : "10rem";
 
   const buttonClicked = (event) => {
     console.log(event);
@@ -30,9 +28,9 @@ export default function LeftDrawer() {
         [`& .MuiDrawer-paper`]: {
           width: drawerWidth,
           boxSizing: "border-box",
-          mt: "4rem",
-          maxHeight: "25vh",
-          bottom: "20rem",
+          mt: { xs: "3rem", sm: "3.5rem", md: "4rem" },
+          maxHeight: { xs: "60vh", sm: "60vh", md: "60vh" },
+          bottom: { xs: "15rem", sm: "18rem", md: "20rem" },
           border: "none",
         },
       }}
@@ -56,24 +54,35 @@ export default function LeftDrawer() {
             route: "/powerbi-dashboard",
             description: "View the powerbi dashboard",
             icon: "Dashboard",
-          }
+          },
         ].map((element) => (
           <ListItem key={element.key}>
             <Button
               sx={{
                 background: "var(--surface-color-primary-button-default)",
                 color: "var(--icons-color-primary-invert)",
+                fontSize: "0.2rem !important",
               }}
               variant="contained"
               id={element.key}
               onClick={() => buttonClicked(element)}
               fullWidth
-              endIcon={
-                (element.icon === "Edit" && <EditIcon />) ||
-                (element.icon === "Add" && <AddIcon />)
-              }
+              
             >
-              <ListItemText primary={element.key} />
+              <ListItemText 
+                primary={element.key} 
+                slotProps={{
+                  primary: {
+                    fontSize: {
+                      sx:"0.5rem",
+                      sm: "0.7rem",
+                      md: "0.8rem",
+                      lg: "0.8rem",
+                    },
+                    textAlign: "center",
+                  },
+                }}
+              />
             </Button>
           </ListItem>
         ))}

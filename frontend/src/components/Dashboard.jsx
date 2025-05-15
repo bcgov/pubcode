@@ -1,6 +1,4 @@
 import { Paper, Box, Container, Typography } from "@mui/material";
-import { env } from "../../env";
-const powerBIURL = env.VITE_POWERBI_URL;
 export default function Dashboard() {
   return (
     <Box
@@ -22,7 +20,7 @@ export default function Dashboard() {
             }}
           >
             <Typography variant="h3" gutterBottom>
-              Welcome to BCGov Pubcode tool.
+             BCGov Pubcode Product Metadata Tool.
             </Typography>
 
             <Box component="ol" sx={{ ml: 2 }}>
