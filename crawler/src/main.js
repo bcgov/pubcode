@@ -9,7 +9,9 @@ const repoWithDetailsArray = [];
 const API_KEY = process.env.API_KEY;
 const API_URL = process.env.API_URL;
 const REPO_NAMES = process.env.REPO_NAMES; //comma separated list of repo names within bcgov org
-
+const BASE_DELAY = process.env.BASE_DELAY ? parseInt(process.env.BASE_DELAY, 10) : 60000; // 1 minute base delay
+const MAX_DELAY =  process.env.MAX_DELAY ? parseInt(process.env.MAX_DELAY, 10) : 600000; // 10 minutes maximum delay
+const JITTER_FACTOR = Math.random() * 0.3; // Random jitter between 0-30%
 /**
  * Fetches the bcgovpubcode yaml for the specified repo and branch
  * @param repoName
@@ -182,21 +184,18 @@ async function getGraphQlResponseOnQuery(query) {
         retries++;
         if (retries >= maxRetries) throw error;
         
-        // Exponential backoff with jitter
-        const baseDelay = 60000; // 1 minute base delay
-        const maxDelay = 600000; // 10 minutes maximum delay
-        const jitterFactor = Math.random() * 0.3; // Random jitter between 0-30%
+
 
         // Calculate delay with exponential backoff and jitter
-        const exponentialPart = baseDelay * (2 ** retries);
-        const jitterAmount = exponentialPart * jitterFactor;
-        const delay = Math.min(exponentialPart + jitterAmount, maxDelay);
+        const exponentialPart = BASE_DELAY * (2 ** retries);
+        const jitterAmount = exponentialPart * JITTER_FACTOR;
+        const delay = Math.min(exponentialPart + jitterAmount, MAX_DELAY);
         // Example delay values (in milliseconds) per retry:
         // Retry 1: ~60000ms (1 min) + up to 18000ms jitter = ~78s
         // Retry 2: ~120000ms (2 min) + up to 36000ms jitter = ~156s
         // Retry 3: ~240000ms (4 min) + up to 72000ms jitter = ~312s
         // Retry 4: ~480000ms (8 min) + up to 144000ms jitter = ~624s
-        // Retry 5: ~600000ms (10 min, capped) + up to 180000ms jitter = max 10min
+        // Retry 5: ~600000ms (10 min, capped, jitter ignored) = 10 min
         console.log(`Rate limit hit. Retrying in ${Math.round(delay/1000)} seconds... (Attempt ${retries}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, delay));
       } else {
