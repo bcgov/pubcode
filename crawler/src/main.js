@@ -140,20 +140,70 @@ async function bulkLoadPubCodes(yamlArrayAsJson) {
  * @param query
  * @returns {Promise<*|{}|number[]>}
  */
+/**
+ * Sends a GraphQL query to the GitHub API and handles rate limiting with exponential backoff.
+ * 
+ * @async
+ * @function getGraphQlResponseOnQuery
+ * @param {string} query - The GraphQL query to send to the GitHub API
+ * @returns {Promise<Object>} The response data from the GraphQL API
+ * @throws {Error} Throws an error if all retry attempts fail or if a non-rate-limit error occurs
+ * 
+ * @description
+ * This function sends a GraphQL query to GitHub's API and implements:
+ * - Authentication using a token
+ * - Automatic retry for rate limit errors (up to 5 attempts)
+ * - Exponential backoff with jitter to respect rate limits
+ * - Detailed logging of retry attempts
+ * https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#about-secondary-rate-limits
+ * Retry delays increase exponentially, with random jitter added:
+ */
 async function getGraphQlResponseOnQuery(query) {
-  const response = await axios({
-    method: "post",
-    url: "https://api.github.com/graphql",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache",
-    },
-    data: {
-      query,
-    },
-  });
-  return response.data;
+  const maxRetries = 5;
+  let retries = 0;
+  
+  while (retries < maxRetries) {
+    try {
+      const response = await axios({
+        method: "post",
+        url: "https://api.github.com/graphql",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
+        data: {
+          query,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 403 && error.response?.data?.message?.includes("rate limit")) {
+        retries++;
+        if (retries >= maxRetries) throw error;
+        
+        // Exponential backoff with jitter
+        const baseDelay = 60000; // 1 minute base delay
+        const maxDelay = 600000; // 10 minutes maximum delay
+        const jitterFactor = Math.random() * 0.3; // Random jitter between 0-30%
+
+        // Calculate delay with exponential backoff and jitter
+        const exponentialPart = baseDelay * (2 ** retries);
+        const jitterAmount = exponentialPart * jitterFactor;
+        const delay = Math.min(exponentialPart + jitterAmount, maxDelay);
+        // Example delay values (in milliseconds) per retry:
+        // Retry 1: ~60000ms (1 min) + up to 18000ms jitter = ~78s
+        // Retry 2: ~120000ms (2 min) + up to 36000ms jitter = ~156s
+        // Retry 3: ~240000ms (4 min) + up to 72000ms jitter = ~312s
+        // Retry 4: ~480000ms (8 min) + up to 144000ms jitter = ~624s
+        // Retry 5: ~600000ms (10 min, capped) + up to 180000ms jitter = max 10min
+        console.log(`Rate limit hit. Retrying in ${Math.round(delay/1000)} seconds... (Attempt ${retries}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw error;
+      }
+    }
+  }
 }
 
 /**
