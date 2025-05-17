@@ -6,8 +6,8 @@ on:
       REPO_NAMES:
         required: false
         description: comma separated list of repo names within bcgov org. for one of jobs to run for specific repos.
-  schedule: # * is a special character in YAML, so you have to quote this string, every day at 8am GMT
-    - cron: "0 8 * * *"
+  schedule: # * is a special character in YAML, so you have to quote this string, every day at 4PM PST as 5PM the powerbi refresh happens.
+    - cron: "0 0 * * *"
 
 concurrency:
   group: ${{ github.workflow }}
