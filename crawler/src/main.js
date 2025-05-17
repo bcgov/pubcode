@@ -188,7 +188,8 @@ async function getGraphQlResponseOnQuery(query) {
 
         // Calculate delay with exponential backoff and jitter
         const exponentialPart = BASE_DELAY * (2 ** retries);
-        const jitterAmount = exponentialPart * JITTER_FACTOR;
+        const jitterFactor = Math.random() * 0.3; // Random jitter between 0-30%
+        const jitterAmount = exponentialPart * jitterFactor;
         const delay = Math.min(exponentialPart + jitterAmount, MAX_DELAY);
         // Example delay values (in milliseconds) per retry:
         // Retry 1: ~60000ms (1 min) + up to 18000ms jitter = ~78s
