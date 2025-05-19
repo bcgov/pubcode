@@ -4,7 +4,7 @@ COPY *.json ./
 RUN npm ci --omit=dev --ignore-scripts
 
 # Deployment container
-FROM gcr.io/distroless/nodejs22:nonroot@sha256:92c2a6c01faeda49fab04f4c3c2fd3c652271bf19e99e5a0e8f2974622b9274f
+FROM gcr.io/distroless/nodejs22:nonroot@sha256:595dcd85af33b16450868993ec48992c82d90a692fb0d5c6f435bca16edb85d6
 ENV NODE_ENV production
 
 # Copy over app
