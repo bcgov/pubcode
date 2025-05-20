@@ -3,6 +3,7 @@ name: Pull Request
 on:
   pull_request:
   merge_group:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -47,7 +48,7 @@ jobs:
       - uses: bcgov/action-builder-ghcr@ace71f7a527ca6fc43c15c7806314be5a4579d2c # v2.3.0
         with:
           package: ${{ matrix.package }}
-          tag: ${{ github.sha }}
+          tag: ${{ github.event.number || github.sha }}
           tag_fallback: latest
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -55,8 +56,8 @@ jobs:
         with:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}
-          target: ${{ github.sha }}
-          tags: ${{ github.event.number }}
+          target: ${{ github.event.number || github.sha }}
+          tags: ${{ github.sha }}
 
   deploys:
     name: Deploys
