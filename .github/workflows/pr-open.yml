@@ -56,8 +56,8 @@ jobs:
         with:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}
-          target: ${{ github.sha }}
-          tags: ${{ github.event.number || github.sha }}
+          target: ${{ github.event.number || github.sha }}
+          tags: ${{ github.sha }}
 
   deploys:
     name: Deploys
