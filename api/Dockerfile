@@ -1,4 +1,4 @@
-FROM node:22@sha256:6e62aab5da3680c65b90b213bb5c9768fd745fafecf8687e87a4728c99e5c1d2 AS build
+FROM node:22@sha256:f466376b5f5ca8327da5914fddbcb5eee21c1c8482bed548a5ee84750d0b1b69 AS build
 WORKDIR /app
 COPY *.json ./
 RUN npm ci --omit=dev --ignore-scripts
