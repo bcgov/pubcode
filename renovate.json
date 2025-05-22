@@ -4,15 +4,7 @@
   "extends": [
     "github>bcgov/renovate-config"
   ],
-  "pinDigest": {
-    "groupName": "Pin Dependencies",
-    "groupSlug": "pin-dependencies",
-    "commitMessageAction": "Pin",
-    "group": {
-      "commitMessageTopic": "dependencies",
-      "commitMessageExtra": ""
-    }
-  },
+  "minimumReleaseAge": "0 days",
   "vulnerabilityAlerts": {
     "enabled": true
   }
