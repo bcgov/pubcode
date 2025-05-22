@@ -45,10 +45,10 @@ jobs:
         package: [api, frontend]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - uses: bcgov/action-builder-ghcr@ace71f7a527ca6fc43c15c7806314be5a4579d2c # v2.3.0
+      - uses: bcgov/action-builder-ghcr@d63c76a4bb7914d3a986a035904b49d99c2c4613 # v3.0.0
         with:
           package: ${{ matrix.package }}
-          tag: ${{ github.event.number || github.sha }}
+          tags: ${{ github.event.number || github.sha }}
           tag_fallback: latest
           token: ${{ secrets.GITHUB_TOKEN }}
 
