@@ -1,10 +1,10 @@
-FROM node:22@sha256:0b5b940c21ab03353de9042f9166c75bcfc53c4cd0508c7fd88576646adbf875 AS build
+FROM node:22 AS build
 WORKDIR /app
 COPY *.json ./
 RUN npm ci --omit=dev --ignore-scripts
 
 # Deployment container
-FROM gcr.io/distroless/nodejs22:nonroot@sha256:581893ba58980f0b4c7444d7a16b89f4e966cd89a89f3e0c6f26c482e312f008
+FROM gcr.io/distroless/nodejs22:nonroot
 ENV NODE_ENV production
 
 # Copy over app
