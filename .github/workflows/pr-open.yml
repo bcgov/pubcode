@@ -39,13 +39,15 @@ jobs:
     name: Builds
     runs-on: ubuntu-24.04
     permissions:
+      attestations: write
+      id-token: write
       packages: write
     strategy:
       matrix:
         package: [api, frontend]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - uses: bcgov/action-builder-ghcr@fix/missingTokens
+      - uses: bcgov/action-builder-ghcr@fd17bc1cbb16a60514e0df3966d42dff9fc232bc # v4.0.0
         with:
           package: ${{ matrix.package }}
           tags: ${{ github.event.number || github.sha }}
