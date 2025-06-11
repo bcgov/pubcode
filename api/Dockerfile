@@ -5,7 +5,7 @@ RUN npm ci --omit=dev --ignore-scripts
 
 # Deployment container
 FROM gcr.io/distroless/nodejs22:nonroot
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Copy over app
 WORKDIR /app
