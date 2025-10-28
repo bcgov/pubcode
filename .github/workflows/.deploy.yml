@@ -8,7 +8,7 @@ on:
         description: Autoscaling enabled or not for the deployments
         required: false
         type: string
-        default: 'true'
+        default: "true"
       environment:
         description: Environment name; omit for PRs
         required: false
@@ -50,16 +50,14 @@ on:
         required: false
         type: string
 
-
 jobs:
-  
   deploys:
     name: Helm
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-24.04
     timeout-minutes: ${{ inputs.timeout-minutes }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - uses: actions/checkout@v5
       - name: Stop pre-existing deployments on PRs (status = pending-upgrade)
         if: github.event_name == 'pull_request'
         uses: bcgov/action-oc-runner@f900830adadd4d9eef3ca6ff80103e839ba8b7c0 # v1.3.0

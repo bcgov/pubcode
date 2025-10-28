@@ -19,24 +19,24 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - uses: actions/checkout@v5
       - name: Conventional Changelog Update
         uses: TriPSs/conventional-changelog-action@84dadaf2c367cb52af02737cd9c7e888807219e7 # v6.2.0
         id: changelog
         with:
           github-token: ${{ github.token }}
-          output-file: 'CHANGELOG.md'
-          skip-version-file: 'true'
-          skip-commit: 'true'
-          skip-on-empty: 'false'
-          git-push: 'true'
+          output-file: "CHANGELOG.md"
+          skip-version-file: "true"
+          skip-commit: "true"
+          skip-on-empty: "false"
+          git-push: "true"
 
   retag-images:
-    needs: [ semantic-version ]
+    needs: [semantic-version]
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        package: [ api, database, frontend ]
+        package: [api, database, frontend]
     steps:
       - name: Tag Docker Images
         uses: shrink/actions-docker-registry-tag@f04afd0559f66b288586792eb150f45136a927fa # v4
@@ -77,7 +77,7 @@ jobs:
       tag: ${{ needs.semantic-version.outputs.semanticVersion }}
       release_name: pubcode
       params: --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.tag }}" --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.tag }}"
-  github_release:    
+  github_release:
     name: Create Release
     needs: [semantic-version, deploys-prod]
     runs-on: ubuntu-24.04
