@@ -17,14 +17,14 @@ jobs:
       matrix:
         browser: [chrome]
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - uses: actions/checkout@v5
       - uses: cypress-io/github-action@v5
         name: Cypress run
         with:
           config: pageLoadTimeout=30000,baseUrl=https://pubcode-${{ inputs.target }}.apps.silver.devops.gov.bc.ca/
           working-directory: ./frontend
           browser: ${{ matrix.browser }}
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots

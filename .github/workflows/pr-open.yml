@@ -46,7 +46,7 @@ jobs:
       matrix:
         package: [api, frontend]
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - uses: actions/checkout@v5
       - uses: bcgov/action-builder-ghcr@1e4295b9766963ca36612b78560db6235120b80f # 4.1.1
         with:
           package: ${{ matrix.package }}
@@ -71,19 +71,19 @@ jobs:
       tag: ${{ github.event.number }}
       release_name: pubcode-${{ github.event.number }}
       params: |
-            --set-string global.repository=${{ github.repository }}  \
-            --set-string api.containers[0].tag="${{ github.sha }}" \
-            --set-string api.containers[0].resources.requests.cpu="30m" \
-            --set-string api.containers[0].resources.requests.memory="50Mi" \
-            --set-string frontend.containers[0].tag="${{ github.sha }}" \
-            --set-string frontend.containers[0].resources.requests.cpu="30m" \
-            --set-string frontend.containers[0].resources.requests.memory="50Mi" \
-            --set-string database.containers[0].resources.requests.cpu="30m" \
-            --set-string database.containers[0].resources.requests.memory="50Mi" \
-            --set-string database.initContainers[0].resources.requests.cpu="30m" \
-            --set-string database.initContainers[0].resources.requests.memory="50Mi" \
-            --set-string database.pvc.size="350Mi" \
-            --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }} \
+        --set-string global.repository=${{ github.repository }}  \
+        --set-string api.containers[0].tag="${{ github.sha }}" \
+        --set-string api.containers[0].resources.requests.cpu="30m" \
+        --set-string api.containers[0].resources.requests.memory="50Mi" \
+        --set-string frontend.containers[0].tag="${{ github.sha }}" \
+        --set-string frontend.containers[0].resources.requests.cpu="30m" \
+        --set-string frontend.containers[0].resources.requests.memory="50Mi" \
+        --set-string database.containers[0].resources.requests.cpu="30m" \
+        --set-string database.containers[0].resources.requests.memory="50Mi" \
+        --set-string database.initContainers[0].resources.requests.cpu="30m" \
+        --set-string database.initContainers[0].resources.requests.memory="50Mi" \
+        --set-string database.pvc.size="350Mi" \
+        --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }} \
 
   tests:
     name: Tests
