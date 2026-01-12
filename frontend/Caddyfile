@@ -14,15 +14,17 @@
 	}
 	encode gzip
 
-  	handle /config.js {
-		header Content-Type "text/javascript"
+  	handle /env.js {
+        header {
+          Content-Type text/javascript
+        }
 		respond `window.config = {"VITE_SCHEMA_BRANCH":"{$VITE_SCHEMA_BRANCH}", "VITE_POWERBI_URL":"{$VITE_POWERBI_URL}"};`
 	}
 	root * /app/dist
 	encode zstd gzip
 	file_server
 	@spa_router {
-		not path /api/* /config.js
+		not path /api/* /env.js
 		file {
 			try_files {path} /index.html
 		}
