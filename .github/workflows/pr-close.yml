@@ -20,5 +20,4 @@ jobs:
       oc_token: ${{ secrets.OC_TOKEN }}
     with:
       cleanup: helm
-      packages: api frontend
-  
+      packages: api frontend database

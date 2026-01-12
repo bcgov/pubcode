@@ -23,22 +23,3 @@ version: 0.1.0
 # It is recommended to use it with quotes.
 appVersion: "0.1.0"
 
-dependencies:
-
-  - name: component
-    condition: api.enabled
-    version: 0.3.3
-    repository: https://bcgov.github.io/helm-service/
-    alias: api
-
-  - name: component
-    condition: frontend.enabled
-    version: 0.3.3
-    repository: https://bcgov.github.io/helm-service/
-    alias: frontend
-
-  - name: component
-    condition: database.enabled
-    version: 0.3.3
-    repository: https://bcgov.github.io/helm-service/
-    alias: database

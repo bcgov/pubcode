@@ -1,0 +1,47 @@
+{{- if and .Values.frontend.enabled .Values.frontend.ingress .Values.frontend.ingress.enabled }}
+{{- $svcName := include "frontend.fullname" . -}}
+{{- $defaultSvcPort := 80 -}}
+{{- if and .Values.frontend.service .Values.frontend.service.ports (gt (len .Values.frontend.service.ports) 0) -}}
+{{- $defaultSvcPort = (index .Values.frontend.service.ports 0).port | default 80 -}}
+{{- end -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $svcName }}
+  labels:
+    {{- include "frontend.labels" . | nindent 4 }}
+  {{- if .Values.frontend.ingress.annotations }}
+  annotations:
+    {{- tpl (toYaml .Values.frontend.ingress.annotations) $ | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ default "openshift-default" .Values.frontend.ingress.className }}
+  rules:
+    {{- if and .Values.frontend.ingress.hosts (gt (len .Values.frontend.ingress.hosts) 0) }}
+    {{- range $h := .Values.frontend.ingress.hosts }}
+    - host: {{ tpl $h.host $ | quote }}
+      http:
+        paths:
+          {{- range $p := $h.paths }}
+          - path: {{ default "/" $p.path | quote }}
+            pathType: {{ default "ImplementationSpecific" $p.pathType }}
+            backend:
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $defaultSvcPort }}
+          {{- end }}
+    {{- end }}
+    {{- else }}
+    - host: {{ printf "%s.%s" $svcName .Values.global.domain | quote }}
+      http:
+        paths:
+          - path: "/"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $defaultSvcPort }}
+    {{- end }}
+{{- end }}

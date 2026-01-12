@@ -1,0 +1,22 @@
+{{- if and .Values.database.enabled .Values.database.pvc.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-database
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "database.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.database.pvc.storageClassName }}
+  storageClassName: {{ .Values.database.pvc.storageClassName }}
+  {{- end }}
+  accessModes:
+    {{- if kindIs "slice" .Values.database.pvc.accessModes }}
+    {{- toYaml .Values.database.pvc.accessModes | nindent 4 }}
+    {{- else }}
+    - {{ default "ReadWriteOnce" .Values.database.pvc.accessModes }}
+    {{- end }}
+  resources:
+    requests:
+      storage: {{ default "1Gi" .Values.database.pvc.size }}
+{{- end }}

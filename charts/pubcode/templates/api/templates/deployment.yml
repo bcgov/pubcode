@@ -1,0 +1,76 @@
+{{- if and .Values.api.enabled .Values.api.deployment.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "api.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.api.autoscaling.enabled }}
+  replicas: {{ default 1 .Values.api.autoscaling.minReplicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- if .Values.api.podAnnotations }}
+        {{- tpl .Values.api.podAnnotations $ | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "api.labels" . | nindent 8 }}
+    spec:
+      containers:
+        {{- range $c := .Values.api.containers }}
+        - name: {{ $c.name }}
+          image: "{{- if and $c.registry $c.repository -}}{{ tpl $c.registry $ }}/{{ tpl $c.repository $ }}/{{ tpl $c.image $ }}{{- else if $c.registry -}}{{ tpl $c.registry $ }}/{{ tpl $c.image $ }}{{- else -}}{{ tpl $c.image $ }}{{- end -}}{{- if $c.tag -}}:{{ tpl (printf "%v" $c.tag) $ }}{{- end -}}"
+          {{- if and $c.envFrom $c.envFrom.secretRef $c.envFrom.secretRef.name }}
+          envFrom:
+            - secretRef:
+                name: {{ tpl $c.envFrom.secretRef.name $ }}
+          {{- end }}
+          {{- if $c.env }}
+          env:
+            {{- if and (kindIs "map" $c.env) $c.env.fromValues }}
+            {{- range $e := $c.env.fromValues }}
+            - name: {{ $e.name }}
+              value: {{ tpl (printf "%v" $e.value) $ | quote }}
+            {{- end }}
+            {{- else if kindIs "slice" $c.env }}
+            {{- tpl (toYaml $c.env) $ | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if $c.ports }}
+          ports:
+            {{- tpl (toYaml $c.ports) $ | nindent 12 }}
+          {{- end }}
+          {{- if $c.resources }}
+          resources:
+            {{- toYaml $c.resources | nindent 12 }}
+          {{- end }}
+          {{- if $c.readinessProbe }}
+          readinessProbe:
+            {{- toYaml $c.readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if $c.livenessProbe }}
+          livenessProbe:
+            {{- toYaml $c.livenessProbe | nindent 12 }}
+          {{- end }}
+        {{- end }}
+
+      {{- with .Values.api.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

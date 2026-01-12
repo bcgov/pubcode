@@ -44,7 +44,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        package: [api, frontend]
+        package: [api, database, frontend]
     steps:
       - uses: actions/checkout@v6
       - uses: bcgov/action-builder-ghcr@2b24ac7f95e6a019064151498660437cca3202c5 # v4.2.1
@@ -72,6 +72,8 @@ jobs:
       release_name: pubcode-${{ github.event.number }}
       params: |
         --set-string global.repository=${{ github.repository }}  \
+        --set-string database.containers[0].tag="${{ github.sha }}" \
+        --set-string database.initContainers[0].tag="${{ github.sha }}" \
         --set-string api.containers[0].tag="${{ github.sha }}" \
         --set-string api.containers[0].resources.requests.cpu="30m" \
         --set-string api.containers[0].resources.requests.memory="50Mi" \
