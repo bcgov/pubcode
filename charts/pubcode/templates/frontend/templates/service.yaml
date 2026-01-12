@@ -1,0 +1,20 @@
+{{- if .Values.frontend.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "frontend.fullname" . }}
+  labels:
+    {{- include "frontend.labels" . | nindent 4 }}
+spec:
+  type: {{ default "ClusterIP" .Values.frontend.service.type }}
+  ports:
+    {{- range $p := .Values.frontend.service.ports }}
+    - name: {{ default "http" $p.name }}
+      port: {{ $p.port }}
+      targetPort: {{ $p.targetPort }}
+      protocol: {{ default "TCP" $p.protocol }}
+    {{- end }}
+  selector:
+    {{- include "frontend.selectorLabels" . | nindent 4 }}
+{{- end }}
