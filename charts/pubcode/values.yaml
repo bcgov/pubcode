@@ -85,10 +85,6 @@ api:
   nodeSelector: { }
   tolerations: [ ]
   affinity: { }
-  route:
-    enabled: true
-    host: "{{ .Release.Name }}-api.{{ .Values.global.domain }}"
-    targetPort: http # look at line#164 refer to the name.
 
   ingress:
     enabled: true
