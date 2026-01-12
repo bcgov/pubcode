@@ -85,10 +85,23 @@ api:
   nodeSelector: { }
   tolerations: [ ]
   affinity: { }
-  route:
+
+  ingress:
     enabled: true
-    host: "{{ .Release.Name }}-api.{{ .Values.global.domain }}"
-    targetPort: http # look at line#164 refer to the name.
+    className: openshift-default
+    annotations:
+      haproxy.router.openshift.io/balance: "roundrobin"
+      route.openshift.io/termination: "edge"
+      haproxy.router.openshift.io/rate-limit-connections: "true"
+      haproxy.router.openshift.io/rate-limit-connections.concurrent-tcp: "20"
+      haproxy.router.openshift.io/rate-limit-connections.rate-http: "50"
+      haproxy.router.openshift.io/rate-limit-connections.rate-tcp: "100"
+      haproxy.router.openshift.io/disable_cookies: "true"
+    hosts:
+      - host: "{{ .Release.Name }}-api.{{ .Values.global.domain }}"
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
   podAnnotations: |-
     prometheus.io/scrape: "true"
     prometheus.io/port: "3000"
