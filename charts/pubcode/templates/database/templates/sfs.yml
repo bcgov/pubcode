@@ -19,11 +19,21 @@ spec:
       labels:
         {{- include "database.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       {{- if .Values.database.initContainers }}
       initContainers:
         {{- range $ic := .Values.database.initContainers }}
         - name: {{ $ic.name }}
           image: "{{- if and $ic.registry $ic.repository -}}{{ tpl $ic.registry $ }}/{{ tpl $ic.repository $ }}/{{ tpl $ic.image $ }}{{- else if $ic.registry -}}{{ tpl $ic.registry $ }}/{{ tpl $ic.image $ }}{{- else -}}{{ tpl $ic.image $ }}{{- end -}}{{- if $ic.tag -}}:{{ tpl (printf "%v" $ic.tag) $ }}{{- end -}}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
           {{- if $ic.command }}
           command:
             {{- tpl (toYaml $ic.command) $ | nindent 12 }}
@@ -47,6 +57,12 @@ spec:
         {{- range $c := .Values.database.containers }}
         - name: {{ $c.name }}
           image: "{{- if and $c.registry $c.repository -}}{{ tpl $c.registry $ }}/{{ tpl $c.repository $ }}/{{ tpl $c.image $ }}{{- else if $c.registry -}}{{ tpl $c.registry $ }}/{{ tpl $c.image $ }}{{- else -}}{{ tpl $c.image $ }}{{- end -}}{{- if $c.tag -}}:{{ tpl (printf "%v" $c.tag) $ }}{{- end -}}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
           {{- if and $c.envFrom $c.envFrom.secretRef $c.envFrom.secretRef.name }}
           envFrom:
             - secretRef:

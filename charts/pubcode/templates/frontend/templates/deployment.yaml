@@ -23,13 +23,26 @@ spec:
       labels:
         {{- include "frontend.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         {{- range $c := .Values.frontend.containers }}
         - name: {{ $c.name }}
-          {{- if $c.securityContext }}
           securityContext:
-            {{- toYaml $c.securityContext | nindent 12 }}
-          {{- end }}
+            allowPrivilegeEscalation: {{ default false $c.securityContext.allowPrivilegeEscalation }}
+            runAsNonRoot: {{ default true $c.securityContext.runAsNonRoot }}
+            {{- if hasKey $c.securityContext "readOnlyRootFilesystem" }}
+            readOnlyRootFilesystem: {{ $c.securityContext.readOnlyRootFilesystem }}
+            {{- end }}
+            capabilities:
+              drop:
+                - ALL
+              {{- if and $c.securityContext $c.securityContext.capabilities $c.securityContext.capabilities.add }}
+              add:
+                {{- toYaml $c.securityContext.capabilities.add | nindent 16 }}
+              {{- end }}
           image: "{{- if and $c.registry $c.repository -}}{{ tpl $c.registry $ }}/{{ tpl $c.repository $ }}/{{ tpl $c.image $ }}{{- else if $c.registry -}}{{ tpl $c.registry $ }}/{{ tpl $c.image $ }}{{- else -}}{{ tpl $c.image $ }}{{- end -}}{{- if $c.tag -}}:{{ tpl (printf "%v" $c.tag) $ }}{{- end -}}"
           {{- if and $c.envFrom $c.envFrom.secretRef $c.envFrom.secretRef.name }}
           envFrom:

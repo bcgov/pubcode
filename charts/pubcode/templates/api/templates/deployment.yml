@@ -23,10 +23,20 @@ spec:
       labels:
         {{- include "api.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         {{- range $c := .Values.api.containers }}
         - name: {{ $c.name }}
           image: "{{- if and $c.registry $c.repository -}}{{ tpl $c.registry $ }}/{{ tpl $c.repository $ }}/{{ tpl $c.image $ }}{{- else if $c.registry -}}{{ tpl $c.registry $ }}/{{ tpl $c.image $ }}{{- else -}}{{ tpl $c.image $ }}{{- end -}}{{- if $c.tag -}}:{{ tpl (printf "%v" $c.tag) $ }}{{- end -}}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
           {{- if and $c.envFrom $c.envFrom.secretRef $c.envFrom.secretRef.name }}
           envFrom:
             - secretRef:
