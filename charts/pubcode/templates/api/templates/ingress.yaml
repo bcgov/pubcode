@@ -1,4 +1,9 @@
-{{- if and .Values.api.enabled .Values.api.route .Values.api.route.enabled }}
+{{- $ing := .Values.api.ingress | default dict -}}
+{{- if and (eq (len $ing) 0) .Values.api.route -}}
+{{- $ing = .Values.api.route -}}
+{{- end -}}
+
+{{- if and .Values.api.enabled $ing $ing.enabled }}
 {{- $svcName := include "api.fullname" . -}}
 {{- $defaultSvcPort := 80 -}}
 {{- if and .Values.api.service .Values.api.service.ports (gt (len .Values.api.service.ports) 0) -}}
@@ -10,14 +15,40 @@ metadata:
   name: {{ $svcName }}
   labels:
     {{- include "api.labels" . | nindent 4 }}
-  {{- if .Values.api.route.annotations }}
+  {{- if $ing.annotations }}
   annotations:
-    {{- tpl (toYaml .Values.api.route.annotations) $ | nindent 4 }}
+    {{- tpl (toYaml $ing.annotations) $ | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ default "openshift-default" .Values.api.route.className }}
+  ingressClassName: {{ default "openshift-default" $ing.className }}
   rules:
-    - host: {{ tpl (default (printf "%s.%s" $svcName .Values.global.domain) (printf "%v" .Values.api.route.host)) $ | quote }}
+    {{- if and $ing.hosts (gt (len $ing.hosts) 0) }}
+    {{- range $h := $ing.hosts }}
+    - host: {{ tpl $h.host $ | quote }}
+      http:
+        paths:
+          {{- if and $h.paths (gt (len $h.paths) 0) }}
+          {{- range $p := $h.paths }}
+          - path: {{ default "/" $p.path | quote }}
+            pathType: {{ default "ImplementationSpecific" $p.pathType }}
+            backend:
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $defaultSvcPort }}
+          {{- end }}
+          {{- else }}
+          - path: "/"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $defaultSvcPort }}
+          {{- end }}
+    {{- end }}
+    {{- else }}
+    - host: {{ tpl (default (printf "%s.%s" $svcName .Values.global.domain) (printf "%v" $ing.host)) $ | quote }}
       http:
         paths:
           - path: "/"
@@ -27,4 +58,5 @@ spec:
                 name: {{ $svcName }}
                 port:
                   number: {{ $defaultSvcPort }}
+    {{- end }}
 {{- end }}
