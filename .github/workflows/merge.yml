@@ -49,8 +49,6 @@ jobs:
           tags: |
             ${{ needs.semantic-version.outputs.semanticVersion }}
             ${{ needs.semantic-version.outputs.tag }}
-permissions: {}
-
   deploys:
     name: TEST Deployments
     needs: [retag-images, semantic-version]
