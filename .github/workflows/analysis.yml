@@ -15,8 +15,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: {}
-
 jobs:
   # https://github.com/marketplace/actions/aqua-security-trivy
   trivy:

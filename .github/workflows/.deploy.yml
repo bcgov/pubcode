@@ -24,8 +24,6 @@ on:
         required: false
         type: string
 
-permissions: {}
-
       ### Usually a bad idea / not recommended
       directory:
         description: "Chart directory"

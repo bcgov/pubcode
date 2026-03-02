@@ -10,8 +10,6 @@ on:
         required: true
         type: string
 
-permissions: {}
-
 jobs:
   cypress-e2e:
     name: Cypress E2E

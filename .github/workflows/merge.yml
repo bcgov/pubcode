@@ -11,8 +11,6 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
-permissions: {}
-
 jobs:
   semantic-version:
     outputs:
