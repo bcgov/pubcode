@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   semantic-version:
     outputs:
@@ -47,6 +50,7 @@ jobs:
           tags: |
             ${{ needs.semantic-version.outputs.semanticVersion }}
             ${{ needs.semantic-version.outputs.tag }}
+permissions: {}
 
   deploys:
     name: TEST Deployments

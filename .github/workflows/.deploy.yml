@@ -23,6 +23,9 @@ on:
         required: false
         type: string
 
+permissions:
+  contents: read
+
       ### Usually a bad idea / not recommended
       directory:
         description: "Chart directory"
@@ -117,3 +120,4 @@ jobs:
 
             # Remove old build runs, build pods and deployment pods
             oc delete po --field-selector=status.phase==Succeeded
+permissions: {}
