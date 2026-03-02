@@ -25,7 +25,7 @@ Follow these conventions:
 Project-specific rules:
 - Python: 4 spaces (override BC Gov standard)
 - APIs: Additional validation for public endpoints
-- Branches: feature/JIRA-123-description
+- Branches: always created from `main` (`git checkout main && git pull && git checkout -b feature/JIRA-123-description`)
 
 Never:
 - Create duplicate files
