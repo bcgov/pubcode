@@ -8,7 +8,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: DPEPGHbjUluRjetU
       MONGODB_DATABASE: pubcode
 
-    image: ghcr.io/bcgov/nr-containers/mongo:7.0.28
+    image: ghcr.io/bcgov/nr-containers/mongo:7.0.30
     ports: ["27017:27017"]
     restart: unless-stopped
 
@@ -47,7 +47,7 @@ services:
 
   #Run npm run build-watch in local before this.
   frontend:
-    image: caddy:2.10.2-alpine
+    image: caddy:2.11.1-alpine
     working_dir: /app
     volumes:
       - ./frontend/Caddyfile:/etc/caddy/Caddyfile
