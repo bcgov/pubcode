@@ -17,6 +17,8 @@ jobs:
       packages: write
     permissions:
       packages: write
+    permissions:
+      packages: write
     secrets:
       oc_namespace: ${{ vars.OC_NAMESPACE }}
       oc_token: ${{ secrets.OC_TOKEN }}
