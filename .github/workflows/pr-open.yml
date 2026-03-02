@@ -67,6 +67,8 @@ jobs:
   deploys:
     name: Deploys
     needs: [builds]
+    permissions:
+      contents: read
     uses: ./.github/workflows/.deploy.yml
     secrets: inherit
     with:
@@ -93,6 +95,8 @@ jobs:
   tests:
     name: Tests
     needs: [deploys]
+    permissions:
+      contents: read
     uses: ./.github/workflows/.tests.yml
     with:
       target: ${{ github.event.number }}
