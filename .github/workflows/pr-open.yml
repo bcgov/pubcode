@@ -1,4 +1,3 @@
-permissions: {}
 name: Pull Request
 
 on:
@@ -9,6 +8,8 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions: {}
 
 jobs:
   pr-greeting:

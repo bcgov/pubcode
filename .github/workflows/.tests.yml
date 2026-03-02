@@ -1,4 +1,3 @@
-permissions: {}
 name: .Tests
 
 on:
@@ -9,6 +8,8 @@ on:
         description: PR number, test or prod
         required: true
         type: string
+
+permissions: {}
 
 jobs:
   cypress-e2e:

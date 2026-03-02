@@ -1,4 +1,3 @@
-permissions: {}
 name: .Deploys
 
 on:
@@ -50,6 +49,8 @@ on:
         default: ${{ github.event.repository.name }}
         required: false
         type: string
+
+permissions: {}
 
 jobs:
   deploys:
