@@ -23,8 +23,7 @@ on:
         required: false
         type: string
 
-permissions:
-  contents: read
+permissions: {}
 
       ### Usually a bad idea / not recommended
       directory:
