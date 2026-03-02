@@ -32,4 +32,3 @@ jobs:
           name: cypress-screenshots
           path: ./frontend/cypress/screenshots
           if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
-permissions: {}

@@ -15,10 +15,6 @@ jobs:
     uses: bcgov/quickstart-openshift-helpers/.github/workflows/.pr-close.yml@6d695dd755fa9255ea4bde335890516beb6f95e4 # v1.0.1
     permissions:
       packages: write
-    permissions:
-      packages: write
-    permissions:
-      packages: write
     secrets:
       oc_namespace: ${{ vars.OC_NAMESPACE }}
       oc_token: ${{ secrets.OC_TOKEN }}

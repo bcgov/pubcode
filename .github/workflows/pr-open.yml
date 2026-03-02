@@ -18,10 +18,6 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       pull-requests: write
-    permissions:
-      pull-requests: write
-    permissions:
-      pull-requests: write
     steps:
       - name: PR Greeting
         uses: bcgov/action-pr-description-add@9bf88aec33edb7c00ed72f9305aa1721d0cdab9f # v2.0.3
@@ -42,14 +38,6 @@ jobs:
   builds:
     name: Builds
     runs-on: ubuntu-24.04
-    permissions:
-      attestations: write
-      id-token: write
-      packages: write
-    permissions:
-      attestations: write
-      id-token: write
-      packages: write
     permissions:
       attestations: write
       id-token: write
