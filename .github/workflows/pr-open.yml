@@ -41,6 +41,7 @@ jobs:
     name: Builds
     runs-on: ubuntu-24.04
     permissions:
+      contents: read
       attestations: write
       id-token: write
       packages: write

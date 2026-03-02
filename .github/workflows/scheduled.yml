@@ -19,6 +19,8 @@ jobs:
   pubcode-crawler:
     name: Crawl Git Repos for bcgovpubcode.yml
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     environment: prod
     defaults:
       run:
@@ -106,6 +108,8 @@ jobs:
   soft-delete-removed-pubcodes:
     name: Soft Delete pubcodes In the Databse which are removed from the repo.
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: utilities/remove-deleted-pubcode

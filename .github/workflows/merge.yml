@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     permissions:
-      contents: write
+      contents: write  # write implies read; needed for git-push and checkout
     steps:
       - uses: actions/checkout@v6
       - name: Conventional Changelog Update
