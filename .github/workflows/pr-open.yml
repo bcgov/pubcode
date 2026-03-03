@@ -9,6 +9,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   pr-greeting:
     name: PR Greeting
@@ -39,6 +41,7 @@ jobs:
     name: Builds
     runs-on: ubuntu-24.04
     permissions:
+      contents: read
       attestations: write
       id-token: write
       packages: write
@@ -64,6 +67,8 @@ jobs:
   deploys:
     name: Deploys
     needs: [builds]
+    permissions:
+      contents: read
     uses: ./.github/workflows/.deploy.yml
     secrets: inherit
     with:
@@ -90,6 +95,8 @@ jobs:
   tests:
     name: Tests
     needs: [deploys]
+    permissions:
+      contents: read
     uses: ./.github/workflows/.tests.yml
     with:
       target: ${{ github.event.number }}

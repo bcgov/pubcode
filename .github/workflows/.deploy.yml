@@ -50,11 +50,15 @@ on:
         required: false
         type: string
 
+permissions: {}
+
 jobs:
   deploys:
     name: Helm
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     timeout-minutes: ${{ inputs.timeout-minutes }}
     steps:
       - uses: actions/checkout@v6

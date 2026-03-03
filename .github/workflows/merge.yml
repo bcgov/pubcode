@@ -10,6 +10,8 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   semantic-version:
     outputs:
@@ -18,6 +20,8 @@ jobs:
       clean_changelog: ${{ steps.changelog.outputs.clean_changelog }}
     runs-on: ubuntu-24.04
     timeout-minutes: 1
+    permissions:
+      contents: write  # write implies read; needed for git-push and checkout
     steps:
       - uses: actions/checkout@v6
       - name: Conventional Changelog Update
@@ -34,6 +38,8 @@ jobs:
   retag-images:
     needs: [semantic-version]
     runs-on: ubuntu-24.04
+    permissions:
+      packages: write
     strategy:
       matrix:
         package: [api, database, frontend]
@@ -47,10 +53,11 @@ jobs:
           tags: |
             ${{ needs.semantic-version.outputs.semanticVersion }}
             ${{ needs.semantic-version.outputs.tag }}
-
   deploys:
     name: TEST Deployments
     needs: [retag-images, semantic-version]
+    permissions:
+      contents: read
     uses: ./.github/workflows/.deploy.yml
     secrets: inherit
     with:
@@ -62,6 +69,8 @@ jobs:
   tests:
     name: Tests
     needs: [deploys]
+    permissions:
+      contents: read
     uses: ./.github/workflows/.tests.yml
     with:
       target: test
@@ -69,6 +78,8 @@ jobs:
   deploys-prod:
     name: PROD Deployments
     needs: [semantic-version, tests]
+    permissions:
+      contents: read
     uses: ./.github/workflows/.deploy.yml
     secrets: inherit
     with:
@@ -81,6 +92,8 @@ jobs:
     name: Create Release
     needs: [semantic-version, deploys-prod]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - name: Create Release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2

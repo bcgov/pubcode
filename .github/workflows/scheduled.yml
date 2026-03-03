@@ -13,10 +13,14 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   pubcode-crawler:
     name: Crawl Git Repos for bcgovpubcode.yml
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     environment: prod
     defaults:
       run:
@@ -59,6 +63,9 @@ jobs:
   validate-ministry-list:
     name: Validate Ministry List in the pubcode schema.
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
     defaults:
       run:
         working-directory: schema/script
@@ -101,6 +108,8 @@ jobs:
   soft-delete-removed-pubcodes:
     name: Soft Delete pubcodes In the Databse which are removed from the repo.
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: utilities/remove-deleted-pubcode
