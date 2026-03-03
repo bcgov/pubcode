@@ -28,7 +28,7 @@ jobs:
           config: pageLoadTimeout=30000,baseUrl=https://pubcode-${{ inputs.target }}.apps.silver.devops.gov.bc.ca/
           working-directory: ./frontend
           browser: ${{ matrix.browser }}
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: cypress-screenshots
