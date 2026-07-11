@@ -10,5 +10,5 @@ spec:
   selector:
     matchLabels:
       {{- include "frontend.selectorLabels" . | nindent 6 }}
-  minAvailable: {{ .Values.frontend.pdb.minAvailable }}
+  maxUnavailable: {{ .Values.frontend.pdb.maxUnavailable }}
 {{- end }}

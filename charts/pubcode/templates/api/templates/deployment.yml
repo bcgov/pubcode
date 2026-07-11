@@ -23,6 +23,7 @@ spec:
       labels:
         {{- include "api.labels" . | nindent 8 }}
     spec:
+      terminationGracePeriodSeconds: {{ default 30 .Values.api.terminationGracePeriodSeconds }}
       securityContext:
         runAsNonRoot: true
         seccompProfile:
@@ -34,9 +35,13 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
           {{- if and $c.envFrom $c.envFrom.secretRef $c.envFrom.secretRef.name }}
           envFrom:
             - secretRef:
@@ -83,4 +88,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
 {{- end }}

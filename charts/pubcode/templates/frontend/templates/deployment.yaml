@@ -23,6 +23,7 @@ spec:
       labels:
         {{- include "frontend.labels" . | nindent 8 }}
     spec:
+      terminationGracePeriodSeconds: {{ default 30 .Values.frontend.terminationGracePeriodSeconds }}
       securityContext:
         runAsNonRoot: true
         seccompProfile:
@@ -43,6 +44,9 @@ spec:
               add:
                 {{- toYaml $c.securityContext.capabilities.add | nindent 16 }}
               {{- end }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
           image: "{{- if and $c.registry $c.repository -}}{{ tpl $c.registry $ }}/{{ tpl $c.repository $ }}/{{ tpl $c.image $ }}{{- else if $c.registry -}}{{ tpl $c.registry $ }}/{{ tpl $c.image $ }}{{- else -}}{{ tpl $c.image $ }}{{- end -}}{{- if $c.tag -}}:{{ tpl (printf "%v" $c.tag) $ }}{{- end -}}"
           {{- if and $c.envFrom $c.envFrom.secretRef $c.envFrom.secretRef.name }}
           envFrom:
@@ -90,4 +94,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
 {{- end }}

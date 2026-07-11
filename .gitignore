@@ -113,3 +113,6 @@ frontend/.env.local
 .idea
 /util/
 *.http
+.claude
+.tokensave
+.copilot-memory

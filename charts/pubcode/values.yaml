@@ -72,6 +72,10 @@ api:
     minReplicas: 3
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80 # this percentage from request cpu
+  pdb:
+    enabled: true
+    maxUnavailable: 1
+  terminationGracePeriodSeconds: 30
   vault:
     enabled: false
   service:
@@ -84,7 +88,15 @@ api:
         protocol: TCP
   nodeSelector: { }
   tolerations: [ ]
-  affinity: { }
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: api
+            topologyKey: kubernetes.io/hostname
 
   ingress:
     enabled: true
@@ -120,6 +132,7 @@ frontend:
       securityContext:
         capabilities:
           add: [ "NET_BIND_SERVICE" ]
+        readOnlyRootFilesystem: true
       envFrom:
         secretRef:
           name: '{{ .Release.Name }}-frontend'
@@ -167,6 +180,21 @@ frontend:
     minReplicas: 3
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80 # this percentage from request cpu
+  pdb:
+    enabled: true
+    maxUnavailable: 1
+  terminationGracePeriodSeconds: 30
+  nodeSelector: { }
+  tolerations: [ ]
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: frontend
+            topologyKey: kubernetes.io/hostname
   service:
     enabled: true
     type: ClusterIP
@@ -203,6 +231,7 @@ database:
     enabled: true
   deploymentStrategy:
     type: Recreate
+  terminationGracePeriodSeconds: 60
   volumes:
     - name: '{{ .Release.Name }}-database'
       persistentVolumeClaim:
@@ -210,6 +239,8 @@ database:
     - name: '{{ include "component.fullname" . }}-config'
       configMap:
         name: '{{ include "component.fullname" . }}'
+    - name: tmp
+      emptyDir: {}
   initContainers:
     - name: database-init
       registry: '{{ .Values.global.registry }}' # example, it includes registry
@@ -227,6 +258,8 @@ database:
       volumeMounts:
         - name: '{{ .Release.Name }}-database'
           mountPath: /data/db
+        - name: tmp
+          mountPath: /tmp
   containers:
     - name: database
       registry: '{{ .Values.global.registry }}' # example, it includes registry
@@ -261,6 +294,8 @@ database:
       volumeMounts:
         - name: '{{ .Release.Name }}-database'
           mountPath: /data/db
+        - name: tmp
+          mountPath: /tmp
   autoscaling:
     enabled: false
     minReplicas: 1
