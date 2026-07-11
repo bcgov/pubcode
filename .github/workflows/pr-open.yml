@@ -12,26 +12,9 @@ concurrency:
 permissions: {}
 
 jobs:
-  vars:
-    if: "!github.event.pull_request.head.repo.fork"
-    name: Compute Vars
-    runs-on: ubuntu-24.04
-    permissions: {}
-    outputs:
-      schema_branch: ${{ steps.branch.outputs.name }}
-    steps:
-      - name: Sanitize PR branch name
-        id: branch
-        env:
-          RAW_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
-        run: |
-          set -euo pipefail
-          safe_branch=$(printf '%s' "$RAW_BRANCH" | tr -cd '[:alnum:]._-')
-          echo "name=${safe_branch:-main}" >> "$GITHUB_OUTPUT"
-
   pr-greeting:
     name: PR Greeting
-    needs: [vars]
+    if: "!github.event.pull_request.head.repo.fork"
     env:
       DOMAIN: apps.silver.devops.gov.bc.ca
       PREFIX: ${{ github.event.repository.name }}-${{ github.event.number }}
@@ -57,7 +40,7 @@ jobs:
 
   builds:
     name: Builds
-    needs: [vars]
+    needs: [pr-greeting]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -85,7 +68,7 @@ jobs:
 
   deploys:
     name: Deploys
-    needs: [builds, vars]
+    needs: [builds]
     permissions:
       contents: read
     uses: ./.github/workflows/.deploy.yml
@@ -109,7 +92,7 @@ jobs:
         --set-string database.initContainers[0].resources.requests.cpu="30m" \
         --set-string database.initContainers[0].resources.requests.memory="50Mi" \
         --set-string database.pvc.size="350Mi" \
-        --set-string global.env.VITE_SCHEMA_BRANCH=${{ needs.vars.outputs.schema_branch }} \
+        --set-string global.env.VITE_SCHEMA_BRANCH=${{ github.event.pull_request.head.ref }} \
 
   tests:
     name: Tests
@@ -123,7 +106,7 @@ jobs:
   results:
     name: Results
     if: always()
-    needs: [vars, pr-greeting, builds, deploys, tests]
+    needs: [pr-greeting, builds, deploys, tests]
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     steps:
