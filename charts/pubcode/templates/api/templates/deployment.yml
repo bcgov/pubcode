@@ -23,6 +23,7 @@ spec:
       labels:
         {{- include "api.labels" . | nindent 8 }}
     spec:
+      terminationGracePeriodSeconds: {{ default 30 .Values.api.terminationGracePeriodSeconds }}
       securityContext:
         runAsNonRoot: true
         seccompProfile:
@@ -34,9 +35,16 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            {{- if $c.volumeMounts }}
+            {{- tpl (toYaml $c.volumeMounts) $ | nindent 12 }}
+            {{- end }}
           {{- if and $c.envFrom $c.envFrom.secretRef $c.envFrom.secretRef.name }}
           envFrom:
             - secretRef:
@@ -79,8 +87,19 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.api.affinity }}
       affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- include "api.selectorLabels" . | nindent 20 }}
+                topologyKey: kubernetes.io/hostname
+        {{- with .Values.api.affinity }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
 {{- end }}

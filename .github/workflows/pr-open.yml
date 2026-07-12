@@ -14,6 +14,7 @@ permissions: {}
 jobs:
   pr-greeting:
     name: PR Greeting
+    if: "!github.event.pull_request.head.repo.fork"
     env:
       DOMAIN: apps.silver.devops.gov.bc.ca
       PREFIX: ${{ github.event.repository.name }}-${{ github.event.number }}
@@ -22,7 +23,7 @@ jobs:
       pull-requests: write
     steps:
       - name: PR Greeting
-        uses: bcgov/action-pr-description-add@9bf88aec33edb7c00ed72f9305aa1721d0cdab9f # v2.0.3
+        uses: bcgov/actions/pr-description-add@0992e41cd11c5370b77f9e6066effe63efe9f8c9 # v0.4.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           add_markdown: |
@@ -39,6 +40,7 @@ jobs:
 
   builds:
     name: Builds
+    needs: [pr-greeting]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -49,13 +51,13 @@ jobs:
       matrix:
         package: [api, database, frontend]
     steps:
-      - uses: actions/checkout@v6
-      - uses: bcgov/action-builder-ghcr@2b24ac7f95e6a019064151498660437cca3202c5 # v4.2.1
+      - uses: actions/checkout@v7
+      - uses: bcgov/actions/builder-ghcr@0992e41cd11c5370b77f9e6066effe63efe9f8c9 # v0.4.0
         with:
           package: ${{ matrix.package }}
           tags: ${{ github.event.number || github.sha }}
           tag_fallback: latest
-          token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: shrink/actions-docker-registry-tag@e6aaef25c595b6e0edd18bf4c7dbfea3abd43299 # v5
         with:
@@ -100,3 +102,14 @@ jobs:
     uses: ./.github/workflows/.tests.yml
     with:
       target: ${{ github.event.number }}
+
+  results:
+    name: Results
+    if: always()
+    needs: [pr-greeting, builds, deploys, tests]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: Fail if any dependent job failed or was cancelled
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1

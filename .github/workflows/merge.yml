@@ -21,9 +21,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     permissions:
-      contents: write  # write implies read; needed for git-push and checkout
+      contents: write # write implies read; needed for git-push and checkout
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Conventional Changelog Update
         uses: TriPSs/conventional-changelog-action@952b14bbc4be87e8458a6ac5926fc655608b1b19 # v6.3.1
         id: changelog
