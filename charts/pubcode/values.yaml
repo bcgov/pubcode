@@ -88,15 +88,7 @@ api:
         protocol: TCP
   nodeSelector: { }
   tolerations: [ ]
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchLabels:
-                app.kubernetes.io/name: api
-            topologyKey: kubernetes.io/hostname
+  affinity: { } # default pod anti-affinity is set in deployment.yml; add extra rules (e.g. nodeAffinity) here
 
   ingress:
     enabled: true
@@ -186,15 +178,7 @@ frontend:
   terminationGracePeriodSeconds: 30
   nodeSelector: { }
   tolerations: [ ]
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchLabels:
-                app.kubernetes.io/name: frontend
-            topologyKey: kubernetes.io/hostname
+  affinity: { } # default pod anti-affinity is set in deployment.yaml; add extra rules (e.g. nodeAffinity) here
   service:
     enabled: true
     type: ClusterIP
