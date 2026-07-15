@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Presets from https://github.com/bcgov/nr-renovate",
   "extends": [
-    "github>bcgov/renovate-config"
+    "github>bcgov/renovate-config#2026.7.0"
   ],
   "minimumReleaseAge": "0 days",
   "vulnerabilityAlerts": {
