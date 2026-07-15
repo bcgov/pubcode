@@ -22,7 +22,7 @@ jobs:
         browser: [chrome]
     steps:
       - uses: actions/checkout@v7
-      - uses: cypress-io/github-action@c495c3ddffba403ba11be95fffb67e25203b3799 # v7.1.10
+      - uses: cypress-io/github-action@fa4a118725a8f001170d49631ea89e5d66fee626 # v7.4.1
         name: Cypress run
         with:
           config: pageLoadTimeout=30000,baseUrl=https://pubcode-${{ inputs.target }}.apps.silver.devops.gov.bc.ca/
