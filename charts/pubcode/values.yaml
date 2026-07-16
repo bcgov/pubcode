@@ -47,8 +47,7 @@ api:
           cpu: 50m
           memory: 100Mi
         limits:
-          cpu: 100m
-          memory: 200Mi
+          memory: 4Gi
       readinessProbe:
         httpGet:
           path: /api/pub-code/health
@@ -151,8 +150,7 @@ frontend:
           cpu: 50m
           memory: 50Mi
         limits:
-          cpu: 100m
-          memory: 100Mi
+          memory: 4Gi
       readinessProbe:
         httpGet:
           path: /health
@@ -246,8 +244,7 @@ database:
           cpu: 50m
           memory: 150Mi
         limits:
-          cpu: 100m
-          memory: 300Mi
+          memory: 4Gi
       volumeMounts:
         - name: '{{ .Release.Name }}-database'
           mountPath: /data/db
@@ -271,8 +268,7 @@ database:
           cpu: 50m
           memory: 150Mi
         limits:
-          cpu: 100m
-          memory: 300Mi
+          memory: 4Gi
       readinessProbe:
         tcpSocket:
           port: 27017

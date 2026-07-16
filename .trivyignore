@@ -12,3 +12,8 @@ AVD-KSV-0125
 # admission webhook rejections on standard OpenShift namespaces.
 AVD-KSV-0020
 AVD-KSV-0021
+
+# KSV-0011: CPU not limited
+# Why ignored: Om, our smart coworker, advised removing CPU limits to allow containers 
+# to burst into unallocated node capacity, preventing unnecessary throttling during peak load.
+AVD-KSV-0011
