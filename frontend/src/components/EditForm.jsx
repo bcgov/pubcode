@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import Form from "@rjsf/mui";
 import validator from "@rjsf/validator-ajv8";
 import * as YAML from "js-yaml";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import * as _ from "lodash";
+import { toast } from "react-toastify";
 
 // below props needs to be treated properly for the form to work properly as the nesting does not work if they are undefined.
 const props = ["product_information.business_capabilities_standard", "product_technology_information.ci_cd_tools", "product_technology_information.data_storage_platforms", "product_technology_information.frontend_frameworks", "product_technology_information.hosting_platforms", "product_technology_information.spatial_mapping_technologies", "product_external_dependencies.common_components", "product_external_dependencies.identity_authorization"];
@@ -25,7 +26,7 @@ function matchFormattingForFormDisplay(existingYamlAsJson) {
 
 export default function EditForm() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({});
+  const [formData] = useState({});
   const [formDisabled, setFormDisabled] = useState(false);
   const onSubmit = async ({ formData }) => {
     setFormDisabled(true);
