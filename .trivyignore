@@ -1,0 +1,6 @@
+# Ignore rule checking container registries (Helm templates use dynamic templating, e.g., {{ .Values.global.registry }} which defaults to ghcr.io, but static scan fails to resolve it)
+AVD-KSV-0125
+
+# Ignore checks for UID/GID <= 10000. OpenShift dynamic Security Context Constraints (SCC) controller dynamically injects extremely high UIDs/GIDs at runtime. Hardcoding IDs in templates breaks compliance in dynamic namespaces.
+AVD-KSV-0020
+AVD-KSV-0021
