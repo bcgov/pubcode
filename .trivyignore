@@ -1,6 +1,14 @@
-# Ignore rule checking container registries (Helm templates use dynamic templating, e.g., {{ .Values.global.registry }} which defaults to ghcr.io, but static scan fails to resolve it)
+# KSV-0125: Restrict container images to trusted registries
+# Why ignored: The container image path is dynamically constructed using Helm templates 
+# (e.g., "{{- if and $c.registry ... }}") and defaults to ghcr.io. Trivy performs static 
+# analysis on raw templates before values are rendered, and flags the Go template syntax 
+# itself as an untrusted registry name.
 AVD-KSV-0125
 
-# Ignore checks for UID/GID <= 10000. OpenShift dynamic Security Context Constraints (SCC) controller dynamically injects extremely high UIDs/GIDs at runtime. Hardcoding IDs in templates breaks compliance in dynamic namespaces.
+# KSV-0020 / KSV-0021: Runs with UID/GID <= 10000
+# Why ignored: OpenShift's Security Context Constraints (SCC) dynamically allocate 
+# extremely high range UIDs and GIDs (e.g., 1000600000+) at runtime. Hardcoding specific 
+# UIDs/GIDs like 10001 in these Helm templates to satisfy the static scanner will trigger 
+# admission webhook rejections on standard OpenShift namespaces.
 AVD-KSV-0020
 AVD-KSV-0021
