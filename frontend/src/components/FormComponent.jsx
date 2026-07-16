@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Form from "@rjsf/mui";
 import validator from "@rjsf/validator-ajv8";
 import * as YAML from "js-yaml";
@@ -35,7 +35,7 @@ const FormComponent = () => {
     initialFormData = data;
   }
   // keep the below in sync with the schema so that the form in UI works properly with showing the correct fields for all of
-  const [formData, setFormData] = useState(initialFormData || {
+  const [formData] = useState(initialFormData || {
     "version": 1,
     "data_management_roles": {
       "data_custodian": undefined,
@@ -79,7 +79,7 @@ const FormComponent = () => {
     if (!schema) {
       fetchData();
     }
-  }, []);
+  }, [schema]);
 
   const uiSchema = {
     "ui:submitButtonOptions": {

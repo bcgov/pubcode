@@ -1,9 +1,5 @@
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import { Button, Drawer, List, ListItem, ListItemText, useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate } from "react-router";
-import { useState } from "react";
 
 export default function LeftDrawer() {
   const navigate = useNavigate();

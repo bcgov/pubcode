@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Button, Container, Grid, Typography } from "@mui/material";
 import { useNavigate } from "react-router";
 
@@ -22,7 +21,7 @@ export default function NotFound() {
             404
           </Typography>
           <Typography variant="h6">
-            The page you're looking for does not exist.
+            The page you&apos;re looking for does not exist.
           </Typography>
           <Button onClick={() => buttonClicked()} variant="contained">Back Home</Button>
         </Grid>
