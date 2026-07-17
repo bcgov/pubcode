@@ -12,9 +12,10 @@ FROM caddy:2.11-alpine
 COPY --from=build /app/dist /app/dist
 COPY Caddyfile /etc/caddy/Caddyfile
 
-# Packages and caddy format
-RUN apk add --no-cache ca-certificates && \
-    caddy fmt --overwrite /etc/caddy/Caddyfile
+# Packages and remove file capabilities
+RUN apk add --no-cache ca-certificates libcap && \
+    setcap -r /usr/bin/caddy && \
+    apk del libcap
 
 # Port, health check and non-root user
 EXPOSE 3000 3001
