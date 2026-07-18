@@ -124,8 +124,6 @@ frontend:
       image: frontend # the exact component name, be it backend, api-1 etc...
       tag: prod # the tag of the image, it can be latest, 1.0.0 etc..., or the sha256 hash
       securityContext:
-        capabilities:
-          add: [ "NET_BIND_SERVICE" ]
         readOnlyRootFilesystem: true
       envFrom:
         secretRef:

@@ -76,7 +76,7 @@ const bulkLoad = async (req, res) => {
       }
     }
 
-    res.status(500).json(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 const readAll = async (req, res) => {
@@ -92,7 +92,7 @@ const readAll = async (req, res) => {
         logger.error("bulkLoad: ", e);
       }
     }
-    res.status(500).json(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -103,7 +103,7 @@ const findById = async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     logger.error("findById: ", error);
-    res.status(500).json(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 const health = async (req, res) => {
@@ -112,7 +112,7 @@ const health = async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     logger.error("health: ", error);
-    res.status(500).json(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 const softDeleteRepo = async (req, res) => {
