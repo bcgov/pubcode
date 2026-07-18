@@ -11,11 +11,11 @@ FROM caddy:2.11-alpine
 # Copy static files and config
 COPY --from=build /app/dist /app/dist
 COPY Caddyfile /etc/caddy/Caddyfile
+RUN caddy fmt /etc/caddy/Caddyfile
 
 # Packages, remove file capabilities, and validate/format config
 RUN apk add --no-cache ca-certificates libcap && \
     setcap -r /usr/bin/caddy && \
-    caddy fmt --overwrite /etc/caddy/Caddyfile && \
     apk del libcap
 
 # Port, health check and non-root user
