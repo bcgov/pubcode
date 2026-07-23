@@ -304,3 +304,4 @@ database:
     size: 750Mi
     storageClassName: netapp-file-standard
     accessModes: ReadWriteMany
+    keep: true

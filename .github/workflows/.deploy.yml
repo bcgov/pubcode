@@ -62,8 +62,7 @@ jobs:
     timeout-minutes: ${{ inputs.timeout-minutes }}
     steps:
       - uses: actions/checkout@v7
-      - name: Stop pre-existing deployments on PRs (status = pending-upgrade)
-        if: github.event_name == 'pull_request'
+      - name: Stop pre-existing deployments (status = pending-*)
         uses: bcgov/action-oc-runner@111868d1fc50db0a40417ba321d865ef5c931bbd # v1.7.0
         with:
           oc_namespace: ${{ vars.oc_namespace }}
@@ -72,12 +71,18 @@ jobs:
           triggers: ${{ inputs.triggers }}
           commands: |
             set -euo pipefail
-            # Interrupt any previous deployments (PR only)
+            # Interrupt any previous deployments
             PREVIOUS=$(helm status ${{ inputs.release_name }} -o json | jq .info.status || true)
             if [[ ${PREVIOUS} =~ pending ]]; then
               echo "Rollback triggered"
-              helm rollback ${{ inputs.release_name }} || \
-                helm uninstall ${{ inputs.release_name }}
+              if [ -n "${{ inputs.environment }}" ]; then
+                # Safe rollback only; never uninstall persistent environments (prod/test)
+                helm rollback ${{ inputs.release_name }}
+              else
+                # Fallback to uninstall permitted for ephemeral PR deployments
+                helm rollback ${{ inputs.release_name }} || \
+                  helm uninstall ${{ inputs.release_name }}
+              fi
             fi
 
       - name: Deploy
@@ -110,6 +115,12 @@ jobs:
 
             if [ -n "${{ inputs.params }}" ]; then
               PARAMS+="${{ inputs.params }}"
+            fi
+            # Force-delete database PVCs ONLY in ephemeral Pull Request (DEV) environments.
+            # For all persistent/formal environments (TEST, PROD, dispatches), we fall back 
+            # to the safe default (keep: true in values.yaml) to prevent accidental data loss.
+            if [ -z "${{ inputs.environment }}" ] && [ "${{ github.event_name }}" = "pull_request" ]; then
+              PARAMS+=" --set database.pvc.keep=false"
             fi
             echo "PARAMS: $PARAMS"
             echo "COMMANDS: $COMMANDS"
