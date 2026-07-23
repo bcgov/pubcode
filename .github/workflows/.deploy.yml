@@ -62,7 +62,7 @@ jobs:
     timeout-minutes: ${{ inputs.timeout-minutes }}
     steps:
       - uses: actions/checkout@v7
-      - name: Stop pre-existing deployments (status = pending-upgrade)
+      - name: Stop pre-existing deployments (status = pending-*)
         uses: bcgov/action-oc-runner@111868d1fc50db0a40417ba321d865ef5c931bbd # v1.7.0
         with:
           oc_namespace: ${{ vars.oc_namespace }}
