@@ -4,6 +4,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-database
   namespace: {{ .Release.Namespace }}
+  {{- if .Values.database.pvc.keep }}
+  annotations:
+    "helm.sh/resource-policy": keep
+  {{- end }}
   labels:
     {{- include "database.labels" . | nindent 4 }}
 spec:

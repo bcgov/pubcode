@@ -116,6 +116,9 @@ jobs:
             if [ -n "${{ inputs.params }}" ]; then
               PARAMS+="${{ inputs.params }}"
             fi
+            if [ -n "${{ inputs.environment }}" ]; then
+              PARAMS+=" --set database.pvc.keep=true"
+            fi
             echo "PARAMS: $PARAMS"
             echo "COMMANDS: $COMMANDS"
             helm upgrade $PARAMS $COMMANDS pubcode.tgz 
