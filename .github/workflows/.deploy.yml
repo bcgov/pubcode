@@ -75,8 +75,14 @@ jobs:
             PREVIOUS=$(helm status ${{ inputs.release_name }} -o json | jq .info.status || true)
             if [[ ${PREVIOUS} =~ pending ]]; then
               echo "Rollback triggered"
-              helm rollback ${{ inputs.release_name }} || \
-                helm uninstall ${{ inputs.release_name }}
+              if [ -n "${{ inputs.environment }}" ]; then
+                # Safe rollback only; never uninstall persistent environments (prod/test)
+                helm rollback ${{ inputs.release_name }}
+              else
+                # Fallback to uninstall permitted for ephemeral PR deployments
+                helm rollback ${{ inputs.release_name }} || \
+                  helm uninstall ${{ inputs.release_name }}
+              fi
             fi
 
       - name: Deploy
