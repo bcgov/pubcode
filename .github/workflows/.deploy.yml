@@ -116,7 +116,10 @@ jobs:
             if [ -n "${{ inputs.params }}" ]; then
               PARAMS+="${{ inputs.params }}"
             fi
-            if [ -z "${{ inputs.environment }}" ]; then
+            # Force-delete database PVCs ONLY in ephemeral Pull Request (DEV) environments.
+            # For all persistent/formal environments (TEST, PROD, dispatches), we fall back 
+            # to the safe default (keep: true in values.yaml) to prevent accidental data loss.
+            if [ -z "${{ inputs.environment }}" ] && [ "${{ github.event_name }}" = "pull_request" ]; then
               PARAMS+=" --set database.pvc.keep=false"
             fi
             echo "PARAMS: $PARAMS"
