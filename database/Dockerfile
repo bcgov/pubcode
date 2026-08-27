@@ -1,4 +1,4 @@
-FROM ghcr.io/bcgov/nr-containers/mongo:7.0.39
+FROM ghcr.io/bcgov/nr-containers/mongo:7.0.40
 
 # Boilerplate to keep scanners happy (covered in FROM image)
 HEALTHCHECK CMD ["mongosh", "--eval", "db.adminCommand('ping')"]
