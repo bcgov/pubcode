@@ -23,9 +23,9 @@ jobs:
       pull-requests: write
     steps:
       - name: PR Greeting
-        uses: bcgov/actions/pr-description-add@4ad61a784f1c17765b03d8d6de9737c1d3f4c0f2 # v0.5.0
+        uses: bcgov/actions/pr-description-add@8400e9131db281379e19846833b87b9edc6c950d # v0.6.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           add_markdown: |
             ---
 
@@ -52,12 +52,12 @@ jobs:
         package: [api, database, frontend]
     steps:
       - uses: actions/checkout@v7
-      - uses: bcgov/actions/builder-ghcr@4ad61a784f1c17765b03d8d6de9737c1d3f4c0f2 # v0.5.0
+      - uses: bcgov/actions/builder-ghcr@8400e9131db281379e19846833b87b9edc6c950d # v0.6.0
         with:
           package: ${{ matrix.package }}
           tags: ${{ github.event.number || github.sha }}
           tag_fallback: latest
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: shrink/actions-docker-registry-tag@e6aaef25c595b6e0edd18bf4c7dbfea3abd43299 # v5
         with:
