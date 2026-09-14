@@ -76,26 +76,10 @@ jobs:
     with:
       target: ${{ github.event.number }}
 
-  comment:
-    name: Deployment Links
-    needs: [deploys]
-    runs-on: ubuntu-24.04
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Sticky PR Comment
-        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
-        with:
-          header: pr-deployment-links
-          message: |
-            ### Deployments Available
-            - [API](https://${{ github.event.repository.name }}-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca/)
-            - [Frontend](https://${{ github.event.repository.name }}-${{ github.event.number }}.apps.silver.devops.gov.bc.ca/)
-
   results:
     name: Results
     if: always()
-    needs: [builds, deploys, tests, comment]
+    needs: [builds, deploys, tests]
     runs-on: ubuntu-24.04
     timeout-minutes: 1
     steps:
