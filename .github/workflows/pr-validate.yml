@@ -1,0 +1,37 @@
+name: PR Validate
+
+on:
+  pull_request:
+    types: [edited, opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-edit-${{ github.event.number }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  validate:
+    name: Validate PR
+    if: (! github.event.pull_request.draft)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: bcgov/actions/pr-validate@ac9d89eede94f5f58d3446784c94cff634d98eac # v0.6.0
+        with:
+          add_markdown: |
+            ---
+
+            Thanks for the PR!
+
+            Deployments, as required, will be available below:
+            - [Frontend](https://${{ github.event.repository.name }}-${{ github.event.number }}.apps.silver.devops.gov.bc.ca)
+            - [API](https://${{ github.event.repository.name }}-${{ github.event.number }}-api.apps.silver.devops.gov.bc.ca)
+
+            Please create PRs in draft mode.  Mark as ready to enable:
+            - [Analysis Workflow](https://github.com/${{ github.repository }}/actions/workflows/analysis.yml)
+
+            After merge, new images are deployed in:
+            - [Merge Workflow](https://github.com/${{ github.repository }}/actions/workflows/merge.yml)
