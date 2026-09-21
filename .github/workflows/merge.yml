@@ -18,7 +18,7 @@ jobs:
       semanticVersion: ${{ steps.changelog.outputs.version }} # this is without v 1.0.0
       tag: ${{ steps.changelog.outputs.tag }} # this is with v, v1.0.0
       clean_changelog: ${{ steps.changelog.outputs.clean_changelog }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 1
     permissions:
       contents: write # write implies read; needed for git-push and checkout
@@ -37,7 +37,7 @@ jobs:
 
   retag-images:
     needs: [semantic-version]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       packages: write
     strategy:
@@ -91,7 +91,7 @@ jobs:
   github_release:
     name: Create Release
     needs: [semantic-version, deploys-prod]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:
