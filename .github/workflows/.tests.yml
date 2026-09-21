@@ -14,7 +14,7 @@ permissions: {}
 jobs:
   cypress-e2e:
     name: Cypress E2E
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     strategy:
