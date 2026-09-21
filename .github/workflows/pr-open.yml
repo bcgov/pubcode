@@ -14,7 +14,7 @@ permissions: {}
 jobs:
   builds:
     name: Builds
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       attestations: write
@@ -80,7 +80,7 @@ jobs:
     name: Results
     if: always()
     needs: [builds, deploys, tests]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 1
     steps:
       - name: Fail if any dependent job failed or was cancelled
