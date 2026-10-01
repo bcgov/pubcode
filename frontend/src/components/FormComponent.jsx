@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import Form from "@rjsf/mui";
+import Form, { Widgets } from "@rjsf/mui";
+import PropTypes from "prop-types";
 import validator from "@rjsf/validator-ajv8";
 import * as YAML from "js-yaml";
 import { env } from "../../env";
@@ -11,6 +12,48 @@ import * as _ from "lodash";
 // below props needs to be treated properly for the form to work properly as the nesting does not work if they are undefined.
 const props = ["product_information.business_capabilities_standard", "product_technology_information.ci_cd_tools", "product_technology_information.data_storage_platforms", "product_technology_information.frontend_frameworks", "product_technology_information.hosting_platforms", "product_technology_information.spatial_mapping_technologies", "product_external_dependencies.common_components", "product_external_dependencies.identity_authorization"];
 const jsonSchemaBranch = env.VITE_SCHEMA_BRANCH || "main";
+
+// ponytail: MUI Select leaves multiple menus open after a choice. Close on the menu click that selected the item.
+// Ceiling: if a later MUI stops bubbling that click, close from the item handler in a local Select instead.
+function ClosingSelectWidget(props) {
+  const [open, setOpen] = useState(false);
+  if (!props.multiple) {
+    return <Widgets.SelectWidget {...props} />;
+  }
+  const select = props.options?.mui?.rjsfSlotProps?.select;
+  const options = {
+    ...props.options,
+    mui: {
+      ...props.options?.mui,
+      rjsfSlotProps: {
+        ...props.options?.mui?.rjsfSlotProps,
+        select: {
+          ...select,
+          open,
+          onOpen: () => setOpen(true),
+          onClose: () => setOpen(false),
+          MenuProps: {
+            ...select?.MenuProps,
+            onClick: () => setOpen(false),
+          },
+        },
+      },
+    },
+  };
+  return <Widgets.SelectWidget {...props} options={options} />;
+}
+
+ClosingSelectWidget.propTypes = {
+  multiple: PropTypes.bool,
+  options: PropTypes.shape({
+    mui: PropTypes.shape({
+      rjsfSlotProps: PropTypes.shape({
+        select: PropTypes.object,
+      }),
+    }),
+  }),
+};
+
 function removeBlankFields(jsonData) {
   if (jsonData) {
     for (const replaceProp of props) {
@@ -125,6 +168,7 @@ const FormComponent = () => {
           noHtml5Validate
           schema={schema}
           uiSchema={uiSchema}
+          widgets={{ SelectWidget: ClosingSelectWidget }}
           formData={formData}
           onSubmit={onSubmit}
           validator={validator}
