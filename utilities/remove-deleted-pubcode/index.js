@@ -1,81 +1,76 @@
 import axios from "axios";
+import { pathToFileURL } from "node:url";
 
-const API_KEY = process.env.API_KEY;
-const API_URL = process.env.API_URL;
-// Set the URL for the initial HTTP GET request
-const pubcodeURL = process.env.PUBCODE_URL || "https://pubcode-api.apps.silver.devops.gov.bc.ca/api/pub-code";
-// Set the URL for the secondary API call
-
-async function doProcess() {
-  try {
-    // Perform the initial HTTP GET request
-    const pubCodeResponse = await axios.get(pubcodeURL);
-    const items = pubCodeResponse.data;
-
-    // Initialize an array to store the final results
-    const results = [];
-
-    // Iterate through items and make secondary API calls
-    for (const item of items) {
-      try {
-        // get result from GitHub API
-        const repoName = item.repo_name;
-        const defaultBranch = item.default_branch;
-        try{
-          await getYamlFromRepo(repoName, defaultBranch);
-        }catch (e){
-          if (e.response?.status === 404) {
-            results.push(repoName);
-          }
-        }
-      } catch (error) {
-        console.error(`Failed to fetch data for ${item.repo_name}:`, error);
-        process.exit(1);
+/**
+ * Returns the repo names whose bcgovpubcode.yml/.yaml is gone (404) from their default branch.
+ * Any other error keeps the entry, so a GitHub outage never hides products.
+ */
+export async function findRemovedRepos(items, getYaml) {
+  const removed = [];
+  for (const item of items) {
+    try {
+      await getYaml(item.repo_name, item.default_branch);
+    } catch (e) {
+      if (e.response?.status === 404) {
+        removed.push(item.repo_name);
       }
     }
-    await markSoftDeleted(results);
-
-  } catch (error) {
-    console.error('Failed to fetch data:', error);
   }
+  return removed;
 }
+
 async function getYamlFromRepo(repoName, branchName) {
-  let yamlResponse;
   try {
-    yamlResponse = await axios.get(`https://raw.githubusercontent.com/bcgov/${repoName}/${branchName}/bcgovpubcode.yml`);
+    return await axios.get(`https://raw.githubusercontent.com/bcgov/${repoName}/${branchName}/bcgovpubcode.yml`);
   } catch (e) {
-    if (e.response?.status === 404) {
-      yamlResponse = await axios.get(`https://raw.githubusercontent.com/bcgov/${repoName}/${branchName}/bcgovpubcode.yaml`);
+    if (e.response?.status !== 404) {
+      throw e;
     }
+    return await axios.get(`https://raw.githubusercontent.com/bcgov/${repoName}/${branchName}/bcgovpubcode.yaml`);
   }
-  return yamlResponse;
 }
 
-async function markSoftDeleted(repoNames) {
-  if (repoNames.length > 0) {
-    console.info(`Found ${repoNames.length} yaml files to mark as soft delete.`);
-    console.info(repoNames);
-    //send to backend api bulk load endpoint
-    for (const repoName of repoNames) {
-      try {
-        await axios.delete(`${API_URL}/api/pub-code/${repoName}`, {
-          headers: {
-            "X-API-KEY": API_KEY
-          }
-        });
-      } catch (e) {
-        console.error(e.response?.status);
-        console.error(e.response?.config?.url);
-      }
-    }
-  } else {
+/**
+ * Soft deletes each repo through deleteRepo; throws after trying all of them if any failed.
+ */
+export async function markSoftDeleted(repoNames, deleteRepo) {
+  if (repoNames.length === 0) {
     console.info(`No yaml files to mark as soft delete.`);
+    return;
+  }
+  console.info(`Found ${repoNames.length} yaml files to mark as soft delete.`);
+  console.info(repoNames);
+  const failed = [];
+  for (const repoName of repoNames) {
+    try {
+      await deleteRepo(repoName);
+    } catch (e) {
+      console.error(`Failed to soft delete ${repoName}: ${e.response?.status ?? e.message}`);
+      failed.push(repoName);
+    }
+  }
+  if (failed.length > 0) {
+    throw new Error(`Failed to soft delete ${failed.length} of ${repoNames.length} repos: ${failed.join(", ")}`);
   }
 }
-try{
-  await doProcess();
-}catch (e) {
-  console.error(e);
-  process.exit(1);
+
+async function main() {
+  const { API_KEY, API_URL } = process.env;
+  if (!API_KEY || !API_URL) {
+    throw new Error("API_KEY and API_URL are required");
+  }
+  const { data: items } = await axios.get(`${API_URL}/api/pub-code`);
+  const removed = await findRemovedRepos(items, getYamlFromRepo);
+  await markSoftDeleted(removed, (repoName) =>
+    axios.delete(`${API_URL}/api/pub-code/${repoName}`, { headers: { "X-API-KEY": API_KEY } })
+  );
 }
 
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  try {
+    await main();
+  } catch (e) {
+    console.error(e.message);
+    process.exit(1);
+  }
+}
