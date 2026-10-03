@@ -58,7 +58,7 @@ jobs:
 
           # Get API key
           API_KEY=$(oc get secrets/pubcode --template={{.data.API_KEY}} | base64 -d)
-          API_URL=https://$(oc get route/pubcode-api --template={{.spec.host}})
+          API_URL=https://$(oc get ingress/pubcode-api --template='{{(index .spec.rules 0).host}}')
           API_KEY="${API_KEY}" API_URL="${API_URL}" node src/main.js
 
   validate-ministry-list:
@@ -147,5 +147,5 @@ jobs:
 
           # Get API key
           API_KEY=$(oc get secrets/pubcode --template={{.data.API_KEY}} | base64 -d)
-          API_URL=https://$(oc get route/pubcode-api --template={{.spec.host}})
+          API_URL=https://$(oc get ingress/pubcode-api --template='{{(index .spec.rules 0).host}}')
           API_KEY="${API_KEY}" API_URL="${API_URL}" node index.js
