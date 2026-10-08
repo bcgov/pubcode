@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import axios from "axios";
-import core from "@actions/core";
+import * as core from "@actions/core";
 import * as cheerio from "cheerio";
 import pkg from 'lodash';
 const { isEqual } = pkg;
