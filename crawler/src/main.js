@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as dotenv from "dotenv";
-import jsYaml from "js-yaml";
+import * as jsYaml from "js-yaml";
 
 dotenv.config();
 const token = process.env.GIT_TOKEN;
