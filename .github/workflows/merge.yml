@@ -1,9 +1,8 @@
 name: Merge to Main
 
 on:
-  workflow_run:
-    workflows: [Pull Request Closed]
-    types: [completed]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -13,6 +12,20 @@ concurrency:
 permissions: {}
 
 jobs:
+  init:
+    name: Initialize
+    runs-on: ubuntu-26.04
+    timeout-minutes: 1
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      pr: ${{ steps.pr.outputs.pr }}
+    steps:
+      # PR number of the squash merge on main; its images were built and tested on that PR
+      - id: pr
+        uses: bcgov/action-get-pr@28b0adf8e4d40720d41f9c87356ce24b0a4bd6af # v0.3.1
+
   semantic-version:
     outputs:
       semanticVersion: ${{ steps.changelog.outputs.version }} # this is without v 1.0.0
@@ -36,7 +49,7 @@ jobs:
           git-push: "true"
 
   retag-images:
-    needs: [semantic-version]
+    needs: [init, semantic-version]
     runs-on: ubuntu-26.04
     permissions:
       packages: write
@@ -49,7 +62,7 @@ jobs:
         with:
           registry: ghcr.io
           repository: ${{ github.repository }}/${{ matrix.package }}
-          target: latest
+          target: ${{ needs.init.outputs.pr }}
           tags: |
             ${{ needs.semantic-version.outputs.semanticVersion }}
             ${{ needs.semantic-version.outputs.tag }}
