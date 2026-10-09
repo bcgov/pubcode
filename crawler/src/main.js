@@ -1,6 +1,7 @@
 import axios from "axios";
 import * as dotenv from "dotenv";
 import * as jsYaml from "js-yaml";
+import { pathToFileURL } from "node:url";
 
 dotenv.config();
 const token = process.env.GIT_TOKEN;
@@ -18,7 +19,7 @@ const JITTER_FACTOR = Math.random() * 0.3; // Random jitter between 0-30%
  * @param branchName
  * @returns {Promise<axios.AxiosResponse<any>>}
  */
-async function getYamlFromRepo(repoName, branchName) {
+export async function getYamlFromRepo(repoName, branchName) {
   let yamlResponse;
   try {
     yamlResponse = await axios.get(
@@ -41,7 +42,7 @@ async function getYamlFromRepo(repoName, branchName) {
  * @returns {JSON object of yaml with additional github attributes}
  */
 
-function processYamlFromHttpResponse(yamlResponse, repoWithDetails) {
+export function processYamlFromHttpResponse(yamlResponse, repoWithDetails) {
   const yaml = yamlResponse.data;
   const yamlJson = jsYaml.load(yaml);
   yamlJson.repo_name = repoWithDetails.name;
@@ -65,6 +66,45 @@ function processYamlFromHttpResponse(yamlResponse, repoWithDetails) {
 const DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
 
 /**
+ * Whether a repo was pushed to within the last day
+ * @param lastUpdated ISO timestamp of the last push
+ * @param now current time
+ * @returns {boolean}
+ */
+export function isRecentlyUpdated(lastUpdated, now = new Date()) {
+  return now.getTime() - new Date(lastUpdated).getTime() <= DAY_IN_MILLIS;
+}
+
+/**
+ * Map GraphQL repository edges to repo details, skipping archived repos and repos without a default branch
+ * @param edges
+ * @returns {*[]}
+ */
+export function reposFromEdges(edges) {
+  const repos = [];
+  for (const edge of edges) {
+    if (edge.node?.defaultBranchRef?.name && !edge.node.isArchived) {
+      repos.push({
+        name: edge.node.name,
+        defaultBranch: edge.node.defaultBranchRef.name,
+        stars: edge.node.stargazers?.totalCount,
+        lastUpdated: edge.node.pushedAt,
+        license: edge.node.licenseInfo?.name,
+        watchers: edge.node.watchers?.totalCount,
+        topics: edge.node.repositoryTopics.nodes.map(
+          (node) => node.topic.name
+        ),
+      });
+    } else {
+      console.warn(
+        `skipping ${edge.node.name} as it does not have default branch or is archived., Default branch: '${edge.node.defaultBranchRef?.name}', isArchived: '${edge.node.isArchived}'`
+      );
+    }
+  }
+  return repos;
+}
+
+/**
  * Fetches all the bcgovpubcode yaml files from the specified repos and converts them to JSON
  * @param compareLastUpdateDate
  * @returns {Promise<*[]>}
@@ -74,9 +114,7 @@ async function getAllPubCodeYamlsAsJSON(compareLastUpdateDate) {
   for (const repoWithDetails of repoWithDetailsArray) {
     //if  date comparison is enabled for this workflow and last_updated is not within last 1 day skip
     if (compareLastUpdateDate) {
-      const currentDate = new Date();
-      const lastUpdatedDate = new Date(repoWithDetails.lastUpdated);
-      if (currentDate.getTime() - lastUpdatedDate.getTime() > DAY_IN_MILLIS) {
+      if (!isRecentlyUpdated(repoWithDetails.lastUpdated)) {
         console.debug(
           `Skipping ${repoWithDetails.name} repo as last updated date is more than 1 day.`
         );
@@ -256,26 +294,9 @@ const performCrawling = async () => {
     try {
       const responseData = await getGraphQlResponseOnQuery(query);
       if (responseData.data?.organization?.repositories?.edges?.length > 0) {
-        for (const edge of responseData.data.organization.repositories.edges) {
-          if (edge.node?.defaultBranchRef?.name && !edge.node.isArchived) {
-            repoWithDetailsArray.push({
-              name: edge.node.name,
-              defaultBranch: edge.node.defaultBranchRef.name,
-              stars: edge.node.stargazers?.totalCount,
-              lastUpdated: edge.node.pushedAt,
-              license: edge.node.licenseInfo?.name,
-              watchers: edge.node.watchers?.totalCount,
-              topics: edge.node.repositoryTopics.nodes.map(
-                (node) => node.topic.name
-              ),
-            });
-          } else {
-            console.warn(
-              `skipping ${edge.node.name} as it does not have default branch or is archived., Default branch: '${edge.node.defaultBranchRef?.name}', isArchived: '${edge.node.isArchived}'`
-            );
-          }
-          cursor = edge.cursor; // keep overriding, the last cursor will be used
-        }
+        const edges = responseData.data.organization.repositories.edges;
+        repoWithDetailsArray.push(...reposFromEdges(edges));
+        cursor = edges[edges.length - 1].cursor; // the last cursor is used for the next page
         if (responseData.data.organization.repositories.edges?.length < 100) {
           moreRecords = false;
         }
@@ -291,62 +312,68 @@ const performCrawling = async () => {
   await bulkLoadPubCodes(yamlAsJsons);
 };
 
-if (!token || !API_KEY || !API_URL) {
-  console.error("Please provide GIT_TOKEN, API_KEY and API_URL in .env file");
-  process.exit(1);
-} else {
-  console.info("Starting crawling... and API_URL is ", API_URL);
-}
-if (REPO_NAMES?.length > 0) {
-  const repoNames = REPO_NAMES.split(",");
-  for (const repoName of repoNames) {
-    try {
-      const query = `query {
-                     repository(owner: "bcgov", name: "${repoName}") {
-                              name,
-                              description,
-                              defaultBranchRef{
-                                name
-                              },
-                              repositoryTopics(first:20) {
-                                nodes {
-                                  topic {
-                                    name
-                                  }
-                                }
-                              },
-                              updatedAt,
-                              pushedAt,
-                              stargazers {
-                                totalCount
-                              },
-                              watchers {
-                                totalCount
-                              },
-                              licenseInfo {
-                                name
-                              },
-                     }
-                    }`;
-      const responseData = await getGraphQlResponseOnQuery(query);
-      const repo = responseData.data?.repository;
-      repoWithDetailsArray.push({
-        name: repo?.name,
-        defaultBranch: repo?.defaultBranchRef?.name,
-        stars: repo?.stargazers?.totalCount,
-        lastUpdated: repo?.pushedAt,
-        license: repo?.licenseInfo?.name,
-        watchers: repo?.watchers?.totalCount,
-        topics: repo?.repositoryTopics?.nodes.map((node) => node.topic.name),
-      });
-    } catch (e) {
-      console.error(
-        `Error while fetching yaml file for ${repoName} repo. Error: ${e.message}`
-      );
-    }
+async function main() {
+  if (!token || !API_KEY || !API_URL) {
+    console.error("Please provide GIT_TOKEN, API_KEY and API_URL in .env file");
+    process.exit(1);
+  } else {
+    console.info("Starting crawling... and API_URL is ", API_URL);
   }
-  const yamlAsJsons = await getAllPubCodeYamlsAsJSON(false);
-  await bulkLoadPubCodes(yamlAsJsons);
-} else {
-  await performCrawling();
+  if (REPO_NAMES?.length > 0) {
+    const repoNames = REPO_NAMES.split(",");
+    for (const repoName of repoNames) {
+      try {
+        const query = `query {
+                       repository(owner: "bcgov", name: "${repoName}") {
+                                name,
+                                description,
+                                defaultBranchRef{
+                                  name
+                                },
+                                repositoryTopics(first:20) {
+                                  nodes {
+                                    topic {
+                                      name
+                                    }
+                                  }
+                                },
+                                updatedAt,
+                                pushedAt,
+                                stargazers {
+                                  totalCount
+                                },
+                                watchers {
+                                  totalCount
+                                },
+                                licenseInfo {
+                                  name
+                                },
+                       }
+                      }`;
+        const responseData = await getGraphQlResponseOnQuery(query);
+        const repo = responseData.data?.repository;
+        repoWithDetailsArray.push({
+          name: repo?.name,
+          defaultBranch: repo?.defaultBranchRef?.name,
+          stars: repo?.stargazers?.totalCount,
+          lastUpdated: repo?.pushedAt,
+          license: repo?.licenseInfo?.name,
+          watchers: repo?.watchers?.totalCount,
+          topics: repo?.repositoryTopics?.nodes.map((node) => node.topic.name),
+        });
+      } catch (e) {
+        console.error(
+          `Error while fetching yaml file for ${repoName} repo. Error: ${e.message}`
+        );
+      }
+    }
+    const yamlAsJsons = await getAllPubCodeYamlsAsJSON(false);
+    await bulkLoadPubCodes(yamlAsJsons);
+  } else {
+    await performCrawling();
+  }
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await main();
 }

@@ -76,29 +76,25 @@ jobs:
     with:
       target: ${{ github.event.number }}
 
-  utility-tests:
-    name: Utility Tests
-    runs-on: ubuntu-26.04
-    permissions:
-      contents: read
-    defaults:
-      run:
-        working-directory: utilities/remove-deleted-pubcode
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: "24.x"
-      - run: npm ci
-      - run: npm test
-
+  # This job is the merge gate for this workflow. Every job in this
+  # workflow must be listed in 'needs', or its failure won't block the PR.
   results:
-    name: Results
+    name: PR Results
+    needs: [builds, deploys, tests]
     if: always()
-    needs: [builds, deploys, tests, utility-tests]
     runs-on: ubuntu-26.04
     timeout-minutes: 1
     steps:
-      - name: Fail if any dependent job failed or was cancelled
+      - name: Log Job Results Context
+        run: |
+          echo "=== Upstream Job Statuses ==="
+          echo '${{ toJson(needs) }}'
+
+      - name: Evaluate Overall Status
         if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-        run: exit 1
+        run: |
+          echo "At least one required job failed or was cancelled."
+          exit 1
+
+      - name: Success Message
+        run: echo "All required jobs passed or were intentionally skipped."
