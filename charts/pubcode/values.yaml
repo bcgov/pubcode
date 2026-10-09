@@ -48,6 +48,13 @@ api:
           memory: 100Mi
         limits:
           memory: 4Gi
+      startupProbe:
+        httpGet:
+          path: /api/pub-code/health
+          port: 3000
+          scheme: HTTP
+        periodSeconds: 5
+        failureThreshold: 72 # 6 minutes: the API listens only after MongoDB, which may take 5, is up
       readinessProbe:
         httpGet:
           path: /api/pub-code/health
@@ -149,6 +156,13 @@ frontend:
           memory: 50Mi
         limits:
           memory: 4Gi
+      startupProbe:
+        httpGet:
+          path: /health
+          port: 3001
+          scheme: HTTP
+        periodSeconds: 5
+        failureThreshold: 30
       readinessProbe:
         httpGet:
           path: /health
@@ -267,6 +281,11 @@ database:
           memory: 150Mi
         limits:
           memory: 4Gi
+      startupProbe:
+        tcpSocket:
+          port: 27017
+        periodSeconds: 10
+        failureThreshold: 30
       readinessProbe:
         tcpSocket:
           port: 27017

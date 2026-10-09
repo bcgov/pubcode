@@ -75,6 +75,10 @@ spec:
           resources:
             {{- toYaml $c.resources | nindent 12 }}
           {{- end }}
+          {{- if $c.startupProbe }}
+          startupProbe:
+            {{- toYaml $c.startupProbe | nindent 12 }}
+          {{- end }}
           {{- if $c.readinessProbe }}
           readinessProbe:
             {{- toYaml $c.readinessProbe | nindent 12 }}
