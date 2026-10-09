@@ -12,6 +12,8 @@ const API_URL = process.env.API_URL;
 const REPO_NAMES = process.env.REPO_NAMES; //comma separated list of repo names within bcgov org
 const BASE_DELAY = process.env.BASE_DELAY ? parseInt(process.env.BASE_DELAY, 10) : 60000; // 1 minute base delay
 const MAX_DELAY =  process.env.MAX_DELAY ? parseInt(process.env.MAX_DELAY, 10) : 600000; // 10 minutes maximum delay
+// Fail a stuck request instead of waiting forever; the API route also cuts requests off at 30 seconds.
+axios.defaults.timeout = 30000;
 const JITTER_FACTOR = Math.random() * 0.3; // Random jitter between 0-30%
 /**
  * Fetches the bcgovpubcode yaml for the specified repo and branch
@@ -83,7 +85,10 @@ export function isRecentlyUpdated(lastUpdated, now = new Date()) {
 export function reposFromEdges(edges) {
   const repos = [];
   for (const edge of edges) {
-    if (edge.node?.defaultBranchRef?.name && !edge.node.isArchived) {
+    if (!edge.node) {
+      continue; // GitHub returns a null node, with an error, for a repository it cannot return
+    }
+    if (edge.node.defaultBranchRef?.name && !edge.node.isArchived) {
       repos.push({
         name: edge.node.name,
         defaultBranch: edge.node.defaultBranchRef.name,
@@ -218,7 +223,8 @@ async function getGraphQlResponseOnQuery(query) {
       });
       return response.data;
     } catch (error) {
-      if (error.response?.status === 403 && error.response?.data?.message?.includes("rate limit")) {
+      const status = error.response?.status;
+      if ((status === 403 && error.response?.data?.message?.includes("rate limit")) || status >= 500) {
         retries++;
         if (retries >= maxRetries) throw error;
         
@@ -235,7 +241,7 @@ async function getGraphQlResponseOnQuery(query) {
         // Retry 3: ~240000ms (4 min) + up to 72000ms jitter = ~312s
         // Retry 4: ~480000ms (8 min) + up to 144000ms jitter = ~624s
         // Retry 5: ~600000ms (10 min, capped, jitter ignored) = 10 min
-        console.log(`Rate limit hit. Retrying in ${Math.round(delay/1000)} seconds... (Attempt ${retries}/${maxRetries})`);
+        console.log(`GitHub GraphQL answered ${status}. Retrying in ${Math.round(delay/1000)} seconds... (Attempt ${retries}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, delay));
       } else {
         throw error;
@@ -291,23 +297,27 @@ const performCrawling = async () => {
               }
             }
             }`;
-    try {
-      const responseData = await getGraphQlResponseOnQuery(query);
-      if (responseData.data?.organization?.repositories?.edges?.length > 0) {
-        const edges = responseData.data.organization.repositories.edges;
-        repoWithDetailsArray.push(...reposFromEdges(edges));
-        cursor = edges[edges.length - 1].cursor; // the last cursor is used for the next page
-        if (responseData.data.organization.repositories.edges?.length < 100) {
-          moreRecords = false;
-        }
-      } else {
-        moreRecords = false;
-      }
-      console.info("iteration completed, cursor at ", cursor);
-    } catch (e) {
-      console.error(e);
+    const responseData = await getGraphQlResponseOnQuery(query);
+    const edges = responseData.data?.organization?.repositories?.edges;
+    if (!edges) {
+      throw new Error(`GitHub GraphQL returned no repositories: ${JSON.stringify(responseData.errors)}`);
     }
+    const unreadable = edges.filter((edge) => !edge.node).length;
+    if (unreadable > 0) {
+      console.warn(`Skipping ${unreadable} repositories GitHub returned as null: ${responseData.errors?.[0]?.message}`);
+    }
+    repoWithDetailsArray.push(...reposFromEdges(edges));
+    if (edges.length > 0) {
+      cursor = edges[edges.length - 1].cursor; // the last cursor is used for the next page
+    }
+    if (edges.length < 100) {
+      moreRecords = false;
+    }
+    console.info("iteration completed, cursor at ", cursor);
   } while (moreRecords);
+  if (repoWithDetailsArray.length === 0) {
+    throw new Error("No readable repositories found under bcgov; check that GIT_TOKEN can read them");
+  }
   const yamlAsJsons = await getAllPubCodeYamlsAsJSON(true);
   await bulkLoadPubCodes(yamlAsJsons);
 };

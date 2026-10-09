@@ -90,6 +90,23 @@ test("reposFromEdges skips archived repos and repos without a default branch", (
   ]);
 });
 
+test("reposFromEdges skips the null nodes GitHub returns for unreadable repositories", () => {
+  const readable = {
+    node: {
+      name: "readable",
+      isArchived: false,
+      defaultBranchRef: { name: "main" },
+      pushedAt: "2026-10-01T00:00:00Z",
+      repositoryTopics: { nodes: [] },
+    },
+    cursor: "c1",
+  };
+
+  const repos = reposFromEdges([{ node: null, cursor: "c0" }, readable, { node: null, cursor: "c2" }]);
+
+  assert.deepEqual(repos.map((repo) => repo.name), ["readable"]);
+});
+
 test("isRecentlyUpdated accepts pushes within the last day only", () => {
   const now = new Date("2026-10-08T12:00:00Z");
 

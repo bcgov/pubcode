@@ -19,6 +19,7 @@ jobs:
   pubcode-crawler:
     name: Crawl Git Repos for bcgovpubcode.yml
     runs-on: ubuntu-26.04
+    timeout-minutes: 45
     permissions:
       contents: read
     environment: prod
