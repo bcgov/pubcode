@@ -3,43 +3,75 @@ import axios from "axios";
 import * as core from "@actions/core";
 import * as cheerio from "cheerio";
 import pkg from 'lodash';
+import { pathToFileURL } from "node:url";
 const { isEqual } = pkg;
 
 const fs_promises = fs.promises;
-const jsonSchemaResponse = await axios({
-  method: "get",
-  url: "https://raw.githubusercontent.com/bcgov/pubcode/main/schema/bcgovpubcode.json",
-  headers: {
-    "Content-Type": "application/json",
-    "Cache-Control": "no-cache"
-  }
-});
-const jsonSchema = jsonSchemaResponse.data;
-const ministryNames = jsonSchema?.definitions?.product_information?.properties?.ministry?.items?.enum;
+const MINISTRIES_URL = "https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries";
 
-//https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries
-if (ministryNames) {
-  let htmlResponse = await axios({
-    method: "get",
-    url: "https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries"
-  });
-  const dom = cheerio.load(htmlResponse.data);
-  const items = dom(`#body li `);
-  let index = 0;
+/**
+ * Ministry names listed in the schema's ministry enum
+ * @param jsonSchema
+ * @returns {string[]|undefined}
+ */
+export function ministryNamesFromSchema(jsonSchema) {
+  return jsonSchema?.definitions?.product_information?.properties?.ministry?.items?.enum;
+}
+
+/**
+ * Ministry names listed on the BC Gov ministries page
+ * @param html page HTML
+ * @returns {string[]}
+ */
+export function ministryNamesFromHtml(html) {
+  const dom = cheerio.load(html);
   const ministryNamesFromWeb = [];
-  items.each(function(idx, el) {
-    const name = dom(el).text().replace(/\u00a0/g, " ");
-    ministryNamesFromWeb.push(name);
+  dom(`#body li `).each(function(idx, el) {
+    ministryNamesFromWeb.push(dom(el).text().replace(/\u00a0/g, " "));
   });
-  if (!isEqual(ministryNamesFromWeb, ministryNames)) {
-    console.error("Ministry name mismatch between web and schema", ministryNamesFromWeb, ministryNames);
-    jsonSchema.definitions.product_information.properties.ministry.items["enum"] = ministryNamesFromWeb;
-    core.setOutput("schemaChanged", "true");
-    await fs_promises.writeFile("../bcgovpubcode.json", JSON.stringify(jsonSchema, null, 2));
-  } else {
-    core.setOutput("schemaChanged", "false");
+  return ministryNamesFromWeb;
+}
+
+/**
+ * Replace the schema's ministry enum when it differs from the web list
+ * @param jsonSchema schema, updated in place
+ * @param ministryNamesFromWeb
+ * @returns {boolean} whether the schema changed
+ */
+export function updateMinistryNames(jsonSchema, ministryNamesFromWeb) {
+  const ministryNames = ministryNamesFromSchema(jsonSchema);
+  if (isEqual(ministryNamesFromWeb, ministryNames)) {
+    return false;
   }
-// BC Data Catalogue option, in future if there is a direct API endpoint to get list of active ministry names, that would be much better.
+  console.error("Ministry name mismatch between web and schema", ministryNamesFromWeb, ministryNames);
+  jsonSchema.definitions.product_information.properties.ministry.items["enum"] = ministryNamesFromWeb;
+  return true;
+}
+
+async function main() {
+  const jsonSchemaResponse = await axios({
+    method: "get",
+    url: "https://raw.githubusercontent.com/bcgov/pubcode/main/schema/bcgovpubcode.json",
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache"
+    }
+  });
+  const jsonSchema = jsonSchemaResponse.data;
+
+  //https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries
+  if (ministryNamesFromSchema(jsonSchema)) {
+    const htmlResponse = await axios({
+      method: "get",
+      url: MINISTRIES_URL
+    });
+    if (updateMinistryNames(jsonSchema, ministryNamesFromHtml(htmlResponse.data))) {
+      core.setOutput("schemaChanged", "true");
+      await fs_promises.writeFile("../bcgovpubcode.json", JSON.stringify(jsonSchema, null, 2));
+    } else {
+      core.setOutput("schemaChanged", "false");
+    }
+  // BC Data Catalogue option, in future if there is a direct API endpoint to get list of active ministry names, that would be much better.
   /*const guids = [
     "96860f84-dc45-4eb0-b0cb-9dedd3b58fe9",
     "3239fc90-cc88-49a8-94d9-e2d391bf0a75",
@@ -78,7 +110,12 @@ if (ministryNames) {
     }
   });*/
 
-} else {
-  console.error("Ministry names not found in pubcode JSON schema");
-  process.exit(1);
+  } else {
+    console.error("Ministry names not found in pubcode JSON schema");
+    process.exit(1);
+  }
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await main();
 }
