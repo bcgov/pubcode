@@ -104,7 +104,7 @@ jobs:
             echo "A ministry name pull request is already open"
             exit 0
           fi
-          BRANCH="chore/ministry-names-${GITHUB_RUN_ID}"
+          BRANCH="chore/ministry-names-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "${BRANCH}"
