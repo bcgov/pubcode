@@ -93,20 +93,26 @@ jobs:
         id: validate-ministry-list
         run: node ./index.js
 
-      - name: create a branch, commit and push changes
+      - name: Open a pull request with the new ministry names
         if: steps.validate-ministry-list.outputs.schemaChanged == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          ACTOR: ${{ github.actor }}
+          TITLE: "fix(schema): update ministry names from gov.bc.ca"
         run: |
           set -euo pipefail
-          git config --local user.name "$ACTOR"
-          git checkout -b chore/ministry-name-schema
+          if [ -n "$(gh pr list --state open --search "\"${TITLE}\" in:title" --json number --jq '.[].number')" ]; then
+            echo "A ministry name pull request is already open"
+            exit 0
+          fi
+          BRANCH="chore/ministry-names-${GITHUB_RUN_ID}"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${BRANCH}"
           git add ../bcgovpubcode.json
-          git commit -m "Updating the Schema as changes to ministry names were detected."
-          git push origin chore/ministry-name-schema
-          # Create a Pull Request
-          gh pr create --assignee "mishraomp" --base main --label "chore" --title "Updating the Schema as changes to ministry names were detected." --body "Updating the Schema as changes to ministry names were detected."
+          git commit -m "${TITLE}"
+          git push origin "${BRANCH}"
+          gh pr create --assignee DerekRoberts --base main --head "${BRANCH}" --label chore --title "${TITLE}" \
+            --body "The ministry names in the schema no longer match https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries."
 
   soft-delete-removed-pubcodes:
     name: Soft Delete pubcodes In the Databse which are removed from the repo.
@@ -149,3 +155,20 @@ jobs:
           API_KEY=$(oc get secrets/pubcode --template={{.data.API_KEY}} | base64 -d)
           API_URL=https://$(oc get ingress/pubcode-api --template='{{(index .spec.rules 0).host}}')
           API_KEY="${API_KEY}" API_URL="${API_URL}" node index.js
+
+  notify:
+    name: Notify on failure
+    needs: [pubcode-crawler, validate-ministry-list, soft-delete-removed-pubcodes]
+    if: failure()
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Notify on failure
+        uses: bcgov/actions/workflow-notifier@4026bfd276b8a5839029106099b13edfb594b2c3 # v0.8.0
+        with:
+          title: "fix: failure in ${{ github.workflow }}"
+          labels: bug
