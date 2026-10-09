@@ -126,10 +126,10 @@ const softDeleteRepo = async (req, res) => {
       console.info(pubcodeEntityFromDB);
       res.status(200).json({ message: "Repo Marked as soft deleted." });
     }
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    logger.error("softDeleteRepo: ", error);
+    res.status(500).json({ message: "Internal server error" });
   }
-
 };
 module.exports = {
   bulkLoad,
