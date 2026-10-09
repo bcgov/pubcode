@@ -40,26 +40,12 @@ async function insertOrUpdate(payload, notInsertedArray) {
   }
 }
 
-async function sendEmailForError(error) {
-  if (EMAIL_RECIPIENTS) {
-    try {
-      const email = emailService.generateHtmlEmail("Error During Bulk Load of Pub Codes Saving to Database Failed", EMAIL_RECIPIENTS, "Error During Bulk Load of Pub Codes Saving to Database Failed.", `<p>${error.message}</p>`);
-      await emailService.send(email);
-    } catch (e) {
-      logger.error("bulkLoad: ", e);
-    }
-  }
-}
-
 const bulkLoad = async (req, res) => {
   try {
     const notInsertedArray = [];
     const payload = req.body;
     if (payload && Array.isArray(payload) && payload.length > 0) {
-      insertOrUpdate(payload, notInsertedArray).catch(async (error) => {
-        await sendEmailForError(error);
-        logger.error("bulkLoad: ", error);
-      });
+      await insertOrUpdate(payload, notInsertedArray);
       res.status(200).json({});
     } else {
       res.status(400).json({ message: "Invalid request body" });
