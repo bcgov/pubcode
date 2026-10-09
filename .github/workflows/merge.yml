@@ -14,6 +14,8 @@ permissions: {}
 jobs:
   init:
     name: Initialize
+    # Manual runs may pick any branch; only main holds merged pull requests
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-26.04
     timeout-minutes: 1
     permissions:
@@ -27,6 +29,7 @@ jobs:
         uses: bcgov/action-get-pr@28b0adf8e4d40720d41f9c87356ce24b0a4bd6af # v0.3.1
 
   semantic-version:
+    needs: [init]
     outputs:
       semanticVersion: ${{ steps.changelog.outputs.version }} # this is without v 1.0.0
       tag: ${{ steps.changelog.outputs.tag }} # this is with v, v1.0.0
