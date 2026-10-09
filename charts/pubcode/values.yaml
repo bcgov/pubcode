@@ -54,7 +54,7 @@ api:
           port: 3000
           scheme: HTTP
         periodSeconds: 5
-        failureThreshold: 30
+        failureThreshold: 72 # 6 minutes: the API listens only after MongoDB, which may take 5, is up
       readinessProbe:
         httpGet:
           path: /api/pub-code/health
