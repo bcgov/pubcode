@@ -93,11 +93,41 @@ jobs:
       - run: npm ci
       - run: npm test
 
+  frontend-lint:
+    name: Frontend Lint
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24.x"
+      - run: npm ci
+      - run: npm run lint
+
+  # Catches broken workflows on the PR, including those that only run after merge or on a schedule
+  workflow-lint:
+    name: Workflow Lint
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker://rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+        with:
+          args: -color
+
   # This job is the merge gate for this workflow. Every job in this
   # workflow must be listed in 'needs', or its failure won't block the PR.
   results:
     name: Analysis Results
-    needs: [trivy, api-tests, unit-tests]
+    needs: [trivy, api-tests, unit-tests, frontend-lint, workflow-lint]
     if: always()
     runs-on: ubuntu-26.04
     timeout-minutes: 1
