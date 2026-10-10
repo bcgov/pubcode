@@ -11,6 +11,11 @@ services:
     image: ghcr.io/bcgov/nr-containers/mongo:7.0.43
     ports: ["27017:27017"]
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 })"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   mongo-express: # The admin UI container for mongoDB
     image: mongo-express
@@ -27,7 +32,7 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://admin:DPEPGHbjUluRjetU@database:27017/
     depends_on:
       database:
-        condition: service_started
+        condition: service_healthy
 
   api:
     image: pub-code-api:latest
@@ -41,20 +46,34 @@ services:
     ports:
       - "3005:3000"
     restart: unless-stopped
+    # The image is distroless (no curl), so check with Node instead
+    healthcheck:
+      test: ["CMD", "/nodejs/bin/node", "-e", "fetch('http://localhost:3000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     depends_on:
       database:
-        condition: service_started
+        condition: service_healthy
 
   #Run npm run build-watch in local before this.
   frontend:
     image: caddy:2.11.7-alpine
     working_dir: /app
+    environment:
+      BACKEND_URL: http://api:3000
+      LOG_LEVEL: info
     volumes:
       - ./frontend/Caddyfile:/etc/caddy/Caddyfile
       - ./frontend/dist:/app/dist
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3002:3000"
     restart: unless-stopped
