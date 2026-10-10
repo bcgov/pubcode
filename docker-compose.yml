@@ -43,6 +43,12 @@ services:
       DB_USER: admin
       DB_PWD: DPEPGHbjUluRjetU
       DB_NAME: pubcode
+      # The API won't start without CHES settings. These placeholders let it
+      # start; set real values in your shell to send email locally.
+      CHES_TOKEN_URL: ${CHES_TOKEN_URL:-http://localhost/ches/token}
+      CHES_CLIENT_ID: ${CHES_CLIENT_ID:-placeholder}
+      CHES_CLIENT_SECRET: ${CHES_CLIENT_SECRET:-placeholder}
+      CHES_API_URL: ${CHES_API_URL:-http://localhost/ches}
     ports:
       - "3005:3000"
     restart: unless-stopped
