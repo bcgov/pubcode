@@ -14,7 +14,7 @@ permissions: {}
 jobs:
   cleanup:
     name: Cleanup and Image Promotion
-    uses: bcgov/actions-openshift/.github/workflows/.pr-close.yml@ea9651011c0bf9d15aad22cf5aa2fae93c096edf # v0.3.2
+    uses: bcgov/actions-openshift/.github/workflows/.pr-close.yml@97cb3f8a5a6d134594c85224d3f593e3c0e90647 # v0.4.0
     permissions:
       packages: write
     secrets:
