@@ -19,7 +19,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: bcgov/actions/pr-validate@4026bfd276b8a5839029106099b13edfb594b2c3 # v0.8.0
+      - uses: bcgov/actions/pr-validate@79aefe3a7abb2d0d00b1b3ea4cfbf12727a10638 # v0.9.0
         with:
           add_markdown: |
             ---
