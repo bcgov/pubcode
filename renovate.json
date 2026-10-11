@@ -1,10 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Presets from https://github.com/bcgov/nr-renovate",
+  "description": "Presets from https://github.com/bcgov/renovate-config",
   "extends": [
     "github>bcgov/renovate-config#2026.9.26"
   ],
-  "minimumReleaseAge": "0 days",
   "vulnerabilityAlerts": {
     "enabled": true
   }
