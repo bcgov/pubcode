@@ -76,11 +76,50 @@ jobs:
     with:
       target: ${{ github.event.number }}
 
+  compose:
+    name: Docker Compose
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24.x"
+
+      # docker-compose.yml serves frontend/dist from the host
+      - name: Build frontend
+        working-directory: frontend
+        run: npm ci --ignore-scripts && npm run build
+
+      - name: Start stack
+        run: docker compose up --build --detach --wait --wait-timeout 300
+
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 5 --retry-all-errors --retry-delay 3 http://localhost:3005/api/pub-code/health
+          curl -fsS --retry 5 --retry-all-errors --retry-delay 3 http://localhost:3002/ | grep -q '<div id="root">'
+          curl -fsS --retry 5 --retry-all-errors --retry-delay 3 http://localhost:3002/api/pub-code/health
+          # mongo-express may answer 401 (basic auth); anything below 500 means it's up
+          code=$(curl -sS --retry 5 --retry-all-errors --retry-delay 3 -o /dev/null -w '%{http_code}' http://localhost:8001/)
+          echo "mongo-express: HTTP ${code}"
+          [ "${code}" -lt 500 ]
+
+      - name: Logs
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop stack
+        if: always()
+        run: docker compose down -v
+
   # This job is the merge gate for this workflow. Every job in this
   # workflow must be listed in 'needs', or its failure won't block the PR.
   results:
     name: PR Results
-    needs: [builds, deploys, tests]
+    needs: [builds, compose, deploys, tests]
     if: always()
     runs-on: ubuntu-26.04
     timeout-minutes: 1
