@@ -1,9 +1,8 @@
 name: Merge to Main
 
 on:
-  workflow_run:
-    workflows: [Pull Request Closed]
-    types: [completed]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -13,7 +12,26 @@ concurrency:
 permissions: {}
 
 jobs:
+  init:
+    name: Initialize
+    # Manual runs may pick any branch; only main holds merged pull requests
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 1
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      pr: ${{ steps.pr.outputs.pr }}
+    steps:
+      # PR number of the squash merge on main; its images were built and tested on that PR
+      - id: pr
+        uses: bcgov/action-get-pr@28b0adf8e4d40720d41f9c87356ce24b0a4bd6af # v0.3.1
+
+  # Next version from conventional commits; nothing is tagged or pushed until PROD succeeds
   semantic-version:
+    name: Semantic Version
+    needs: [init]
     outputs:
       semanticVersion: ${{ steps.changelog.outputs.version }} # this is without v 1.0.0
       tag: ${{ steps.changelog.outputs.tag }} # this is with v, v1.0.0
@@ -21,9 +39,12 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 1
     permissions:
-      contents: write # write implies read; needed for git-push and checkout
+      contents: read
     steps:
+      # Full history and tags at the merge commit, so the version matches github.sha
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - name: Conventional Changelog Update
         uses: TriPSs/conventional-changelog-action@469f0e5e35831fbd1962706f29f65daf0a5723f2 # v6.5.0
         id: changelog
@@ -33,29 +54,13 @@ jobs:
           skip-version-file: "true"
           skip-commit: "true"
           skip-on-empty: "false"
-          git-push: "true"
+          skip-git-pull: "true"
+          git-push: "false"
 
-  retag-images:
-    needs: [semantic-version]
-    runs-on: ubuntu-26.04
-    permissions:
-      packages: write
-    strategy:
-      matrix:
-        package: [api, database, frontend]
-    steps:
-      - name: Tag Docker Images
-        uses: shrink/actions-docker-registry-tag@e6aaef25c595b6e0edd18bf4c7dbfea3abd43299 # v5
-        with:
-          registry: ghcr.io
-          repository: ${{ github.repository }}/${{ matrix.package }}
-          target: latest
-          tags: |
-            ${{ needs.semantic-version.outputs.semanticVersion }}
-            ${{ needs.semantic-version.outputs.tag }}
+  # Deploy the merged PR's own images (ghcr.io/bcgov/pubcode/<package>:<PR number>)
   deploys:
-    name: TEST Deployments
-    needs: [retag-images, semantic-version]
+    name: TEST Deployments (${{ needs.init.outputs.pr }})
+    needs: [init]
     permissions:
       contents: read
     uses: ./.github/workflows/.deploy.yml
@@ -63,9 +68,10 @@ jobs:
     with:
       autoscaling: true
       environment: test
-      tag: ${{ needs.semantic-version.outputs.semanticVersion }} # this is without v
+      tag: ${{ needs.init.outputs.pr }}
       release_name: pubcode-test
-      params: --set-string database.containers[0].tag="${{ needs.semantic-version.outputs.tag }}" --set-string database.initContainers[0].tag="${{ needs.semantic-version.outputs.tag }}" --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.tag }}" --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.tag }}"
+      params: --set-string database.containers[0].tag="${{ needs.init.outputs.pr }}" --set-string database.initContainers[0].tag="${{ needs.init.outputs.pr }}" --set-string api.containers[0].tag="${{ needs.init.outputs.pr }}" --set-string frontend.containers[0].tag="${{ needs.init.outputs.pr }}"
+
   tests:
     name: Tests
     needs: [deploys]
@@ -76,8 +82,8 @@ jobs:
       target: test
 
   deploys-prod:
-    name: PROD Deployments
-    needs: [semantic-version, tests]
+    name: PROD Deployments (${{ needs.init.outputs.pr }})
+    needs: [init, tests]
     permissions:
       contents: read
     uses: ./.github/workflows/.deploy.yml
@@ -85,23 +91,43 @@ jobs:
     with:
       autoscaling: true
       environment: prod
-      tag: ${{ needs.semantic-version.outputs.semanticVersion }}
+      tag: ${{ needs.init.outputs.pr }}
       release_name: pubcode
-      params: --set-string database.containers[0].tag="${{ needs.semantic-version.outputs.tag }}" --set-string database.initContainers[0].tag="${{ needs.semantic-version.outputs.tag }}"  --set-string api.containers[0].tag="${{ needs.semantic-version.outputs.tag }}" --set-string frontend.containers[0].tag="${{ needs.semantic-version.outputs.tag }}"
+      params: --set-string database.containers[0].tag="${{ needs.init.outputs.pr }}" --set-string database.initContainers[0].tag="${{ needs.init.outputs.pr }}" --set-string api.containers[0].tag="${{ needs.init.outputs.pr }}" --set-string frontend.containers[0].tag="${{ needs.init.outputs.pr }}"
+
+  # Tag the images now in PROD as prod, the chart's default tag
+  promote:
+    name: Promote Images
+    needs: [init, deploys-prod]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 1
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        package: [api, database, frontend]
+    steps:
+      - uses: shrink/actions-docker-registry-tag@e6aaef25c595b6e0edd18bf4c7dbfea3abd43299 # v5
+        with:
+          registry: ghcr.io
+          repository: ${{ github.repository }}/${{ matrix.package }}
+          target: ${{ needs.init.outputs.pr }}
+          tags: prod
+
+  # Tag and release only after PROD succeeds, so a failed deploy leaves no tag behind
   github_release:
     name: Create Release
     needs: [semantic-version, deploys-prod]
     runs-on: ubuntu-26.04
+    timeout-minutes: 1
     permissions:
       contents: write
     steps:
       - name: Create Release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
         with:
           token: ${{ github.token }}
           tag_name: ${{ needs.semantic-version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           name: ${{ needs.semantic-version.outputs.tag }}
           body: ${{ needs.semantic-version.outputs.clean_changelog }}
