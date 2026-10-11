@@ -7,8 +7,8 @@ on:
       autoscaling:
         description: Autoscaling enabled or not for the deployments
         required: false
-        type: string
-        default: "true"
+        type: boolean
+        default: true
       environment:
         description: Environment name; omit for PRs
         required: false
