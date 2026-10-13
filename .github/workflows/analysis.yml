@@ -38,7 +38,16 @@ jobs:
           scanners: "vuln,secret,config"
           severity: "CRITICAL,HIGH"
 
+      - name: Upload Trivy scan results to GitHub Security tab (PR)
+        if: always() && github.event_name == 'pull_request'
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: "trivy-results.sarif"
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
+          sha: ${{ github.event.pull_request.head.sha }}
+
       - name: Upload Trivy scan results to GitHub Security tab
+        if: always() && github.event_name != 'pull_request'
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: "trivy-results.sarif"
