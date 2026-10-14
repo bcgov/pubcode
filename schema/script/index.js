@@ -8,6 +8,9 @@ const { isEqual } = pkg;
 
 const fs_promises = fs.promises;
 const MINISTRIES_URL = "https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries";
+const SCHEMA_FILE = new URL("../bcgovpubcode.json", import.meta.url);
+
+axios.defaults.timeout = 30000;
 
 /**
  * Ministry names listed in the schema's ministry enum
@@ -48,26 +51,51 @@ export function updateMinistryNames(jsonSchema, ministryNamesFromWeb) {
   return true;
 }
 
-async function main() {
-  const jsonSchemaResponse = await axios({
-    method: "get",
-    url: "https://raw.githubusercontent.com/bcgov/pubcode/main/schema/bcgovpubcode.json",
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache"
-    }
-  });
-  const jsonSchema = jsonSchemaResponse.data;
+export async function loadSchema(schemaPath = SCHEMA_FILE) {
+  const content = await fs_promises.readFile(schemaPath, "utf-8");
+  return JSON.parse(content);
+}
 
-  //https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries
+export async function saveSchema(jsonSchema, schemaPath = SCHEMA_FILE) {
+  await fs_promises.writeFile(schemaPath, JSON.stringify(jsonSchema, null, 2) + "\n");
+}
+
+/**
+ * Fetches the HTML of the BC Gov ministries page with retry and backoff
+ * @param {string} [url=MINISTRIES_URL]
+ * @param {number} [retries=3]
+ * @param {number} [delayMs=1000]
+ * @returns {Promise<string>}
+ */
+export async function getMinistriesHtml(url = MINISTRIES_URL, retries = 3, delayMs = 1000) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await axios.get(url, {
+        timeout: 30000,
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; pubcode-schema-validator/1.0)",
+          "Accept": "text/html,application/xhtml+xml"
+        }
+      });
+      return response.data;
+    } catch (error) {
+      if (attempt === retries) {
+        throw error;
+      }
+      console.warn(`Attempt ${attempt} to fetch ${url} failed: ${error.message}. Retrying in ${delayMs * attempt}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delayMs * attempt));
+    }
+  }
+}
+
+export async function main() {
+  const jsonSchema = await loadSchema();
+
   if (ministryNamesFromSchema(jsonSchema)) {
-    const htmlResponse = await axios({
-      method: "get",
-      url: MINISTRIES_URL
-    });
-    if (updateMinistryNames(jsonSchema, ministryNamesFromHtml(htmlResponse.data))) {
+    const html = await getMinistriesHtml();
+    if (updateMinistryNames(jsonSchema, ministryNamesFromHtml(html))) {
       core.setOutput("schemaChanged", "true");
-      await fs_promises.writeFile("../bcgovpubcode.json", JSON.stringify(jsonSchema, null, 2));
+      await saveSchema(jsonSchema);
     } else {
       core.setOutput("schemaChanged", "false");
     }
