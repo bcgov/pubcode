@@ -20,13 +20,18 @@ jobs:
     timeout-minutes: 1
     permissions:
       contents: read
+      packages: read
       pull-requests: read
     outputs:
       pr: ${{ steps.pr.outputs.pr }}
     steps:
+      # image-tracker reads the merge commit from the workspace
+      - uses: actions/checkout@v7
       # PR number of the squash merge on main; its images were built and tested on that PR
       - id: pr
-        uses: bcgov/action-get-pr@28b0adf8e4d40720d41f9c87356ce24b0a4bd6af # v0.3.1
+        uses: bcgov/actions/image-tracker@79aefe3a7abb2d0d00b1b3ea4cfbf12727a10638 # v0.9.0
+        with:
+          package: api frontend database
 
   # Next version from conventional commits; nothing is tagged or pushed until PROD succeeds
   semantic-version:
