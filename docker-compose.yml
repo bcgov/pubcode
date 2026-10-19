@@ -29,6 +29,7 @@ services:
       ME_CONFIG_MONGODB_AUTH_PASSWORD: default
       ME_CONFIG_MONGODB_ADMINUSERNAME: default
       ME_CONFIG_MONGODB_ADMINPASSWORD: default
+      # Compose can't percent-encode, so a MONGO_PASSWORD override must be URL-safe for this UI
       ME_CONFIG_MONGODB_URL: mongodb://admin:${MONGO_PASSWORD:-local-dev-password}@database:27017/
     depends_on:
       database:
