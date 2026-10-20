@@ -19,7 +19,7 @@ on:
         type: string
         default: ${{ github.event.number }}
       triggers:
-        description: Paths to trigger a deploy; omit=always; e.g. ('backend/' 'frontend/')
+        description: Paths to trigger a deploy; omit=always; one path per line (multiline string), e.g. backend/ and frontend/ on separate lines
         required: false
         type: string
 
