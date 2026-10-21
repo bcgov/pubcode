@@ -8,9 +8,11 @@ const DB_NAME = process.env.DB_NAME || "pubcode";
 const retry = require("async-retry");
 const database = async () => {
   await retry(async () => {
-    const connectionUri = `mongodb://${DB_USER}:${DB_PWD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+    // Credentials go in options, not the URI, so they need no escaping and aren't logged
+    const connectionUri = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`;
     logger.info(`connecting to mongodb on url: ${connectionUri}`);
     await mongoose.connect(connectionUri, {
+      auth: { username: DB_USER, password: DB_PWD },
       authSource: "admin",
       maxPoolSize: 20,
       minPoolSize: 5,

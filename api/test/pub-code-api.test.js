@@ -80,6 +80,11 @@ test("bulk-load and delete reject requests without the API key", async () => {
   assert.equal((await request("POST", "/api/pub-code/bulk-load", { body: [pubcode("a")] })).status, 401);
   assert.equal((await request("POST", "/api/pub-code/bulk-load", { body: [pubcode("a")], apiKey: "wrong" })).status, 401);
   assert.equal((await request("DELETE", "/api/pub-code/a")).status, 401);
+  // Same length as the key but different, and a longer key that starts with it
+  for (const apiKey of ["test-api-kez", "test-api-key-extra"]) {
+    assert.equal((await request("POST", "/api/pub-code/bulk-load", { body: [pubcode("a")], apiKey })).status, 401, apiKey);
+    assert.equal((await request("DELETE", "/api/pub-code/a", { apiKey })).status, 401, apiKey);
+  }
   assert.equal(await pubcodeEntity.countDocuments(), 0);
 });
 
