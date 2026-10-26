@@ -34,8 +34,6 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: "24.x"
-      - name: Install Dependencies
-        run: npm ci
 
       - uses: actions/cache@v6
         with:
@@ -56,6 +54,7 @@ jobs:
           timeout: 40m
           commands: |
             cd crawler
+            npm ci
             API_KEY=$(oc get secrets/pubcode --template='{{.data.API_KEY}}' | base64 -d)
             API_URL=https://$(oc get ingress/pubcode-api --template='{{(index .spec.rules 0).host}}')
             API_KEY="${API_KEY}" API_URL="${API_URL}" node src/main.js
@@ -130,8 +129,6 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: "24.x"
-      - name: Install Dependencies
-        run: npm ci
 
       - uses: actions/cache@v6
         with:
@@ -148,6 +145,7 @@ jobs:
           oc_token: ${{ secrets.OC_TOKEN }}
           commands: |
             cd utilities/remove-deleted-pubcode
+            npm ci
             API_KEY=$(oc get secrets/pubcode --template='{{.data.API_KEY}}' | base64 -d)
             API_URL=https://$(oc get ingress/pubcode-api --template='{{(index .spec.rules 0).host}}')
             API_KEY="${API_KEY}" API_URL="${API_URL}" node index.js
