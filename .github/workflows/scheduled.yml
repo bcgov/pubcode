@@ -169,7 +169,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Notify on failure
-        uses: bcgov/actions/workflow-notifier@122a9b1c6c082b1b1f18c300020fbdc417b6b0b2 # v0.10.0
+        uses: bcgov/actions/workflow-notifier@77e7b21eda7c99a2230a6dfb4db3b33947678307 # v0.11.0
         with:
           title: "fix: failure in ${{ github.workflow }}"
-          labels: bug

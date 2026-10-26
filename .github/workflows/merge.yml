@@ -29,9 +29,12 @@ jobs:
       - uses: actions/checkout@v7
       # PR number of the squash merge on main; its images were built and tested on that PR
       - id: pr
-        uses: bcgov/actions/image-tracker@122a9b1c6c082b1b1f18c300020fbdc417b6b0b2 # v0.10.0
+        uses: bcgov/actions/image-tracker@77e7b21eda7c99a2230a6dfb4db3b33947678307 # v0.11.0
         with:
-          package: api frontend database
+          packages: |
+            api
+            frontend
+            database
 
   # Next version from conventional commits; nothing is tagged or pushed until PROD succeeds
   semantic-version:
