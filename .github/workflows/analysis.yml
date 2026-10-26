@@ -143,6 +143,6 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 1
     steps:
-      - uses: bcgov/actions/workflow-results@77e7b21eda7c99a2230a6dfb4db3b33947678307 # v0.11.0
+      - uses: bcgov/actions/workflow-results@8843560d44aa717798dacb6831bf87161d0658ca # v0.11.0
         with:
           needs: ${{ toJson(needs) }}
