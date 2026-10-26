@@ -23,9 +23,6 @@ jobs:
     permissions:
       contents: read
     environment: prod
-    outputs:
-      blocked: ${{ steps.oc.outputs.blocked }}
-      unreachable: ${{ steps.oc.outputs.unreachable }}
     defaults:
       run:
         working-directory: crawler
@@ -48,7 +45,6 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Process script
-        id: oc
         uses: bcgov/actions-openshift/oc-runner@4dbe4f6d25d14cbdb01e525a302e61e31f96c3ed # v0.5.0
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -122,9 +118,6 @@ jobs:
     runs-on: ubuntu-26.04
     permissions:
       contents: read
-    outputs:
-      blocked: ${{ steps.oc.outputs.blocked }}
-      unreachable: ${{ steps.oc.outputs.unreachable }}
     defaults:
       run:
         working-directory: utilities/remove-deleted-pubcode
@@ -148,7 +141,6 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Process script
-        id: oc
         uses: bcgov/actions-openshift/oc-runner@4dbe4f6d25d14cbdb01e525a302e61e31f96c3ed # v0.5.0
         with:
           oc_namespace: ${{ vars.OC_NAMESPACE }}
@@ -159,26 +151,3 @@ jobs:
             API_KEY=$(oc get secrets/pubcode --template='{{.data.API_KEY}}' | base64 -d)
             API_URL=https://$(oc get ingress/pubcode-api --template='{{(index .spec.rules 0).host}}')
             API_KEY="${API_KEY}" API_URL="${API_URL}" node index.js
-
-  notify:
-    name: Notify on failure
-    needs: [pubcode-crawler, validate-ministry-list, soft-delete-removed-pubcodes]
-    if: >-
-      failure() && (
-        (needs.pubcode-crawler.result == 'failure' && needs.pubcode-crawler.outputs.blocked != 'true' && needs.pubcode-crawler.outputs.unreachable != 'true') ||
-        needs.validate-ministry-list.result == 'failure' ||
-        (needs.soft-delete-removed-pubcodes.result == 'failure' && needs.soft-delete-removed-pubcodes.outputs.blocked != 'true' && needs.soft-delete-removed-pubcodes.outputs.unreachable != 'true')
-      )
-    runs-on: ubuntu-26.04
-    permissions:
-      actions: read
-      contents: read
-      issues: write
-      pull-requests: read
-    steps:
-      - uses: actions/checkout@v7
-      - name: Notify on failure
-        uses: bcgov/actions/workflow-notifier@122a9b1c6c082b1b1f18c300020fbdc417b6b0b2 # v0.10.0
-        with:
-          title: "fix: failure in ${{ github.workflow }}"
-          labels: bug
