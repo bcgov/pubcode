@@ -149,19 +149,3 @@ jobs:
             API_KEY=$(oc get secrets/pubcode --template='{{.data.API_KEY}}' | base64 -d)
             API_URL=https://$(oc get ingress/pubcode-api --template='{{(index .spec.rules 0).host}}')
             API_KEY="${API_KEY}" API_URL="${API_URL}" node index.js
-
-  notify:
-    name: Notify on failure
-    needs: [pubcode-crawler, validate-ministry-list, soft-delete-removed-pubcodes]
-    if: failure()
-    runs-on: ubuntu-26.04
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: read
-    steps:
-      - uses: actions/checkout@v7
-      - name: Notify on failure
-        uses: bcgov/actions/workflow-notifier@091f1da89c669d36bf4899830381e5b12d2c889a # v0.11.0
-        with:
-          title: "fix: failure in ${{ github.workflow }}"
