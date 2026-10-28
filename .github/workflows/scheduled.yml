@@ -33,7 +33,7 @@ jobs:
       - name: Add Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "24.x"
+          node-version: "26.x"
 
       - uses: actions/cache@v6
         with:
@@ -75,7 +75,7 @@ jobs:
       - name: Add Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "24.x"
+          node-version: "26.x"
 
       - name: Install Dependencies
         run: npm ci
@@ -128,7 +128,7 @@ jobs:
       - name: Add Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "24.x"
+          node-version: "26.x"
 
       - uses: actions/cache@v6
         with:
