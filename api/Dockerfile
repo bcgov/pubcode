@@ -1,4 +1,4 @@
-FROM node:24 AS build
+FROM node:26 AS build
 WORKDIR /app
 COPY *.json ./
 RUN npm ci --omit=dev --ignore-scripts
