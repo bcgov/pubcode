@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Process script
-        uses: bcgov/actions-openshift/oc-runner@4dbe4f6d25d14cbdb01e525a302e61e31f96c3ed # v0.5.0
+        uses: bcgov/actions-openshift/oc-runner@46f2614322f7ba1a5ad88a7e4e1b98569c80dcf7 # v0.6.0
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_NAMES: ${{ github.event.inputs.REPO_NAMES }}
@@ -138,7 +138,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Process script
-        uses: bcgov/actions-openshift/oc-runner@4dbe4f6d25d14cbdb01e525a302e61e31f96c3ed # v0.5.0
+        uses: bcgov/actions-openshift/oc-runner@46f2614322f7ba1a5ad88a7e4e1b98569c80dcf7 # v0.6.0
         with:
           oc_namespace: ${{ vars.OC_NAMESPACE }}
           oc_server: ${{ vars.OC_SERVER }}
