@@ -65,7 +65,7 @@ services:
 
   #Run npm run build-watch in local before this.
   frontend:
-    image: caddy:2.11.7-alpine
+    image: caddy:2.11.8-alpine
     working_dir: /app
     environment:
       BACKEND_URL: http://api:3000
