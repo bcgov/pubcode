@@ -295,12 +295,9 @@ export function isTransientGitHubFailure(failure = {}) {
   if (status && status !== 200 && status < 500) {
     return false;
   }
-  // HTTP 200 (or no status) with no usable repositories connection and no errors
-  if (
-    responseData &&
-    !Array.isArray(responseData?.data?.organization?.repositories?.edges)
-  ) {
-    return true;
+  // HTTP 200, empty bodies, and other unusable repository pages with no errors
+  if (status === 200 || responseData !== undefined) {
+    return !isUsableRepositoriesConnection(responseData);
   }
   return false;
 }
@@ -466,6 +463,22 @@ export function organizationRepositoriesQuery(cursor = "") {
 }
 
 /**
+ * Whether a GraphQL body is a usable organization repositories page.
+ * Matches the checks in repositoriesConnectionFromResponse.
+ * @param responseData
+ * @returns {boolean}
+ */
+export function isUsableRepositoriesConnection(responseData) {
+  const connection = responseData?.data?.organization?.repositories;
+  const edges = connection?.edges;
+  const pageInfo = connection?.pageInfo;
+  if (!Array.isArray(edges) || typeof pageInfo?.hasNextPage !== "boolean") {
+    return false;
+  }
+  return !(pageInfo.hasNextPage && !pageInfo.endCursor);
+}
+
+/**
  * Read a repositories connection from a GraphQL response, or throw a loud error.
  * @param responseData
  * @param extras
@@ -475,10 +488,7 @@ export function repositoriesConnectionFromResponse(responseData, extras = {}) {
   const connection = responseData?.data?.organization?.repositories;
   const edges = connection?.edges;
   const pageInfo = connection?.pageInfo;
-  const usable =
-    Array.isArray(edges) && typeof pageInfo?.hasNextPage === "boolean";
-  const nextCursorMissing = usable && pageInfo.hasNextPage && !pageInfo.endCursor;
-  if (!usable || nextCursorMissing) {
+  if (!isUsableRepositoriesConnection(responseData)) {
     const error = new Error(
       `GitHub GraphQL returned no repositories: ${describeGraphQlResponse(responseData, extras)}`
     );

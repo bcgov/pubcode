@@ -409,3 +409,83 @@ test("organizationRepositoriesQuery includes pageInfo and the after cursor", () 
   assert.match(query, /endCursor/);
   assert.match(query, /after:"Y3Vyc29yOnYyOpHOLGKMpA=="/);
 });
+
+test("isTransientGitHubFailure retries HTTP 200 pages the validator also rejects", () => {
+  const edgesOnly = {
+    data: {
+      organization: {
+        repositories: {
+          edges: [{ node: { name: "readable" }, cursor: "c1" }],
+        },
+      },
+    },
+  };
+  const missingEndCursor = {
+    data: {
+      organization: {
+        repositories: {
+          pageInfo: { hasNextPage: true, endCursor: null },
+          edges: [{ node: { name: "readable" }, cursor: "c1" }],
+        },
+      },
+    },
+  };
+
+  assert.equal(isTransientGitHubFailure({ status: 200, responseData: edgesOnly }), true);
+  assert.equal(isTransientGitHubFailure({ status: 200, responseData: missingEndCursor }), true);
+  assert.equal(isTransientGitHubFailure({ status: 200, responseData: null }), true);
+  assert.equal(isTransientGitHubFailure({ status: 200, responseData: "" }), true);
+});
+
+test("fetchOrganizationRepositoriesPage retries a missing pageInfo page then returns a usable page", async () => {
+  let attempts = 0;
+  const request = async () => {
+    attempts += 1;
+    if (attempts === 1) {
+      return {
+        status: 200,
+        data: {
+          data: {
+            organization: {
+              repositories: {
+                edges: [{ node: { name: "partial" }, cursor: "c1" }],
+              },
+            },
+          },
+        },
+      };
+    }
+    return { status: 200, data: usablePage };
+  };
+
+  const page = await fetchOrganizationRepositoriesPage("", {
+    request,
+    sleep: async () => {},
+    token: "test-token",
+  });
+
+  assert.equal(attempts, 2);
+  assert.equal(page.endCursor, "cursor-2");
+  assert.equal(page.edges[0].node.name, "readable");
+});
+
+test("fetchOrganizationRepositoriesPage retries an empty HTTP 200 body then returns a usable page", async () => {
+  let attempts = 0;
+  const request = async () => {
+    attempts += 1;
+    if (attempts === 1) {
+      return { status: 200, data: null };
+    }
+    return { status: 200, data: usablePage };
+  };
+
+  const page = await fetchOrganizationRepositoriesPage("", {
+    request,
+    sleep: async () => {},
+    token: "test-token",
+  });
+
+  assert.equal(attempts, 2);
+  assert.equal(page.hasNextPage, true);
+  assert.equal(page.edges[0].node.name, "readable");
+});
