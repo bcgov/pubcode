@@ -181,90 +181,256 @@ async function bulkLoadPubCodes(yamlArrayAsJson) {
 }
 
 /**
- * execute graphql query and return the response.
- * @param query
- * @returns {Promise<*|{}|number[]>}
+ * Compact description of a GraphQL response for error messages.
+ * Never stringifies only `errors`, which may be missing.
+ * @param responseData
+ * @param extras extra fields such as HTTP status or error code
+ * @returns {string}
  */
+export function describeGraphQlResponse(responseData, extras = {}) {
+  const organization = responseData?.data === undefined
+    ? undefined
+    : responseData?.data?.organization;
+  const repositories = organization?.repositories;
+  let dataSummary;
+  if (responseData?.data === undefined) {
+    dataSummary = "missing";
+  } else if (responseData.data === null) {
+    dataSummary = null;
+  } else if (organization === undefined) {
+    dataSummary = { organization: "missing" };
+  } else if (organization === null) {
+    dataSummary = { organization: null };
+  } else if (repositories === undefined) {
+    dataSummary = { organization: { repositories: "missing" } };
+  } else if (repositories === null) {
+    dataSummary = { organization: { repositories: null } };
+  } else {
+    dataSummary = {
+      organization: {
+        repositories: {
+          edges: Array.isArray(repositories.edges)
+            ? `${repositories.edges.length} edges`
+            : repositories.edges ?? "missing",
+          pageInfo: repositories.pageInfo ?? "missing",
+        },
+      },
+    };
+  }
+  return JSON.stringify({
+    status: extras.status ?? null,
+    code: extras.code ?? null,
+    message: responseData?.message ?? extras.message ?? null,
+    errors: responseData?.errors ?? null,
+    data: dataSummary,
+  });
+}
+
+const TRANSIENT_CODES = new Set([
+  "ECONNABORTED",
+  "ETIMEDOUT",
+  "ECONNRESET",
+  "EPIPE",
+  "EAI_AGAIN",
+  "ENETUNREACH",
+  "ECONNREFUSED",
+]);
+const RATE_LIMIT_RE = /rate limit|secondary rate/i;
+const TRANSIENT_GRAPHQL_RE =
+  /RATE_LIMIT|TIMEOUT|SERVICE_UNAVAILABLE|502|503|504|something went wrong while executing your query|timed? out/i;
+const PERMANENT_GRAPHQL_TYPES = new Set([
+  "FORBIDDEN",
+  "INSUFFICIENT_SCOPES",
+  "UNAUTHORIZED",
+  "NOT_FOUND",
+]);
+const PERMANENT_GRAPHQL_RE =
+  /resource not accessible|insufficient.?scope|bad credentials|requires authentication|not found/i;
+
 /**
- * Sends a GraphQL query to the GitHub API and handles rate limiting with exponential backoff.
- * 
- * @async
- * @function getGraphQlResponseOnQuery
- * @param {string} query - The GraphQL query to send to the GitHub API
- * @returns {Promise<Object>} The response data from the GraphQL API
- * @throws {Error} Throws an error if all retry attempts fail or if a non-rate-limit error occurs
- * 
- * @description
- * This function sends a GraphQL query to GitHub's API and implements:
- * - Authentication using a token
- * - Automatic retry for rate limit errors (up to 5 attempts)
- * - Exponential backoff with jitter to respect rate limits
- * - Detailed logging of retry attempts
- * https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#about-secondary-rate-limits
- * Retry delays increase exponentially, with random jitter added:
+ * Whether a GitHub HTTP or GraphQL failure is a rate limit.
+ * @param failure
+ * @returns {boolean}
  */
-async function getGraphQlResponseOnQuery(query) {
-  const maxRetries = 5;
+export function isRateLimitFailure(failure = {}) {
+  if (failure.status === 429) {
+    return true;
+  }
+  const text = `${failure.message ?? ""} ${failure.responseData?.message ?? ""} ${JSON.stringify(failure.responseData?.errors ?? [])}`;
+  return RATE_LIMIT_RE.test(text);
+}
+
+/**
+ * Whether a GitHub HTTP or GraphQL failure should be retried.
+ * Unusable 200 pages with no errors are treated as transient.
+ * Permanent auth, scope, and not-found failures are not retried.
+ * @param failure
+ * @returns {boolean}
+ */
+export function isTransientGitHubFailure(failure = {}) {
+  const { status, code, message = "", responseData } = failure;
+  if (TRANSIENT_CODES.has(code)) {
+    return true;
+  }
+  if (status === 429 || status >= 500) {
+    return true;
+  }
+  if (isRateLimitFailure(failure)) {
+    return true;
+  }
+  const errors = responseData?.errors;
+  if (Array.isArray(errors) && errors.length > 0) {
+    const allPermanent = errors.every(
+      (err) =>
+        PERMANENT_GRAPHQL_TYPES.has(err.type) ||
+        PERMANENT_GRAPHQL_RE.test(err.message ?? "")
+    );
+    if (allPermanent) {
+      return false;
+    }
+    return errors.some((err) =>
+      TRANSIENT_GRAPHQL_RE.test(`${err.type ?? ""} ${err.message ?? ""}`)
+    );
+  }
+  if (status && status !== 200 && status < 500) {
+    return false;
+  }
+  // HTTP 200 (or no status) with no usable repositories connection and no errors
+  if (
+    responseData &&
+    !Array.isArray(responseData?.data?.organization?.repositories?.edges)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Backoff delay for a retry attempt. Rate limits keep the existing long backoff.
+ * Other transients use a short backoff starting at one second.
+ * @param retries 1-based attempt number
+ * @param failure
+ * @returns {number}
+ */
+export function retryDelayMs(retries, failure = {}) {
+  if (isRateLimitFailure(failure)) {
+    const exponentialPart = BASE_DELAY * (2 ** retries);
+    const jitterAmount = exponentialPart * Math.random() * 0.3;
+    return Math.min(exponentialPart + jitterAmount, MAX_DELAY);
+  }
+  const exponentialPart = 1000 * (2 ** (retries - 1));
+  const jitterAmount = exponentialPart * Math.random() * 0.3;
+  return Math.min(exponentialPart + jitterAmount, 30000);
+}
+
+async function defaultSleep(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function failureFromAxiosError(error) {
+  return {
+    status: error.response?.status,
+    code: error.code,
+    message: error.message,
+    responseData: error.response?.data,
+  };
+}
+
+/**
+ * Retry a GitHub operation on transient failures, then throw the last error.
+ * @param operation
+ * @param options
+ * @returns {Promise<*>}
+ */
+export async function withGitHubRetries(
+  operation,
+  { sleep = defaultSleep, maxRetries = 5 } = {}
+) {
   let retries = 0;
-  
-  while (retries < maxRetries) {
+  while (true) {
     try {
-      const response = await axios({
-        method: "post",
-        url: "https://api.github.com/graphql",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-        },
-        data: {
-          query,
-        },
-      });
-      return response.data;
+      return await operation();
     } catch (error) {
-      const status = error.response?.status;
-      if ((status === 403 && error.response?.data?.message?.includes("rate limit")) || status >= 500) {
-        retries++;
-        if (retries >= maxRetries) throw error;
-        
-
-
-        // Calculate delay with exponential backoff and jitter
-        const exponentialPart = BASE_DELAY * (2 ** retries);
-        const jitterFactor = Math.random() * 0.3; // Random jitter between 0-30%
-        const jitterAmount = exponentialPart * jitterFactor;
-        const delay = Math.min(exponentialPart + jitterAmount, MAX_DELAY);
-        // Example delay values (in milliseconds) per retry:
-        // Retry 1: ~60000ms (1 min) + up to 18000ms jitter = ~78s
-        // Retry 2: ~120000ms (2 min) + up to 36000ms jitter = ~156s
-        // Retry 3: ~240000ms (4 min) + up to 72000ms jitter = ~312s
-        // Retry 4: ~480000ms (8 min) + up to 144000ms jitter = ~624s
-        // Retry 5: ~600000ms (10 min, capped, jitter ignored) = 10 min
-        console.log(`GitHub GraphQL answered ${status}. Retrying in ${Math.round(delay/1000)} seconds... (Attempt ${retries}/${maxRetries})`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      } else {
+      const failure = error.githubFailure ?? failureFromAxiosError(error);
+      retries++;
+      if (retries >= maxRetries || !isTransientGitHubFailure(failure)) {
         throw error;
       }
+      const delay = retryDelayMs(retries, failure);
+      const unusablePage =
+        failure.status === 200 ||
+        (!failure.status && failure.responseData && !failure.code);
+      const label = unusablePage
+        ? "an unusable page"
+        : (failure.status ?? failure.code ?? "an unusable page");
+      console.log(
+        `GitHub GraphQL answered ${label}. Retrying in ${Math.round(delay / 1000)} seconds... (Attempt ${retries}/${maxRetries})`
+      );
+      await sleep(delay);
     }
   }
 }
 
 /**
- *  start crawling.
- * @returns {Promise<void>}
+ * Send one GraphQL query to the GitHub API.
+ * @param query
+ * @param options
+ * @returns {Promise<{data: *, status: number}>}
  */
-const performCrawling = async () => {
-  let moreRecords = true;
-  let cursor = "";
-  do {
-    let after = "";
-    if (cursor) {
-      after = `,after:"${cursor}"`;
-    }
-    const query = `query {
+export async function requestGraphQl(
+  query,
+  { request = axios, token: authToken = token } = {}
+) {
+  const response = await request({
+    method: "post",
+    url: "https://api.github.com/graphql",
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    },
+    data: {
+      query,
+    },
+  });
+  return { data: response.data, status: response.status };
+}
+
+/**
+ * Sends a GraphQL query to the GitHub API and retries transient failures.
+ *
+ * @async
+ * @function getGraphQlResponseOnQuery
+ * @param {string} query - The GraphQL query to send to the GitHub API
+ * @param {object} [options]
+ * @returns {Promise<Object>} The response data from the GraphQL API
+ * @throws {Error} Throws an error if all retry attempts fail or if a non-transient error occurs
+ *
+ * Retries HTTP 5xx, 429, rate limits, and timeouts (up to 5 attempts) with backoff.
+ * https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#about-secondary-rate-limits
+ */
+export async function getGraphQlResponseOnQuery(query, options = {}) {
+  const result = await withGitHubRetries(
+    () => requestGraphQl(query, options),
+    options
+  );
+  return result.data;
+}
+
+/**
+ * Build the organization repositories GraphQL query for one page.
+ * @param cursor
+ * @returns {string}
+ */
+export function organizationRepositoriesQuery(cursor = "") {
+  const after = cursor ? `,after:"${cursor}"` : "";
+  return `query {
             organization(login: "bcgov") {
               repositories(first:100${after}){
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
               edges{
                 node{
                 url,
@@ -297,22 +463,74 @@ const performCrawling = async () => {
               }
             }
             }`;
-    const responseData = await getGraphQlResponseOnQuery(query);
-    const edges = responseData.data?.organization?.repositories?.edges;
-    if (!edges) {
-      throw new Error(`GitHub GraphQL returned no repositories: ${JSON.stringify(responseData.errors)}`);
-    }
+}
+
+/**
+ * Read a repositories connection from a GraphQL response, or throw a loud error.
+ * @param responseData
+ * @param extras
+ * @returns {{edges: Array, hasNextPage: boolean, endCursor: string, errors: *}}
+ */
+export function repositoriesConnectionFromResponse(responseData, extras = {}) {
+  const connection = responseData?.data?.organization?.repositories;
+  const edges = connection?.edges;
+  const pageInfo = connection?.pageInfo;
+  const usable =
+    Array.isArray(edges) && typeof pageInfo?.hasNextPage === "boolean";
+  const nextCursorMissing = usable && pageInfo.hasNextPage && !pageInfo.endCursor;
+  if (!usable || nextCursorMissing) {
+    const error = new Error(
+      `GitHub GraphQL returned no repositories: ${describeGraphQlResponse(responseData, extras)}`
+    );
+    error.githubFailure = {
+      status: extras.status,
+      code: extras.code,
+      message: error.message,
+      responseData,
+    };
+    throw error;
+  }
+  return {
+    edges,
+    hasNextPage: pageInfo.hasNextPage,
+    endCursor: pageInfo.endCursor ?? "",
+    errors: responseData.errors,
+  };
+}
+
+/**
+ * Fetch one page of bcgov repositories, retrying transient and unusable pages.
+ * @param cursor
+ * @param options
+ * @returns {Promise<{edges: Array, hasNextPage: boolean, endCursor: string, errors: *}>}
+ */
+export async function fetchOrganizationRepositoriesPage(cursor = "", options = {}) {
+  const query = organizationRepositoriesQuery(cursor);
+  return withGitHubRetries(async () => {
+    const { data, status } = await requestGraphQl(query, options);
+    return repositoriesConnectionFromResponse(data, { status });
+  }, options);
+}
+
+/**
+ *  start crawling.
+ * @returns {Promise<void>}
+ */
+const performCrawling = async () => {
+  let moreRecords = true;
+  let cursor = "";
+  do {
+    const { edges, hasNextPage, endCursor, errors } =
+      await fetchOrganizationRepositoriesPage(cursor);
     const unreadable = edges.filter((edge) => !edge.node).length;
     if (unreadable > 0) {
-      console.warn(`Skipping ${unreadable} repositories GitHub returned as null: ${responseData.errors?.[0]?.message}`);
+      console.warn(`Skipping ${unreadable} repositories GitHub returned as null: ${errors?.[0]?.message}`);
     }
     repoWithDetailsArray.push(...reposFromEdges(edges));
-    if (edges.length > 0) {
-      cursor = edges[edges.length - 1].cursor; // the last cursor is used for the next page
+    if (endCursor) {
+      cursor = endCursor;
     }
-    if (edges.length < 100) {
-      moreRecords = false;
-    }
+    moreRecords = hasNextPage;
     console.info("iteration completed, cursor at ", cursor);
   } while (moreRecords);
   if (repoWithDetailsArray.length === 0) {

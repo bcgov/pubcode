@@ -6,6 +6,13 @@ import {
   isRecentlyUpdated,
   processYamlFromHttpResponse,
   reposFromEdges,
+  describeGraphQlResponse,
+  isRateLimitFailure,
+  isTransientGitHubFailure,
+  repositoriesConnectionFromResponse,
+  getGraphQlResponseOnQuery,
+  fetchOrganizationRepositoriesPage,
+  organizationRepositoriesQuery,
 } from "../src/main.js";
 
 const repoWithDetails = {
@@ -134,4 +141,271 @@ test("getYamlFromRepo falls back to bcgovpubcode.yaml when the .yml file is miss
     "https://raw.githubusercontent.com/bcgov/nr-example/main/bcgovpubcode.yml",
     "https://raw.githubusercontent.com/bcgov/nr-example/main/bcgovpubcode.yaml",
   ]);
+});
+
+
+const usablePage = {
+  data: {
+    organization: {
+      repositories: {
+        pageInfo: { hasNextPage: true, endCursor: "cursor-2" },
+        edges: [
+          { node: { name: "readable", isArchived: false, defaultBranchRef: { name: "main" } }, cursor: "cursor-2" },
+        ],
+      },
+    },
+  },
+};
+
+test("describeGraphQlResponse includes GraphQL errors when they are present", () => {
+  const description = describeGraphQlResponse(
+    {
+      data: { organization: { repositories: null } },
+      errors: [{ type: "TIMEOUT", message: "Something went wrong while executing your query." }],
+    },
+    { status: 200 }
+  );
+
+  assert.match(description, /TIMEOUT/);
+  assert.match(description, /Something went wrong while executing your query/);
+  assert.match(description, /"status":200/);
+  assert.match(description, /"repositories":null/);
+});
+
+test("describeGraphQlResponse does not report errors as undefined when they are missing", () => {
+  const description = describeGraphQlResponse(
+    { data: { organization: { repositories: {} } } },
+    { status: 200 }
+  );
+
+  assert.equal(description.includes("undefined"), false);
+  assert.match(description, /"errors":null/);
+  assert.match(description, /"edges":"missing"/);
+  assert.match(description, /"pageInfo":"missing"/);
+});
+
+test("isTransientGitHubFailure retries 5xx, 429, rate limits, timeouts, and empty pages", () => {
+  assert.equal(isTransientGitHubFailure({ status: 502 }), true);
+  assert.equal(isTransientGitHubFailure({ status: 429 }), true);
+  assert.equal(
+    isTransientGitHubFailure({
+      status: 403,
+      message: "API rate limit exceeded",
+      responseData: { message: "API rate limit exceeded" },
+    }),
+    true
+  );
+  assert.equal(isTransientGitHubFailure({ code: "ECONNABORTED", message: "timeout of 30000ms exceeded" }), true);
+  assert.equal(
+    isTransientGitHubFailure({
+      status: 200,
+      responseData: {
+        errors: [{ type: "TIMEOUT", message: "Something went wrong while executing your query." }],
+      },
+    }),
+    true
+  );
+  assert.equal(
+    isTransientGitHubFailure({
+      status: 200,
+      responseData: { data: { organization: { repositories: {} } } },
+    }),
+    true
+  );
+  assert.equal(isRateLimitFailure({ status: 429 }), true);
+});
+
+test("isTransientGitHubFailure does not retry permanent auth or permission failures", () => {
+  assert.equal(isTransientGitHubFailure({ status: 401, responseData: { message: "Requires authentication" } }), false);
+  assert.equal(isTransientGitHubFailure({ status: 403, responseData: { message: "Resource not accessible by integration" } }), false);
+  assert.equal(
+    isTransientGitHubFailure({
+      status: 200,
+      responseData: {
+        data: { organization: { repositories: null } },
+        errors: [{ type: "FORBIDDEN", message: "Resource not accessible by integration" }],
+      },
+    }),
+    false
+  );
+});
+
+test("repositoriesConnectionFromResponse returns edges and pageInfo for a usable page", () => {
+  const page = repositoriesConnectionFromResponse(usablePage, { status: 200 });
+
+  assert.equal(page.hasNextPage, true);
+  assert.equal(page.endCursor, "cursor-2");
+  assert.equal(page.edges.length, 1);
+  assert.equal(page.edges[0].node.name, "readable");
+});
+
+test("repositoriesConnectionFromResponse fails loudly when edges and errors are missing", () => {
+  const responseData = { data: { organization: { repositories: {} } } };
+
+  try {
+    repositoriesConnectionFromResponse(responseData, { status: 200 });
+    assert.fail("expected an error");
+  } catch (error) {
+    assert.match(error.message, /GitHub GraphQL returned no repositories:/);
+    assert.equal(error.message.includes("undefined"), false);
+    assert.match(error.message, /"errors":null/);
+    assert.match(error.message, /"edges":"missing"/);
+    assert.match(error.message, /"status":200/);
+    assert.equal(error.githubFailure.responseData, responseData);
+  }
+});
+
+test("repositoriesConnectionFromResponse includes GraphQL errors in the thrown message", () => {
+  const responseData = {
+    data: { organization: { repositories: null } },
+    errors: [{ type: "TIMEOUT", message: "Something went wrong while executing your query." }],
+  };
+
+  try {
+    repositoriesConnectionFromResponse(responseData, { status: 200 });
+    assert.fail("expected an error");
+  } catch (error) {
+    assert.match(error.message, /TIMEOUT/);
+    assert.match(error.message, /Something went wrong while executing your query/);
+  }
+});
+
+test("getGraphQlResponseOnQuery retries HTTP 502 then returns the successful body", async (t) => {
+  const sleeps = [];
+  let attempts = 0;
+  const request = async () => {
+    attempts += 1;
+    if (attempts === 1) {
+      const error = new Error("Bad gateway");
+      error.response = { status: 502, data: { message: "Bad gateway" } };
+      throw error;
+    }
+    return { status: 200, data: { data: { ok: true } } };
+  };
+
+  const data = await getGraphQlResponseOnQuery("query { ok }", {
+    request,
+    sleep: async (ms) => {
+      sleeps.push(ms);
+    },
+    token: "test-token",
+  });
+
+  assert.deepEqual(data, { data: { ok: true } });
+  assert.equal(attempts, 2);
+  assert.equal(sleeps.length, 1);
+  assert.ok(sleeps[0] >= 1000);
+  assert.ok(sleeps[0] < 30000);
+});
+
+test("getGraphQlResponseOnQuery retries timeouts and HTTP 429", async () => {
+  const seen = [];
+  let attempts = 0;
+  const request = async () => {
+    attempts += 1;
+    if (attempts === 1) {
+      const error = new Error("timeout of 30000ms exceeded");
+      error.code = "ECONNABORTED";
+      throw error;
+    }
+    if (attempts === 2) {
+      const error = new Error("Too Many Requests");
+      error.response = { status: 429, data: { message: "Too Many Requests" } };
+      throw error;
+    }
+    return { status: 200, data: { data: { ok: true } } };
+  };
+
+  const data = await getGraphQlResponseOnQuery("query { ok }", {
+    request,
+    sleep: async (ms) => {
+      seen.push(ms);
+    },
+    token: "test-token",
+  });
+
+  assert.deepEqual(data, { data: { ok: true } });
+  assert.equal(attempts, 3);
+  assert.equal(seen.length, 2);
+});
+
+test("getGraphQlResponseOnQuery does not retry HTTP 401", async () => {
+  let attempts = 0;
+  const request = async () => {
+    attempts += 1;
+    const error = new Error("Unauthorized");
+    error.response = { status: 401, data: { message: "Requires authentication" } };
+    throw error;
+  };
+
+  await assert.rejects(
+    () =>
+      getGraphQlResponseOnQuery("query { ok }", {
+        request,
+        sleep: async () => {
+          throw new Error("should not sleep");
+        },
+        token: "test-token",
+      }),
+    /Unauthorized/
+  );
+  assert.equal(attempts, 1);
+});
+
+test("fetchOrganizationRepositoriesPage retries an empty 200 page then returns a usable page", async () => {
+  let attempts = 0;
+  const request = async ({ data }) => {
+    attempts += 1;
+    assert.match(data.query, /pageInfo/);
+    assert.match(data.query, /after:"cursor-18"/);
+    if (attempts === 1) {
+      return { status: 200, data: { data: { organization: { repositories: {} } } } };
+    }
+    return { status: 200, data: usablePage };
+  };
+
+  const page = await fetchOrganizationRepositoriesPage("cursor-18", {
+    request,
+    sleep: async () => {},
+    token: "test-token",
+  });
+
+  assert.equal(attempts, 2);
+  assert.equal(page.hasNextPage, true);
+  assert.equal(page.endCursor, "cursor-2");
+  assert.equal(page.edges[0].node.name, "readable");
+});
+
+test("fetchOrganizationRepositoriesPage exhausts retries and throws the response summary", async () => {
+  let attempts = 0;
+  const request = async () => {
+    attempts += 1;
+    return { status: 200, data: { data: { organization: { repositories: {} } } } };
+  };
+
+  await assert.rejects(
+    () =>
+      fetchOrganizationRepositoriesPage("", {
+        request,
+        sleep: async () => {},
+        token: "test-token",
+        maxRetries: 3,
+      }),
+    (error) => {
+      assert.match(error.message, /GitHub GraphQL returned no repositories:/);
+      assert.equal(error.message.includes("undefined"), false);
+      assert.match(error.message, /"errors":null/);
+      assert.match(error.message, /"edges":"missing"/);
+      return true;
+    }
+  );
+  assert.equal(attempts, 3);
+});
+
+test("organizationRepositoriesQuery includes pageInfo and the after cursor", () => {
+  const query = organizationRepositoriesQuery("Y3Vyc29yOnYyOpHOLGKMpA==");
+  assert.match(query, /pageInfo/);
+  assert.match(query, /hasNextPage/);
+  assert.match(query, /endCursor/);
+  assert.match(query, /after:"Y3Vyc29yOnYyOpHOLGKMpA=="/);
 });
