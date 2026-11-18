@@ -63,7 +63,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Stop pre-existing deployments (status = pending-*)
-        uses: bcgov/actions-openshift/oc-runner@a7a039ba45f9635c0bdbcc6b4cdbd2555811e100 # v0.8.0
+        uses: bcgov/actions-openshift/oc-runner@510a8105fdffbb718094e8a093e638132e300975 # v0.10.0
         with:
           oc_namespace: ${{ vars.oc_namespace }}
           oc_token: ${{ secrets.oc_token }}
@@ -86,7 +86,7 @@ jobs:
             fi
 
       - name: Deploy
-        uses: bcgov/actions-openshift/oc-runner@a7a039ba45f9635c0bdbcc6b4cdbd2555811e100 # v0.8.0
+        uses: bcgov/actions-openshift/oc-runner@510a8105fdffbb718094e8a093e638132e300975 # v0.10.0
         with:
           oc_namespace: ${{ vars.oc_namespace }}
           oc_token: ${{ secrets.oc_token }}
