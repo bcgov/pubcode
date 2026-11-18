@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v7
       # PR number of the squash merge on main; its images were built and tested on that PR
       - id: pr
-        uses: bcgov/actions/image-tracker@a32f1904a14c4bda07b998aa0e19cd321ae82dd4 # v0.13.0
+        uses: bcgov/actions/image-tracker@6c8ac0469fcf0d826533bc526c90119b8f149884 # v0.13.0
         with:
           packages: |
             api
