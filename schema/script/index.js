@@ -7,10 +7,27 @@ import { pathToFileURL } from "node:url";
 const { isEqual } = pkg;
 
 const fs_promises = fs.promises;
-const MINISTRIES_URL = "https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries";
+export const MINISTRIES_URL = "https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries";
+export const CABINET_URL = "https://www2.gov.bc.ca/gov/content/governments/organizational-structure/cabinet/cabinet-ministers";
 const SCHEMA_FILE = new URL("../bcgovpubcode.json", import.meta.url);
+// Official ministry pages live under this path with a slug; leftover CMS links do not.
+const MINISTRY_PAGE_HREF = /\/ministries-organizations\/ministries\/[^/?#]+\/?(?:[?#].*)?$/;
 
 axios.defaults.timeout = 30000;
+
+/**
+ * Normalize typographic quotes and spacing in scraped ministry names
+ * @param {string} text
+ * @returns {string}
+ */
+export function normalizeTypography(text) {
+  return String(text)
+    .replace(/\u00a0/g, " ")
+    .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'")
+    .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 /**
  * Ministry names listed in the schema's ministry enum
@@ -22,17 +39,117 @@ export function ministryNamesFromSchema(jsonSchema) {
 }
 
 /**
- * Ministry names listed on the BC Gov ministries page
- * @param html page HTML
+ * Current ministry names listed on the BC Gov ministries page.
+ * Only links to an official ministry page under ministries-organizations/ministries/<slug>
+ * are included, so leftover or stale list items (for example a /gov/content?id=… link) are dropped.
+ * @param {string} html page HTML
  * @returns {string[]}
  */
 export function ministryNamesFromHtml(html) {
   const dom = cheerio.load(html);
   const ministryNamesFromWeb = [];
-  dom(`#body li `).each(function(idx, el) {
-    ministryNamesFromWeb.push(dom(el).text().replace(/\u00a0/g, " "));
+  dom("#body a").each(function(idx, el) {
+    const href = dom(el).attr("href") || "";
+    if (!MINISTRY_PAGE_HREF.test(href)) {
+      return;
+    }
+    const name = normalizeTypography(dom(el).text());
+    if (name) {
+      ministryNamesFromWeb.push(name);
+    }
   });
   return ministryNamesFromWeb;
+}
+
+/**
+ * Portfolio title from the cabinet ministers page, or undefined when it is not a ministry
+ * (Premier, minister of state, or parliamentary secretary).
+ * "and Deputy Premier" is a role suffix, not part of the ministry name.
+ * @param {string} title
+ * @returns {string|undefined}
+ */
+export function ministryNameFromCabinetTitle(title) {
+  const normalized = normalizeTypography(title);
+  if (/^The Premier$/i.test(normalized)) {
+    return undefined;
+  }
+  if (/^Minister of State\b/i.test(normalized)) {
+    return undefined;
+  }
+  if (/^Parliamentary Secretary\b/i.test(normalized)) {
+    return undefined;
+  }
+  return normalized.replace(/^Minister of /, "").replace(/ and Deputy Premier$/, "");
+}
+
+/**
+ * Ministry names listed on the BC Gov cabinet ministers page
+ * @param {string} html page HTML
+ * @returns {string[]}
+ */
+export function ministryNamesFromCabinetHtml(html) {
+  const dom = cheerio.load(html);
+  const names = [];
+  dom("#body h4").each(function(idx, el) {
+    const name = ministryNameFromCabinetTitle(dom(el).text());
+    if (name) {
+      names.push(name);
+    }
+  });
+  return names;
+}
+
+function uniqueNames(names) {
+  const seen = new Set();
+  const duplicates = [];
+  for (const name of names) {
+    if (seen.has(name)) {
+      duplicates.push(name);
+    }
+    seen.add(name);
+  }
+  return { unique: [...seen], duplicates };
+}
+
+/**
+ * Fail when either list is empty, has duplicates, or the two gov.bc.ca sources disagree.
+ * Does not merge or otherwise fall back to one list.
+ * @param {string[]} ministryPageNames
+ * @param {string[]} cabinetNames
+ */
+export function assertConsistentMinistryLists(ministryPageNames, cabinetNames) {
+  const problems = [];
+
+  const inspect = (label, names) => {
+    if (!Array.isArray(names) || names.length === 0) {
+      problems.push(`${label} list is empty`);
+      return new Set();
+    }
+    const { unique, duplicates } = uniqueNames(names);
+    if (duplicates.length > 0) {
+      problems.push(`${label} list has duplicate name(s): ${JSON.stringify(duplicates)}`);
+    }
+    return new Set(unique);
+  };
+
+  const pageSet = inspect("ministries page", ministryPageNames);
+  const cabinetSet = inspect("cabinet page", cabinetNames);
+
+  if (pageSet.size > 0 && cabinetSet.size > 0) {
+    const onlyOnMinistries = [...pageSet].filter((name) => !cabinetSet.has(name));
+    const onlyOnCabinet = [...cabinetSet].filter((name) => !pageSet.has(name));
+    if (onlyOnMinistries.length > 0 || onlyOnCabinet.length > 0) {
+      problems.push(
+        `ministry lists do not match. Only on ministries page: ${JSON.stringify(onlyOnMinistries)}. Only on cabinet page: ${JSON.stringify(onlyOnCabinet)}.`
+      );
+    }
+  }
+
+  if (problems.length > 0) {
+    const message = `Ministry list validation failed: ${problems.join("; ")}`;
+    console.error(message);
+    throw new Error(message);
+  }
 }
 
 /**
@@ -92,8 +209,12 @@ export async function main() {
   const jsonSchema = await loadSchema();
 
   if (ministryNamesFromSchema(jsonSchema)) {
-    const html = await getMinistriesHtml();
-    if (updateMinistryNames(jsonSchema, ministryNamesFromHtml(html))) {
+    const ministriesHtml = await getMinistriesHtml(MINISTRIES_URL);
+    const cabinetHtml = await getMinistriesHtml(CABINET_URL);
+    const ministryPageNames = ministryNamesFromHtml(ministriesHtml);
+    const cabinetNames = ministryNamesFromCabinetHtml(cabinetHtml);
+    assertConsistentMinistryLists(ministryPageNames, cabinetNames);
+    if (updateMinistryNames(jsonSchema, ministryPageNames)) {
       core.setOutput("schemaChanged", "true");
       await saveSchema(jsonSchema);
     } else {
