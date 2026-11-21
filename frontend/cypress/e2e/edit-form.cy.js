@@ -5,7 +5,7 @@ describe("New Form", () => {
 
   it("renders the form", () => {
     cy.contains("GitHub Public Code Yml Link");
-    cy.get("#root_bcgovpubcode_url").should("exist").type("https://github.com/bcgov/public-code/blob/main/bcgovpubcode.yml");
+    cy.get("#root_bcgovpubcode_url").should("exist").type("https://github.com/bcgov/wps/blob/main/bcgovpubcode.yml");
     cy.get("#submit").should("exist").click();
     cy.get("#submit").should("exist").click();
     cy.get("#copy").should("exist");
