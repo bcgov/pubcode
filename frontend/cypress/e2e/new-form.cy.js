@@ -6,9 +6,9 @@ describe("New Form", () => {
   it("renders the form", () => {
     cy.contains("JSON schema for bcgovpubcode.yml");
     cy.get("#root_product_information_ministry").click();
-    cy.get("#menu-root_product_information_ministry").contains("li", "Agriculture and Food").click();
+    cy.get("#menu-root_product_information_ministry").contains("li", "Agriculture").click();
     cy.get("#menu-root_product_information_ministry").should("not.exist");
-    cy.contains("Agriculture and Food").should("be.visible");
+    cy.contains("Agriculture").should("be.visible");
     cy.get("#root_product_information_program_area").should("exist").type("Water, Land and Resource Stewardship");
     cy.get("#root_product_information_product_acronym").should("exist").type("Water, Land and Resource Stewardship");
     cy.get("#root_product_information_product_name").should("exist").type("Water, Land and Resource Stewardship");
