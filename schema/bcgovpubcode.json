@@ -123,29 +123,25 @@
           "type": "array",
           "items": {
             "enum": [
-              "Agriculture and Food",
+              "Agriculture",
               "Attorney General",
               "Children and Family Development",
-              "Citizens' Services",
+              "Citizens’ Services and Technology",
+              "Economic Development and Tourism",
               "Education and Child Care",
-              "Emergency Management and Climate Readiness",
-              "Energy and Climate Solutions",
-              "Environment and Parks",
+              "Energy, Mines and Petroleum Resources",
+              "Environment",
               "Finance",
               "Forests",
               "Health",
-              "Housing and Municipal Affairs",
               "Indigenous Relations and Reconciliation",
-              "Infrastructure",
-              "Jobs and Economic Growth",
-              "Labour",
-              "Mining and Critical Minerals",
-              "Post-Secondary Education and Future Skills",
+              "Local Government, Housing, Sport and Culture",
+              "Post-Secondary Education and Labour",
               "Public Safety and Solicitor General",
-              "Social Development and Poverty Reduction",
+              "Social Development",
               "Tourism, Arts, Culture and Sport",
-              "Transportation and Transit",
-              "Water, Land and Resource Stewardship"
+              "Transportation and Infrastructure",
+              "Water, Land and Natural Resource Operations"
             ]
           }
         },
@@ -600,7 +596,6 @@
           "else": {}
         }
       ]
-      
     },
     "external_dependencies": {
       "type": "object",
