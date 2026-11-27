@@ -25,7 +25,7 @@ jobs:
         package: [api, database, frontend]
     steps:
       - uses: actions/checkout@v7
-      - uses: bcgov/actions/builder@0ed2b82c50ba113304b3b879e1dc7b9ea087d0fe # v0.15.0
+      - uses: bcgov/actions/builder@a25c5f02d20139f29c17c3ceaa41c314ffe92ec9 # v0.16.0
         with:
           package: ${{ matrix.package }}
           tags: ${{ github.event.number || github.sha }}
@@ -124,7 +124,7 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 1
     steps:
-      - uses: bcgov/actions/workflow-results@0ed2b82c50ba113304b3b879e1dc7b9ea087d0fe # v0.15.0
+      - uses: bcgov/actions/workflow-results@a25c5f02d20139f29c17c3ceaa41c314ffe92ec9 # v0.16.0
         with:
           needs: ${{ toJson(needs) }}
           notify: false
