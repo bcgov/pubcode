@@ -19,7 +19,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: bcgov/actions/pr-validate@acc058abf85bb183dad21b839a92a40a4ff47af3 # v0.14.0
+      - uses: bcgov/actions/pr-validate@0ed2b82c50ba113304b3b879e1dc7b9ea087d0fe # v0.15.0
         with:
           markdown: |
             ---
@@ -43,6 +43,6 @@ jobs:
     runs-on: ubuntu-slim
     timeout-minutes: 1
     steps:
-      - uses: bcgov/actions/workflow-results@acc058abf85bb183dad21b839a92a40a4ff47af3 # v0.14.0
+      - uses: bcgov/actions/workflow-results@0ed2b82c50ba113304b3b879e1dc7b9ea087d0fe # v0.15.0
         with:
           needs: ${{ toJson(needs) }}
